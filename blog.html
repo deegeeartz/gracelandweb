@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - RCCG Graceland Area HQ | Apapa Family</title>
+    <meta name="description" content="Read inspiring articles, testimonies, and biblical insights from RCCG Graceland Area HQ. Stay connected with our community through faith-building content.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="blog-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="logo.png" alt="RCCG Graceland Area HQ Logo" class="logo-image">
+                <div class="logo-text">
+                    <h1>RCCG GRACELAND AREA HQ</h1>
+                    <p>Apapa Family | Lagos, Nigeria</p>
+                </div>
+            </div>
+            <button class="menu-toggle" aria-label="Toggle menu">
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#livestream">Live</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#sermons">Sermons</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+                <li><a href="index.html#ministries">Ministries</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="index.html#give">Give</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="page-header-overlay"></div>
+        <div class="container">
+            <div class="page-header-content">
+                <div class="breadcrumb">
+                    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                    <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+                    <span>Blog</span>
+                </div>
+                <h1>Blog & Articles</h1>
+                <p>Inspiring content to strengthen your faith journey</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Filters -->
+    <section class="blog-filters">
+        <div class="container">
+            <div class="filter-controls">
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-category="all">All Posts</button>
+                    <button class="filter-btn" data-category="sermon">Sermons</button>
+                    <button class="filter-btn" data-category="testimony">Testimonies</button>
+                    <button class="filter-btn" data-category="family">Family</button>
+                    <button class="filter-btn" data-category="prayer">Prayer</button>
+                    <button class="filter-btn" data-category="youth">Youth</button>
+                    <button class="filter-btn" data-category="worship">Worship</button>
+                </div>
+                <div class="search-sort">
+                    <div class="search-box">
+                        <input type="text" id="blogSearch" placeholder="Search posts..." aria-label="Search blog posts">
+                        <button type="button" class="search-btn" aria-label="Search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <select id="sortPosts" aria-label="Sort posts">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="popular">Most Popular</option>
+                        <option value="title">Title A-Z</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Content -->
+    <section class="blog-content">
+        <div class="container">
+            <div class="blog-layout">
+                <!-- Main Blog Grid -->
+                <main class="blog-main">
+                    <div class="blog-posts-header">
+                        <h2>Latest Posts</h2>
+                        <span class="posts-count" id="postsCount">Showing 12 of 24 posts</span>
+                    </div>
+                    
+                    <div class="blog-grid" id="blogGrid">
+                        <!-- Blog posts will be loaded here -->
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <button class="pagination-btn" id="prevPage" aria-label="Previous page">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <div class="pagination-numbers" id="paginationNumbers">
+                            <!-- Page numbers will be generated here -->
+                        </div>
+                        <button class="pagination-btn" id="nextPage" aria-label="Next page">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </main>
+
+                <!-- Sidebar -->
+                <aside class="blog-sidebar">
+                    <!-- Featured Post -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Featured Post</h3>
+                        <div class="featured-post">
+                            <div class="featured-image">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="featured-content">
+                                <h4>Walking in Divine Purpose</h4>
+                                <p>Discovering God's plan for your life...</p>
+                                <a href="#" class="featured-link">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Posts -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Recent Posts</h3>
+                        <div class="recent-posts" id="recentPosts">
+                            <!-- Recent posts will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Categories</h3>
+                        <div class="category-list">
+                            <a href="#" class="category-item" data-category="sermon">
+                                <span>Sermons</span>
+                                <span class="category-count">8</span>
+                            </a>
+                            <a href="#" class="category-item" data-category="testimony">
+                                <span>Testimonies</span>
+                                <span class="category-count">12</span>
+                            </a>
+                            <a href="#" class="category-item" data-category="family">
+                                <span>Family</span>
+                                <span class="category-count">6</span>
+                            </a>
+                            <a href="#" class="category-item" data-category="prayer">
+                                <span>Prayer</span>
+                                <span class="category-count">4</span>
+                            </a>
+                            <a href="#" class="category-item" data-category="youth">
+                                <span>Youth</span>
+                                <span class="category-count">7</span>
+                            </a>
+                            <a href="#" class="category-item" data-category="worship">
+                                <span>Worship</span>
+                                <span class="category-count">5</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Newsletter Signup -->
+                    <div class="sidebar-widget newsletter-widget">
+                        <h3 class="widget-title">Stay Updated</h3>
+                        <p>Subscribe to receive our latest posts and updates.</p>
+                        <form class="newsletter-form" id="newsletterForm">
+                            <input type="email" placeholder="Your email address" required aria-label="Email address">
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i> Subscribe
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Follow Us</h3>
+                        <div class="social-links">
+                            <a href="#" class="social-link facebook">
+                                <i class="fab fa-facebook-f"></i>
+                                <span>Facebook</span>
+                            </a>
+                            <a href="#" class="social-link youtube">
+                                <i class="fab fa-youtube"></i>
+                                <span>YouTube</span>
+                            </a>
+                            <a href="#" class="social-link instagram">
+                                <i class="fab fa-instagram"></i>
+                                <span>Instagram</span>
+                            </a>
+                            <a href="#" class="social-link twitter">
+                                <i class="fab fa-twitter"></i>
+                                <span>Twitter</span>
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="logo.png" alt="RCCG Graceland Area HQ Logo" class="footer-logo-image">
+                    </div>
+                    <h3>RCCG Graceland Area HQ</h3>
+                    <p>An Area HQ under the Redeemed Christian Church of God, Apapa Family</p>
+                    <p class="footer-motto">"Experiencing An Overflow Of His Grace"</p>
+                    <p>Making heaven, taking as many people with us.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#about">About Us</a></li>
+                        <li><a href="index.html#services">Service Times</a></li>
+                        <li><a href="index.html#ministries">Ministries</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-map-marker-alt"></i> Jah Michael Bus Stop, Lagos-Badagry Expressway, Lagos</p>
+                        <p><i class="fas fa-phone"></i> +234-XXX-XXX-XXXX</p>
+                        <p><i class="fas fa-envelope"></i> info@rccggraceland.org</p>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2024 RCCG Graceland Area HQ. All rights reserved. | Built with ❤️ for the Kingdom</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script src="blog-script.js"></script>
+</body>
+</html>

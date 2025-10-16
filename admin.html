@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Panel - RCCG Graceland Area HQ</title>
+        <link rel="stylesheet" href="admin-styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet">
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
+            rel="stylesheet">
+    </head>
+    <body>
+        <!-- Navigation Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-church"></i>
+                    <h2>RCCG Admin</h2>
+                </div> <button class="sidebar-toggle" id="sidebarToggle"
+                    title="Toggle sidebar" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-tab="dashboard">
+                    <a href="#dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="blog-posts">
+                    <a href="#blog-posts">
+                        <i class="fas fa-blog"></i>
+                        <span>Blog Posts</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="sermons">
+                    <a href="#sermons">
+                        <i class="fas fa-microphone-alt"></i>
+                        <span>Sermons</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="social-media">
+                    <a href="#social-media">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Social Media</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="settings">
+                    <a href="#settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <img src="https://via.placeholder.com/40" alt="User Avatar"
+                        class="user-avatar">
+                    <div class="user-details">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div> <button class="logout-btn" title="Logout"
+                    aria-label="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left"> <button class="mobile-menu-toggle"
+                        id="mobileMenuToggle" title="Toggle mobile menu"
+                        aria-label="Toggle mobile menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search..."
+                            id="searchInput">
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn" id="notificationBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <button class="action-btn" id="addNewBtn">
+                            <i class="fas fa-plus"></i>
+                            <span>Add New</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Tab -->
+            <section class="tab-content active" id="dashboard">
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-blog"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPosts">12</h3>
+                            <p>Total Posts</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalViews">2,847</h3>
+                            <p>Total Views</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-share"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalShares">156</h3>
+                            <p>Social Shares</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalComments">89</h3>
+                            <p>Comments</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div class="recent-posts">
+                        <h2>Recent Blog Posts</h2>
+                        <div class="posts-list" id="recentPostsList">
+                            <!-- Recent posts will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="quick-actions">
+                        <h2>Quick Actions</h2>
+                        <div class="action-buttons">
+                            <button class="quick-action-btn"
+                                data-action="new-post">
+                                <i class="fas fa-plus"></i>
+                                <span>New Blog Post</span>
+                            </button>
+                            <button class="quick-action-btn"
+                                data-action="new-sermon">
+                                <i class="fas fa-microphone-alt"></i>
+                                <span>Add Sermon</span>
+                            </button>
+                            <button class="quick-action-btn"
+                                data-action="share-social">
+                                <i class="fas fa-share-alt"></i>
+                                <span>Share to Social</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blog Posts Tab -->
+            <section class="tab-content" id="blog-posts">
+                <div class="content-header">
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="createPostBtn">
+                            <i class="fas fa-plus"></i> Create New Post
+                        </button>
+                        <div class="filter-options"> <select id="statusFilter"
+                                aria-label="Filter by status">
+                                <option value="all">All Status</option>
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                                <option value="scheduled">Scheduled</option>
+                            </select>
+                            <select id="categoryFilter"
+                                aria-label="Filter by category">
+                                <option value="all">All Categories</option>
+                                <option value="spiritual-growth">Spiritual
+                                    Growth</option>
+                                <option value="testimony">Testimony</option>
+                                <option value="ministry">Ministry</option>
+                                <option value="family">Family</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="posts-table-container">
+                    <table class="posts-table" id="postsTable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Views</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="postsTableBody">
+                            <!-- Blog posts will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Social Media Tab -->
+            <section class="tab-content" id="social-media">
+                <div class="social-grid">
+                    <div class="social-platform" data-platform="facebook">
+                        <div class="platform-header">
+                            <i class="fab fa-facebook-f"></i>
+                            <h3>Facebook</h3>
+                            <span class="status connected">Connected</span>
+                        </div>
+                        <div class="platform-stats">
+                            <div class="stat">
+                                <span class="stat-value">1.2K</span>
+                                <span class="stat-label">Followers</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">45</span>
+                                <span class="stat-label">Posts</span>
+                            </div>
+                        </div>
+                        <button class="share-btn" data-platform="facebook">
+                            <i class="fas fa-share"></i> Share Post
+                        </button>
+                    </div>
+
+                    <div class="social-platform" data-platform="instagram">
+                        <div class="platform-header">
+                            <i class="fab fa-instagram"></i>
+                            <h3>Instagram</h3>
+                            <span class="status connected">Connected</span>
+                        </div>
+                        <div class="platform-stats">
+                            <div class="stat">
+                                <span class="stat-value">856</span>
+                                <span class="stat-label">Followers</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">32</span>
+                                <span class="stat-label">Posts</span>
+                            </div>
+                        </div>
+                        <button class="share-btn" data-platform="instagram">
+                            <i class="fas fa-share"></i> Share Post
+                        </button>
+                    </div>
+
+                    <div class="social-platform" data-platform="twitter">
+                        <div class="platform-header">
+                            <i class="fab fa-twitter"></i>
+                            <h3>Twitter</h3>
+                            <span class="status disconnected">Not
+                                Connected</span>
+                        </div>
+                        <div class="platform-stats">
+                            <div class="stat">
+                                <span class="stat-value">--</span>
+                                <span class="stat-label">Followers</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">--</span>
+                                <span class="stat-label">Posts</span>
+                            </div>
+                        </div>
+                        <button class="connect-btn" data-platform="twitter">
+                            <i class="fas fa-link"></i> Connect
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sharing-history">
+                    <h2>Sharing History</h2>
+                    <div class="history-list" id="sharingHistory">
+                        <!-- Sharing history will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sermons Tab -->
+            <section class="tab-content" id="sermons">
+                <div class="content-header">
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="createSermonBtn">
+                            <i class="fas fa-plus"></i> Add New Sermon
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sermons-grid" id="sermonsGrid">
+                    <!-- Sermons will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Settings Tab -->
+            <section class="tab-content" id="settings">
+                <div class="settings-container">
+                    <div class="setting-section">
+                        <h2>General Settings</h2>
+                        <div class="setting-item">
+                            <label for="siteName">Site Name</label>
+                            <input type="text" id="siteName"
+                                value="RCCG Graceland Area HQ">
+                        </div>
+                        <div class="setting-item">
+                            <label for="siteDescription">Site
+                                Description</label>
+                            <textarea
+                                id="siteDescription">Experiencing An Overflow Of His Grace</textarea>
+                        </div>
+                    </div>
+
+                    <div class="setting-section">
+                        <h2>Social Media Settings</h2>
+                        <div class="setting-item">
+                            <label for="facebookPage">Facebook Page URL</label>
+                            <input type="url" id="facebookPage"
+                                placeholder="https://facebook.com/your-page">
+                        </div>
+                        <div class="setting-item">
+                            <label for="instagramHandle">Instagram
+                                Handle</label>
+                            <input type="text" id="instagramHandle"
+                                placeholder="@your_handle">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary">Save Settings</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Post Editor Modal -->
+        <div class="modal" id="postEditorModal">
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h2 id="editorTitle">Create New Post</h2> <button
+                        class="modal-close" id="closeEditor"
+                        title="Close editor" aria-label="Close editor">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="postForm">
+                        <div class="form-group">
+                            <label for="postTitle">Title</label>
+                            <input type="text" id="postTitle" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="postCategory">Category</label>
+                                <select id="postCategory" required>
+                                    <option value>Select Category</option>
+                                    <option value="spiritual-growth">Spiritual
+                                        Growth</option>
+                                    <option value="testimony">Testimony</option>
+                                    <option value="ministry">Ministry</option>
+                                    <option value="family">Family</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="postAuthor">Author</label>
+                                <input type="text" id="postAuthor" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postExcerpt">Excerpt</label>
+                            <textarea id="postExcerpt" rows="3"
+                                placeholder="Brief summary of the post..."></textarea>
+                        </div> <div class="form-group">
+                            <label for="featuredImage">Featured Image</label>
+                            <div class="image-upload">
+                                <input type="file" id="featuredImage"
+                                    accept="image/*"
+                                    title="Select featured image">
+                                <div class="image-preview" id="imagePreview">
+                                    <i class="fas fa-image"></i>
+                                    <span>Click to upload image</span>
+                                </div>
+                            </div>
+                        </div><div class="form-group">
+                            <label>Content</label>
+                            <div id="postContent"
+                                class="post-content-editor"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="postStatus">Status</label>
+                                <select id="postStatus">
+                                    <option value="draft">Draft</option>
+                                    <option value="published">Published</option>
+                                    <option value="scheduled">Scheduled</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="publishDate">Publish Date</label>
+                                <input type="datetime-local" id="publishDate">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Social Media Sharing</label>
+                            <div class="social-checkboxes">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="shareToFacebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                    Share to Facebook
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox"
+                                        id="shareToInstagram">
+                                    <i class="fab fa-instagram"></i>
+                                    Share to Instagram
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="shareToTwitter">
+                                    <i class="fab fa-twitter"></i>
+                                    Share to Twitter
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        id="saveDraft">Save as Draft</button>
+                    <button type="submit" form="postForm"
+                        class="btn btn-primary" id="publishPost">Publish
+                        Post</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Share Modal -->
+        <div class="modal" id="socialShareModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Share to Social Media</h2> <button class="modal-close"
+                        id="closeSocialShare" title="Close social share modal"
+                        aria-label="Close social share modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="share-preview">
+                        <h3 id="shareTitle">Post Title</h3>
+                        <p id="shareExcerpt">Post excerpt...</p>
+                    </div>
+                    <div class="platform-selection">
+                        <h4>Select Platforms:</h4>
+                        <div class="platform-options">
+                            <label class="platform-option">
+                                <input type="checkbox" value="facebook">
+                                <i class="fab fa-facebook-f"></i>
+                                Facebook
+                            </label>
+                            <label class="platform-option">
+                                <input type="checkbox" value="instagram">
+                                <i class="fab fa-instagram"></i>
+                                Instagram
+                            </label>
+                            <label class="platform-option">
+                                <input type="checkbox" value="twitter">
+                                <i class="fab fa-twitter"></i>
+                                Twitter
+                            </label>
+                        </div>
+                    </div>
+                    <div class="custom-message">
+                        <label for="shareMessage">Custom Message
+                            (Optional)</label>
+                        <textarea id="shareMessage"
+                            placeholder="Add a custom message for social media..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        id="cancelShare">Cancel</button>
+                    <button type="button" class="btn btn-primary"
+                        id="confirmShare">Share Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Processing...</span>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+        <script src="admin-script.js"></script>
+    </body>
+</html>
