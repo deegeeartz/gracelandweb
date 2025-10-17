@@ -6,22 +6,8 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const multer = require('multer');
 
-// Check if we should use MySQL or SQLite
-const useMySQL = process.env.NODE_ENV === 'production' || 
-                 process.env.DATABASE_URL || 
-                 process.env.MYSQLHOST || 
-                 process.env.DB_HOST !== 'localhost';
-
-let initDatabase;
-if (useMySQL) {
-    console.log('Using MySQL database for production');
-    const { initDatabase: initMySQL } = require('./database/init-mysql');
-    initDatabase = initMySQL;
-} else {
-    console.log('Using SQLite database for development');
-    const { initDatabase: initSQLite } = require('./database/init-db');
-    initDatabase = initSQLite;
-}
+// Import unified database initialization
+const { initializeDatabase } = require('./database/init-database');
 
 // Import routes
 const blogRoutes = require('./routes/blog');
@@ -34,7 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Initialize database
-initDatabase();
+initializeDatabase().catch(console.error);
 
 // Security middleware
 app.use(helmet({
