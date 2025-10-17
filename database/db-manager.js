@@ -4,24 +4,39 @@ const mysql = require('mysql2/promise');
 
 console.log('Database Manager: MySQL-only configuration');
 
+// Debug: Show ALL environment variables related to MySQL/Database
+console.log('🔍 Checking environment variables:');
+console.log('MYSQLHOST:', process.env.MYSQLHOST || '❌ Not set');
+console.log('MYSQLUSER:', process.env.MYSQLUSER || '❌ Not set');
+console.log('MYSQLDATABASE:', process.env.MYSQLDATABASE || '❌ Not set');
+console.log('MYSQLPORT:', process.env.MYSQLPORT || '❌ Not set');
+console.log('MYSQLPASSWORD:', process.env.MYSQLPASSWORD ? '✅ Set (hidden)' : '❌ Not set');
+console.log('DB_HOST:', process.env.DB_HOST || '❌ Not set');
+console.log('DB_USER:', process.env.DB_USER || '❌ Not set');
+console.log('NODE_ENV:', process.env.NODE_ENV || '❌ Not set');
+
 // MySQL connection configuration
+// Support both Railway variables (MYSQLHOST, MYSQLUSER, etc.) and standard variables (DB_HOST, DB_USER, etc.)
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'graceland_church',
+    host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT || 3306),
+    user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
+    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
+    database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'graceland_church',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
     charset: 'utf8mb4'
 };
 
-console.log('MySQL Configuration:', {
+console.log('✅ MySQL Configuration:', {
     host: dbConfig.host,
     port: dbConfig.port,
     user: dbConfig.user,
-    database: dbConfig.database
+    database: dbConfig.database,
+    usingRailway: !!(process.env.MYSQLHOST),
+    usingStandard: !!(process.env.DB_HOST),
+    usingDefaults: (!process.env.MYSQLHOST && !process.env.DB_HOST)
 });
 
 // Create MySQL connection pool
