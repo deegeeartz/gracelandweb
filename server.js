@@ -6,6 +6,9 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const multer = require('multer');
 
+// Check Railway setup
+require('./railway-check');
+
 // Import unified database initialization
 const { initializeDatabase } = require('./database/init-database');
 
@@ -15,6 +18,9 @@ const sermonRoutes = require('./routes/sermons');
 const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
 const settingsRoutes = require('./routes/settings');
+
+// Import auth middleware
+const { verifyToken } = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

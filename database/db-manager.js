@@ -1,6 +1,11 @@
 // Database connection manager - automatically selects SQLite or MySQL
 require('dotenv').config();
 
+// Debug environment variables
+console.log('DB Manager Environment Check:');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('Available env vars:', Object.keys(process.env).filter(key => key.includes('MYSQL') || key.includes('DB') || key.includes('DATABASE')));
+
 // Determine which database system to use
 const useMySQL = process.env.NODE_ENV === 'production' || 
                  process.env.DATABASE_URL || 
