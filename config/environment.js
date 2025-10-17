@@ -16,7 +16,7 @@ const environment = {
             return 'http://localhost:3000/api';
         } else {
             // Production - Replace with your actual backend URL
-            return 'https://your-backend-app.railway.app/api';
+            return 'https://gracelandweb-production.up.railway.app/api';
             // Or: 'https://your-app.onrender.com/api'
             // Or: 'https://your-app.fly.io/api'
         }
