@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>RCCG Graceland - API Test</title>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #005a87; }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+        #output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+    </style>
+    </head>
+    <body>
+        <h1>🔧 RCCG Graceland - API Test Page</h1>
+
+        <div class="test-card">
+            <h2>Server Health Check</h2>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+        </div>
+
+        <div class="test-card">
+            <h2>Admin Login Test</h2>
+            <p><strong>Credentials:</strong> admin / admin123</p>
+            <button onclick="testLogin()">Test Login</button>
+        </div>
+
+        <div class="test-card">
+            <h2>Database Connection</h2>
+            <button onclick="testDatabase()">Test Database</button>
+        </div>
+
+        <div class="test-card">
+            <h2>Go to Admin Panel</h2>
+            <button onclick="window.open('/admin.html', '_blank')">Open Admin
+                Panel</button>
+        </div>
+
+        <div id="output"></div>
+
+        <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function testHealth() {
+            log('Testing health endpoint...');
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                log('✅ Health check successful: ' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                log('❌ Health check failed: ' + error.message);
+            }
+        }
+
+        async function testLogin() {
+            log('Testing admin login...');
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
+                });
+                
+                log('Response status: ' + response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Login successful!');
+                    log('Token: ' + (data.token ? 'Received' : 'Missing'));
+                    log('User: ' + data.user?.username);
+                } else {
+                    const error = await response.text();
+                    log('❌ Login failed: ' + error);
+                }
+            } catch (error) {
+                log('❌ Network error: ' + error.message);
+            }
+        }
+
+        async function testDatabase() {
+            log('Testing database connection...');
+            try {
+                const response = await fetch('/api/blog?limit=1');
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Database connection successful');
+                    log('Sample data: ' + JSON.stringify(data, null, 2));
+                } else {
+                    log('❌ Database test failed: ' + response.status);
+                }
+            } catch (error) {
+                log('❌ Database error: ' + error.message);
+            }
+        }
+
+        // Run initial health check
+        setTimeout(testHealth, 500);
+    </script>
+    </body>
+</html>

@@ -492,13 +492,16 @@
                     <p>&copy; 2025 RCCG Graceland Area HQ. All rights
                         reserved.</p>
                 </div>
-            </div>
-        </footer>
+            </div>        </footer>
 
+        <!-- Environment Configuration -->
+        <script src="config/environment.js"></script>
         <script>
-        const API_BASE = '/api';
+        const API_BASE = window.ENV ? window.ENV.apiBaseUrl : '/api';
 
         console.log('Post page loaded');
+        console.log('Environment:', window.ENV ? window.ENV.environment : 'unknown');
+        console.log('API Base URL:', API_BASE);
 
         // Get post ID from URL
         const urlParams = new URLSearchParams(window.location.search);

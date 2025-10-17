@@ -1,5 +1,5 @@
-// API Configuration
-const API_BASE = window.location.origin + '/api';
+// API Configuration - Uses environment-based config
+const API_BASE = window.ENV ? window.ENV.apiBaseUrl : (window.location.origin + '/api');
 
 // Auth helper class
 class Auth {
