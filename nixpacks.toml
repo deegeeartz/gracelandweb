@@ -1,8 +1,0 @@
-[phases.install]
-cmd = "npm install --production=false"
-
-[phases.build]
-cmd = "echo 'Build phase completed'"
-
-[start]
-cmd = "npm start"

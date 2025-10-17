@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Validation - Post Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #8B0000;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #8B0000;
+        }
+
+        .section h2 {
+            color: #1B3A57;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+        }
+
+        .status.pass {
+            background: #228B22;
+        }
+
+        .status.fail {
+            background: #8B0000;
+        }
+
+        .status.pending {
+            background: #FFA500;
+        }
+
+        .result {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .result strong {
+            color: #1B3A57;
+        }
+
+        .result .value {
+            color: #666;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .preview {
+            margin-top: 10px;
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            border: 1px solid #b3d9e6;
+        }
+
+        button {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #660000;
+        }
+
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .score.excellent {
+            color: #228B22;
+        }
+
+        .score.good {
+            color: #FFA500;
+        }
+
+        .score.poor {
+            color: #8B0000;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 SEO Validation Test - Blog Post Page</h1>
+
+        <div id="loading" class="loading">
+            <p>Testing post page SEO optimization...</p>
+        </div>
+
+        <div id="results" style="display: none;">
+            <div class="score" id="score">0/100</div>
+
+            <div class="section">
+                <h2>📄 Meta Tags</h2>
+                <div id="metaTags"></div>
+            </div>
+
+            <div class="section">
+                <h2>📱 Open Graph Tags</h2>
+                <div id="ogTags"></div>
+            </div>
+
+            <div class="section">
+                <h2>🐦 Twitter Card Tags</h2>
+                <div id="twitterTags"></div>
+            </div>
+
+            <div class="section">
+                <h2>📊 Structured Data (JSON-LD)</h2>
+                <div id="structuredData"></div>
+            </div>
+
+            <div class="section">
+                <h2>⚡ Performance Optimization</h2>
+                <div id="performance"></div>
+            </div>
+
+            <div class="section">
+                <h2>♿ Accessibility</h2>
+                <div id="accessibility"></div>
+            </div>
+        </div>
+
+        <button onclick="runTest()">Run SEO Test</button>
+    </div>
+
+    <script>
+        async function runTest() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            // Simulate loading a test post
+            setTimeout(async () => {
+                // Open post page in iframe to test
+                const iframe = document.createElement('iframe');
+                iframe.src = '/post.html?id=1';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+
+                await new Promise(resolve => {
+                    iframe.onload = () => {
+                        setTimeout(() => {
+                            try {
+                                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                                analyzePostPage(doc);
+                                document.body.removeChild(iframe);
+                                resolve();
+                            } catch (e) {
+                                console.error('Cannot access iframe:', e);
+                                // Run with current page if iframe fails
+                                analyzeCurrentPage();
+                                resolve();
+                            }
+                        }, 2000); // Wait for dynamic content
+                    };
+                });
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+            }, 500);
+        }
+
+        function analyzeCurrentPage() {
+            analyzePostPage(document);
+        }
+
+        function analyzePostPage(doc) {
+            let score = 0;
+            const maxScore = 100;
+
+            // Meta Tags
+            const metaChecks = [
+                { name: 'title', selector: 'title', required: true, points: 10 },
+                { name: 'meta[name="description"]', selector: 'meta[name="description"]', required: true, points: 10 },
+                { name: 'meta[name="author"]', selector: 'meta[name="author"]', required: true, points: 5 },
+                { name: 'meta[name="robots"]', selector: 'meta[name="robots"]', required: true, points: 5 },
+                { name: 'link[rel="canonical"]', selector: 'link[rel="canonical"]', required: true, points: 10 }
+            ];
+
+            let metaHTML = '';
+            metaChecks.forEach(check => {
+                const element = doc.querySelector(check.selector);
+                const exists = !!element;
+                if (exists) score += check.points;
+
+                const content = element ? (element.content || element.href || element.textContent) : 'Not found';
+                metaHTML += createCheckItem(
+                    exists,
+                    check.name,
+                    content.substring(0, 100)
+                );
+            });
+            document.getElementById('metaTags').innerHTML = metaHTML;
+
+            // Open Graph Tags
+            const ogChecks = [
+                'og:title', 'og:description', 'og:image', 'og:url', 'og:type'
+            ];
+
+            let ogHTML = '';
+            ogChecks.forEach(tag => {
+                const element = doc.querySelector(`meta[property="${tag}"]`);
+                const exists = !!element;
+                if (exists) score += 3;
+
+                const content = element ? element.content : 'Not found';
+                ogHTML += createCheckItem(exists, tag, content.substring(0, 100));
+            });
+            document.getElementById('ogTags').innerHTML = ogHTML;
+
+            // Twitter Tags
+            const twitterChecks = [
+                'twitter:card', 'twitter:title', 'twitter:description', 'twitter:image'
+            ];
+
+            let twitterHTML = '';
+            twitterChecks.forEach(tag => {
+                const element = doc.querySelector(`meta[property="${tag}"]`);
+                const exists = !!element;
+                if (exists) score += 2;
+
+                const content = element ? element.content : 'Not found';
+                twitterHTML += createCheckItem(exists, tag, content.substring(0, 100));
+            });
+            document.getElementById('twitterTags').innerHTML = twitterHTML;
+
+            // Structured Data
+            const structuredDataScript = doc.querySelector('script[type="application/ld+json"]');
+            let sdHTML = '';
+            if (structuredDataScript) {
+                score += 15;
+                try {
+                    const data = JSON.parse(structuredDataScript.textContent);
+                    sdHTML = createCheckItem(true, 'JSON-LD Schema', 'Valid structured data found');
+                    sdHTML += `<div class="preview"><pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre></div>`;
+                } catch (e) {
+                    sdHTML = createCheckItem(false, 'JSON-LD Schema', 'Invalid JSON');
+                }
+            } else {
+                sdHTML = createCheckItem(false, 'JSON-LD Schema', 'Not found');
+            }
+            document.getElementById('structuredData').innerHTML = sdHTML;
+
+            // Performance
+            let perfHTML = '';
+            const images = doc.querySelectorAll('img');
+            let lazyImages = 0;
+            images.forEach(img => {
+                if (img.loading === 'lazy') lazyImages++;
+            });
+            if (lazyImages > 0) score += 5;
+            perfHTML += createCheckItem(lazyImages > 0, 'Lazy Loading Images', `${lazyImages} of ${images.length} images use lazy loading`);
+
+            const preconnect = doc.querySelectorAll('link[rel="preconnect"]');
+            if (preconnect.length > 0) score += 5;
+            perfHTML += createCheckItem(preconnect.length > 0, 'Resource Preconnection', `${preconnect.length} preconnect links found`);
+
+            document.getElementById('performance').innerHTML = perfHTML;
+
+            // Accessibility
+            let a11yHTML = '';
+            const headings = doc.querySelectorAll('h1');
+            const hasH1 = headings.length === 1;
+            if (hasH1) score += 5;
+            a11yHTML += createCheckItem(hasH1, 'Single H1 Tag', hasH1 ? 'Correct (1 H1 tag)' : `Found ${headings.length} H1 tags`);
+
+            const imgsWithAlt = doc.querySelectorAll('img[alt]').length;
+            const totalImgs = images.length;
+            const allImgsHaveAlt = imgsWithAlt === totalImgs;
+            if (allImgsHaveAlt && totalImgs > 0) score += 5;
+            a11yHTML += createCheckItem(allImgsHaveAlt, 'Image Alt Text', `${imgsWithAlt}/${totalImgs} images have alt text`);
+
+            document.getElementById('accessibility').innerHTML = a11yHTML;
+
+            // Display score
+            const scoreEl = document.getElementById('score');
+            scoreEl.textContent = `${score}/${maxScore}`;
+            
+            if (score >= 90) {
+                scoreEl.className = 'score excellent';
+            } else if (score >= 70) {
+                scoreEl.className = 'score good';
+            } else {
+                scoreEl.className = 'score poor';
+            }
+        }
+
+        function createCheckItem(passed, label, value) {
+            const statusClass = passed ? 'pass' : 'fail';
+            const statusIcon = passed ? '✓' : '✗';
+            return `
+                <div class="check-item">
+                    <div class="status ${statusClass}">${statusIcon}</div>
+                    <div class="result">
+                        <strong>${label}</strong>
+                        <div class="value">${value}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(runTest, 500);
+        });
+    </script>
+</body>
+</html>

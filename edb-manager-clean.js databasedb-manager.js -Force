@@ -1,0 +1,43 @@
+[1mdiff --git a/railway-check.js b/railway-check.js[m
+[1mindex e69de29..bb49fb5 100644[m
+[1m--- a/railway-check.js[m
+[1m+++ b/railway-check.js[m
+[36m@@ -0,0 +1,38 @@[m
+[32m+[m[32m// Simple Railway database connection handler[m
+[32m+[m[32mrequire('dotenv').config();[m
+[32m+[m
+[32m+[m[32m// Check if we're on Railway[m
+[32m+[m[32mconst isRailway = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;[m
+[32m+[m
+[32m+[m[32mconsole.log('Railway Environment Check:');[m
+[32m+[m[32mconsole.log('Is Railway:', !!isRailway);[m
+[32m+[m[32mconsole.log('Environment Variables:');[m
+[32m+[m[32mObject.keys(process.env).forEach(key => {[m
+[32m+[m[32m    if (key.includes('MYSQL') || key.includes('DATABASE') || key.includes('RAILWAY')) {[m
+[32m+[m[32m        console.log(`${key}:`, process.env[key] ? '[SET]' : '[NOT SET]');[m
+[32m+[m[32m    }[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m[32mif (isRailway) {[m
+[32m+[m[32m    console.log('Running on Railway - checking for database service...');[m
+[32m+[m[41m    [m
+[32m+[m[32m    // Check if MySQL service is available[m
+[32m+[m[32m    const hasMySQL = process.env.MYSQLHOST &&[m[41m [m
+[32m+[m[32m                     process.env.MYSQLUSER &&[m[41m [m
+[32m+[m[32m                     process.env.MYSQLPASSWORD &&[m[41m [m
+[32m+[m[32m                     process.env.MYSQLDATABASE;[m
+[32m+[m[41m    [m
+[32m+[m[32m    if (!hasMySQL) {[m
+[32m+[m[32m        console.log('❌ MySQL service not detected on Railway!');[m
+[32m+[m[32m        console.log('Please add a MySQL database service to your Railway project:');[m
+[32m+[m[32m        console.log('1. Go to Railway Dashboard');[m
+[32m+[m[32m        console.log('2. Click "New Service"');[m
+[32m+[m[32m        console.log('3. Select "Database" → "MySQL"');[m
+[32m+[m[32m        console.log('4. Wait for provisioning to complete');[m
+[32m+[m[32m        process.exit(1);[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m        console.log('✅ MySQL service detected on Railway');[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mmodule.exports = { isRailway };[m

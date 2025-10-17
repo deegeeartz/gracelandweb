@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en"> <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Primary Meta Tags (Will be updated dynamically) -->
+        <title>Blog Post - RCCG Graceland Area HQ | Apapa Family</title>
+        <meta name="title"
+            content="Blog Post - RCCG Graceland Area HQ | Apapa Family">
+        <meta name="description"
+            content="Read inspiring articles, testimonies, and biblical insights from RCCG Graceland Area HQ. Experience an overflow of His grace through faith-building content.">
+        <meta name="keywords"
+            content="RCCG, Graceland, Church, Blog, Christian Articles, Testimonies, Bible Study, Lagos, Apapa, Nigeria">
+        <meta name="author" content="RCCG Graceland Area HQ">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href>
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="article">
+        <meta property="og:url" content>
+        <meta property="og:title" content="Blog Post - RCCG Graceland Area HQ">
+        <meta property="og:description"
+            content="Read inspiring articles, testimonies, and biblical insights from RCCG Graceland Area HQ.">
+        <meta property="og:image" content>
+        <meta property="og:site_name" content="RCCG Graceland Area HQ">
+        <meta property="article:author" content="RCCG Graceland Area HQ">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content>
+        <meta property="twitter:title"
+            content="Blog Post - RCCG Graceland Area HQ">
+        <meta property="twitter:description"
+            content="Read inspiring articles, testimonies, and biblical insights from RCCG Graceland Area HQ.">
+        <meta property="twitter:image" content>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="logo.png">
+        <link rel="apple-touch-icon" href="logo.png">
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet">
+
+        <!-- Performance Optimization -->
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+        <style>
+        /* Additional Post-specific Styles */
+        body {
+            background: var(--bg-secondary);
+        }        .post-page-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 25px;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+            font-weight: 500;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .back-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 0, 0, 0.3);
+        }
+
+        .post-container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+            margin-top: 90px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-header {
+            padding: 3rem;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><path fill="%23ffffff" fill-opacity="0.05" d="M0 300L50 280L100 320L150 290L200 310L250 285L300 305L350 295L400 315L450 288L500 308L550 292L600 312L650 287L700 307L750 293L800 313L850 289L900 309L950 294L1000 314L1050 291L1100 311L1150 296L1200 316V600H0Z"/></svg>');
+            opacity: 0.5;
+        }
+
+        .post-header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .post-title {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }        .post-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .meta-item i {
+            color: var(--bright-accent);
+        }
+
+        .post-featured-image {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .post-content {
+            padding: 3rem;
+        }
+
+        .post-excerpt {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            font-style: italic;
+            margin-bottom: 2rem;
+            padding-left: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            line-height: 1.6;
+        }        .post-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        .post-body p {
+            margin-bottom: 1.5rem;
+        }
+
+        .post-body h2 {
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+            font-weight: 700;
+            font-size: 1.75rem;
+        }
+
+        .post-body h3 {
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        .post-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            margin: 2rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .post-body blockquote {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--text-light);
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .post-body ul, .post-body ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .post-body li {
+            margin-bottom: 0.75rem;
+        }
+
+        .post-footer {
+            padding: 2rem 3rem;
+            background: var(--gray-50);
+            border-top: 2px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .stat-item i {
+            color: var(--primary-color);
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border-radius: 25px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .category-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 0, 0, 0.3);
+        }        .loading {
+            text-align: center;
+            padding: 8rem 2rem;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            margin-top: 90px;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        .loading h2 {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            text-align: center;
+            padding: 6rem 3rem;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            margin-top: 90px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .error i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .error h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }        .error p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .error .back-button {
+            margin-top: 2rem;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--gray-100);
+        }
+
+        .share-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .share-btn.twitter {
+            background: #1DA1F2;
+        }
+
+        .share-btn.facebook {
+            background: #4267B2;
+        }
+
+        .share-btn.linkedin {
+            background: #0077b5;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .post-header {
+                padding: 2rem 1.5rem;
+            }
+
+            .post-title {
+                font-size: 1.75rem;
+            }
+
+            .post-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .post-footer {
+                padding: 1.5rem;
+            }
+
+            .share-buttons {
+                flex-wrap: wrap;
+            }
+
+            .post-meta {
+                gap: 1rem;
+            }
+
+            .meta-item {
+                font-size: 0.85rem;
+            }
+        }
+    </style> </head>
+    <body>
+        <!-- Header -->
+        <header class="header">
+            <nav class="nav">
+                <div class="logo">
+                    <img src="logo.png" alt="RCCG Graceland Area HQ Logo"
+                        class="logo-image">
+                    <div class="logo-text">
+                        <h1>RCCG GRACELAND AREA HQ</h1>
+                        <p>Apapa Family | Lagos, Nigeria</p>
+                    </div>
+                </div>
+                <button class="menu-toggle" aria-label="Toggle menu">
+                    <span class="hamburger"></span>
+                    <span class="hamburger"></span>
+                    <span class="hamburger"></span>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#livestream">Live</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#sermons">Sermons</a></li>
+                    <li><a href="blog.html" class="active">Blog</a></li>
+                    <li><a href="index.html#ministries">Ministries</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="index.html#give">Give</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="post-page-container">
+            <a href="/blog.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Blog
+            </a>
+
+            <div id="loading" class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h2>Loading post...</h2>
+            </div>
+
+            <div id="post-container" class="hidden"></div> <div
+                id="error-container" class="error hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <h2>Post Not Found</h2>
+                <p>Sorry, we couldn't find the blog post you're looking for.</p>
+                <a href="/blog.html" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Return to Blog
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3>RCCG Graceland Area HQ</h3>
+                        <p>Apapa Family, Lagos, Nigeria</p>
+                        <p>Experiencing An Overflow Of His Grace</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="index.html#about">About Us</a></li>
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="index.html#contact">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Connect With Us</h4>
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/RCCGLP4GRACELAND/"
+                                target="_blank" rel="noopener"
+                                aria-label="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a
+                                href="https://www.instagram.com/rccggracelandparishbadagry/"
+                                target="_blank" rel="noopener"
+                                aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 RCCG Graceland Area HQ. All rights
+                        reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+        const API_BASE = '/api';
+
+        console.log('Post page loaded');
+
+        // Get post ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+        
+        console.log('Post ID from URL:', postId);
+
+        if (!postId) {
+            console.log('No post ID found, showing error');
+            showError();
+        } else {
+            console.log('Loading post:', postId);
+            loadPost(postId);
+        }        async function loadPost(id) {
+            console.log('loadPost called with id:', id);
+            try {
+                console.log('Fetching:', `${API_BASE}/blog/${id}`);
+                const response = await fetch(`${API_BASE}/blog/${id}`);
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error('Post not found');
+                }
+
+                const post = await response.json();
+                console.log('Post data received:', post);
+                displayPost(post);
+            } catch (error) {
+                console.error('Error loading post:', error);
+                showError();
+            }
+        }        function displayPost(post) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('post-container').classList.remove('hidden');
+
+            const publishDate = new Date(post.published_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Calculate read time (average 200 words per minute)
+            const wordCount = post.content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+            const readTime = Math.ceil(wordCount / 200);
+
+            const postHTML = `
+                <div class="post-container">
+                    <div class="post-header">
+                        <div class="post-header-content">
+                            <h1 class="post-title">${escapeHtml(post.title)}</h1>                            <div class="post-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>${publishDate}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>${escapeHtml(post.author_name || 'Admin')}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-eye"></i>
+                                    <span>${post.views || 0} views</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-heart"></i>
+                                    <span>${post.likes || 0} likes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    ${post.featured_image ? `
+                        <img src="${post.featured_image}" 
+                             alt="${escapeHtml(post.title)}" 
+                             class="post-featured-image"
+                             loading="lazy"
+                             decoding="async">
+                    ` : ''}
+
+                    <div class="post-content">
+                        ${post.excerpt ? `
+                            <div class="post-excerpt">${escapeHtml(post.excerpt)}</div>
+                        ` : ''}
+                        
+                        <div class="post-body">
+                            ${post.content}
+                        </div>
+
+                        <div class="share-buttons">
+                            <button class="share-btn twitter" onclick="shareOnTwitter()">
+                                <i class="fab fa-twitter"></i>
+                                Tweet
+                            </button>
+                            <button class="share-btn facebook" onclick="shareOnFacebook()">
+                                <i class="fab fa-facebook"></i>
+                                Share
+                            </button>
+                            <button class="share-btn linkedin" onclick="shareOnLinkedIn()">
+                                <i class="fab fa-linkedin"></i>
+                                Share
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="post-footer">
+                        <div class="post-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-eye"></i>
+                                <span>${post.views || 0} views</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-heart"></i>
+                                <span>${post.likes || 0} likes</span>
+                            </div>
+                        </div>
+                        ${post.category_name ? `
+                            <a href="/blog.html?category=${post.category_slug}" class="category-badge">
+                                <i class="fas fa-folder"></i>
+                                ${escapeHtml(post.category_name)}
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;            document.getElementById('post-container').innerHTML = postHTML;
+
+            // Update page title and meta tags for SEO
+            updateMetaTags(post);
+        }
+
+        function updateMetaTags(post) {
+            const title = `${post.title} - RCCG Graceland Area HQ`;
+            const description = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
+            const image = post.featured_image || `${window.location.origin}/logo.png`;
+            const url = window.location.href;
+            const author = post.author_name || 'RCCG Graceland Area HQ';
+            const publishDate = post.published_at;
+            
+            // Update title
+            document.title = title;
+            
+            // Update meta tags
+            updateMetaTag('name', 'title', title);
+            updateMetaTag('name', 'description', description);
+            updateMetaTag('name', 'author', author);
+            
+            // Update Open Graph tags
+            updateMetaTag('property', 'og:title', title);
+            updateMetaTag('property', 'og:description', description);
+            updateMetaTag('property', 'og:image', image);
+            updateMetaTag('property', 'og:url', url);
+            updateMetaTag('property', 'article:published_time', publishDate);
+            updateMetaTag('property', 'article:author', author);
+            if (post.category_name) {
+                updateMetaTag('property', 'article:section', post.category_name);
+            }
+            
+            // Update Twitter tags
+            updateMetaTag('property', 'twitter:title', title);
+            updateMetaTag('property', 'twitter:description', description);
+            updateMetaTag('property', 'twitter:image', image);
+            updateMetaTag('property', 'twitter:url', url);
+              // Update canonical URL
+            updateLinkTag('canonical', url);
+            
+            // Add structured data (JSON-LD) for rich snippets
+            addStructuredData(post);
+            
+            console.log('Meta tags and structured data updated for SEO');
+        }
+
+        function addStructuredData(post) {
+            // Remove existing structured data if any
+            const existingScript = document.querySelector('script[type="application/ld+json"]');
+            if (existingScript) {
+                existingScript.remove();
+            }
+
+            const structuredData = {
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "headline": post.title,
+                "description": post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
+                "image": post.featured_image || `${window.location.origin}/logo.png`,
+                "author": {
+                    "@type": "Organization",
+                    "name": post.author_name || "RCCG Graceland Area HQ",
+                    "url": window.location.origin
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "RCCG Graceland Area HQ",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": `${window.location.origin}/logo.png`
+                    }
+                },
+                "datePublished": post.published_at,
+                "dateModified": post.updated_at || post.published_at,
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": window.location.href
+                }
+            };
+
+            // Add article section if category exists
+            if (post.category_name) {
+                structuredData.articleSection = post.category_name;
+            }
+
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(structuredData);
+            document.head.appendChild(script);
+        }
+
+        function updateMetaTag(attr, value, content) {
+            let element = document.querySelector(`meta[${attr}="${value}"]`);
+            if (element) {
+                element.setAttribute('content', content);
+            } else {
+                element = document.createElement('meta');
+                element.setAttribute(attr, value);
+                element.setAttribute('content', content);
+                document.head.appendChild(element);
+            }
+        }
+
+        function updateLinkTag(rel, href) {
+            let element = document.querySelector(`link[rel="${rel}"]`);
+            if (element) {
+                element.setAttribute('href', href);
+            } else {
+                element = document.createElement('link');
+                element.setAttribute('rel', rel);
+                element.setAttribute('href', href);
+                document.head.appendChild(element);
+            }
+        }function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error-container').classList.remove('hidden');
+        }
+
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    menuToggle.classList.toggle('active');
+                });
+            }
+        });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function shareOnTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent(document.querySelector('.post-title')?.textContent || 'Check out this post!');
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+        }
+
+        function shareOnFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+
+        function shareOnLinkedIn() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+        }
+    </script>
+    </body>
+</html>

@@ -67,8 +67,6 @@ const htmlRoutes = {
     '/': 'index.html',
     '/blog': 'blog.html',
     '/blog.html': 'blog.html',
-    '/post': 'post.html',
-    '/post.html': 'post.html',
     '/admin': 'admin.html',
     '/admin.html': 'admin.html'
 };

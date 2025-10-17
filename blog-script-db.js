@@ -271,22 +271,9 @@ class BlogPage {
                 block: 'start' 
             });
         }
-    }
-
-    async openPost(postId) {
-        try {
-            const response = await fetch(`${API_BASE}/blog/${postId}`);
-            const post = await response.json();
-            
-            if (response.ok) {
-                this.showPostModal(post);
-            } else {
-                throw new Error(post.error);
-            }
-        } catch (error) {
-            console.error('Error loading post:', error);
-            this.showNotification('Failed to load post', 'error');
-        }
+    }    async openPost(postId) {
+        // Redirect to dedicated post page instead of modal
+        window.location.href = `/post.html?id=${postId}`;
     }
 
     showPostModal(post) {

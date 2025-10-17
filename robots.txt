@@ -1,0 +1,53 @@
+# robots.txt for RCCG Graceland Area HQ Website
+
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow admin pages and private areas
+Disallow: /admin.html
+Disallow: /admin/
+Disallow: /api/auth/
+Disallow: /uploads/private/
+
+# Disallow test and temporary files
+Disallow: /test-*.html
+Disallow: /tests/
+Disallow: /*.bat
+Disallow: /*.ps1
+
+# Allow CSS, JS, and image files
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.webp
+Allow: /*.svg
+
+# Sitemap location
+Sitemap: https://rccggraceland.org/sitemap.xml
+
+# Crawl delay (be nice to the server)
+Crawl-delay: 1
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Block bad bots (optional - add specific bad bots here)
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10

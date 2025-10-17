@@ -58,11 +58,14 @@ router.get('/posts', verifyToken, async (req, res) => {
             sortOrder = 'DESC'
         } = req.query;
 
+        // Convert 'all' status to null to fetch all posts
+        const actualStatus = (status === 'all' || status === '') ? null : status;
+
         const options = {
             page: parseInt(page),
             limit: parseInt(limit),
             category,
-            status,
+            status: actualStatus,
             search,
             sortBy,
             sortOrder

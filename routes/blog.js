@@ -71,12 +71,25 @@ router.get('/recent', async (req, res) => {
     }
 });
 
-// GET /api/blog/:id - Get single blog post
+// GET /api/blog/:id - Get single blog post (by ID or slug)
 router.get('/:id', async (req, res) => {
     try {
-        const post = await BlogPost.getById(req.params.id);
+        const identifier = req.params.id;
+        
+        // Try to fetch by ID first, then by slug
+        let post = await BlogPost.getById(identifier);
+        
+        // If not found by ID and identifier is not a number, try slug
+        if (!post && isNaN(identifier)) {
+            post = await BlogPost.getBySlug(identifier);
+        }
         
         if (!post) {
+            return res.status(404).json({ error: 'Blog post not found' });
+        }
+
+        // Only show published posts on public blog
+        if (post.status !== 'published') {
             return res.status(404).json({ error: 'Blog post not found' });
         }
 
