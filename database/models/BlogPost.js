@@ -1,6 +1,24 @@
 const { db } = require('../db-manager');
 
-class BlogPostModel {    // Get all blog posts with pagination and filters
+class BlogPostModel {
+    // Helper method to parse JSON fields
+    static parsePost(post) {
+        if (!post) return null;
+        
+        // Parse image_urls JSON field if it exists
+        if (post.image_urls && typeof post.image_urls === 'string') {
+            try {
+                post.image_urls = JSON.parse(post.image_urls);
+            } catch (e) {
+                console.error('Error parsing image_urls:', e);
+                post.image_urls = null;
+            }
+        }
+        
+        return post;
+    }
+
+    // Get all blog posts with pagination and filters
     static async getAll(options = {}) {
         const {
             page = 1,
@@ -50,10 +68,9 @@ class BlogPostModel {    // Get all blog posts with pagination and filters
             ORDER BY bp.${sortBy} ${sortOrder}
             LIMIT ? OFFSET ?
         `;        params.push(validLimit, offset);
-        return await db.all(query, params);
-    }
-
-    // Get blog post by slug
+        const posts = await db.all(query, params);
+        return posts.map(post => this.parsePost(post));
+    }// Get blog post by slug
     static async getBySlug(slug) {
         const query = `
             SELECT 
@@ -66,7 +83,8 @@ class BlogPostModel {    // Get all blog posts with pagination and filters
             LEFT JOIN users u ON bp.author_id = u.id
             WHERE bp.slug = ? AND bp.status = 'published'
         `;
-        return await db.get(query, [slug]);
+        const post = await db.get(query, [slug]);
+        return this.parsePost(post);
     }
 
     // Get blog post by ID
@@ -82,8 +100,9 @@ class BlogPostModel {    // Get all blog posts with pagination and filters
             LEFT JOIN users u ON bp.author_id = u.id
             WHERE bp.id = ?
         `;
-        return await db.get(query, [id]);
-    }    // Create new blog post
+        const post = await db.get(query, [id]);
+        return this.parsePost(post);
+    }// Create new blog post
     static async create(postData) {
         const {
             title,

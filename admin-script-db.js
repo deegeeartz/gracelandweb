@@ -227,13 +227,13 @@ class AdminPanel {
             btn.addEventListener('click', (e) => {
                 const action = e.currentTarget.dataset.action;
                 this.handleQuickAction(action);
-            });
-        });
+            });        });
 
-        // Image upload
-        document.getElementById('featuredImage').addEventListener('change', (e) => {
-            this.handleImageUpload(e);
-        });
+        // Image upload - REMOVED: Handled by scripts/admin-image-upload.js
+        // This was causing double uploads!
+        // document.getElementById('featuredImage').addEventListener('change', (e) => {
+        //     this.handleImageUpload(e);
+        // });
 
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -277,9 +277,7 @@ class AdminPanel {
                 select.appendChild(option);
             });
         });
-    }
-
-    initializeQuillEditor() {
+    }    initializeQuillEditor() {
         const toolbarOptions = [
             ['bold', 'italic', 'underline', 'strike'],
             ['blockquote', 'code-block'],
@@ -291,12 +289,67 @@ class AdminPanel {
             [{ 'align': [] }],
             ['link', 'image', 'video'],
             ['clean']
-        ];
+        ];        // Custom image handler to upload to Cloudinary instead of base64
+        const imageHandler = async () => {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = async () => {
+                const file = input.files[0];
+                if (!file) return;
+
+                // Show uploading indicator
+                const range = this.quillEditor.getSelection();
+                this.quillEditor.insertText(range.index, 'Uploading image...');                try {
+                    // Upload to Cloudinary via your API
+                    const formData = new FormData();
+                    formData.append('file', file); // Changed from 'image' to 'file'
+
+                    const response = await fetch(`${API_BASE}/upload`, {
+                        method: 'POST',
+                        headers: {
+                            ...Auth.getAuthHeaders()
+                            // Don't set Content-Type - browser sets it with boundary for FormData
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Upload failed');
+                    }
+
+                    const data = await response.json();
+                    
+                    // Remove "Uploading..." text
+                    this.quillEditor.deleteText(range.index, 'Uploading image...'.length);
+                    
+                    // Insert Cloudinary URL instead of base64
+                    const imageUrl = data.optimized?.medium || data.url;
+                    this.quillEditor.insertEmbed(range.index, 'image', imageUrl);
+                    
+                    // Move cursor after image
+                    this.quillEditor.setSelection(range.index + 1);
+                    
+                    console.log('📸 Image uploaded to Cloudinary:', imageUrl);
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                    this.quillEditor.deleteText(range.index, 'Uploading image...'.length);
+                    alert('Failed to upload image. Please try again.');
+                }
+            };
+        };
 
         this.quillEditor = new Quill('#postContent', {
             theme: 'snow',
             modules: {
-                toolbar: toolbarOptions
+                toolbar: {
+                    container: toolbarOptions,
+                    handlers: {
+                        image: imageHandler
+                    }
+                }
             },
             placeholder: 'Write your blog post content here...'
         });

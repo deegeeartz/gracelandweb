@@ -571,8 +571,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    ${post.featured_image ? `
-                        <img src="${post.featured_image}" 
+                    </div>                    ${post.featured_image || (post.image_urls && post.image_urls.large) ? `
+                        <img src="${post.image_urls?.large || post.image_urls?.medium || post.featured_image}" 
                              alt="${escapeHtml(post.title)}" 
                              class="post-featured-image"
                              loading="lazy"

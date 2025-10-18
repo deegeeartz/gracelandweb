@@ -126,6 +126,7 @@ function loadRoutes() {
         { path: '/api/blog', file: './routes/blog', name: 'Blog' },
         { path: '/api/sermons', file: './routes/sermons', name: 'Sermons' },
         { path: '/api/admin', file: './routes/admin', name: 'Admin' },
+        { path: '/api/admin', file: './routes/reset-database', name: 'Database Reset' },
         { path: '/api/settings', file: './routes/settings', name: 'Settings' }
     ];
 
