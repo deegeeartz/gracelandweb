@@ -3,17 +3,32 @@ require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
 const sharp = require('sharp');
 const stream = require('stream');
+const logger = require('../utils/logger');
 
 // Configure Cloudinary
-cloudinary.config({
+c                    if (error) {
+                        logger.error('Video upload error:', error);
+                        reject(error);
+                    } else {
+                        logger.success('Video uploaded:', result.public_id);
+                        resolve({
+                            success: true,
+                            public_id: result.public_id,
+                            url: result.secure_url,
+                            duration: result.duration,
+                            format: result.format,
+                            bytes: result.bytes
+                        });
+                    }
+                });g({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
     secure: true
 });
 
-console.log('📸 Cloudinary Service Initialized');
-console.log('Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME || '❌ Not configured');
+logger.success('Cloudinary Service Initialized');
+logger.log('Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME || '❌ Not configured');
 
 // Image optimization settings
 const OPTIMIZATION_PRESETS = {
@@ -81,15 +96,14 @@ async function optimizeImageBuffer(buffer, options = {}) {
             .jpeg({ quality, mozjpeg: true })
             .toBuffer();
 
-        const originalSize = buffer.length;
-        const optimizedSize = optimized.length;
+        const originalSize = buffer.length;        const optimizedSize = optimized.length;
         const savings = ((originalSize - optimizedSize) / originalSize * 100).toFixed(1);
 
-        console.log(`📊 Image optimized: ${(originalSize / 1024).toFixed(1)}KB → ${(optimizedSize / 1024).toFixed(1)}KB (${savings}% savings)`);
+        logger.log(`Image optimized: ${(originalSize / 1024).toFixed(1)}KB → ${(optimizedSize / 1024).toFixed(1)}KB (${savings}% savings)`);
 
         return optimized;
     } catch (error) {
-        console.error('Sharp optimization error:', error);
+        logger.error('Sharp optimization error:', error);
         // Return original buffer if optimization fails
         return buffer;
     }
@@ -137,12 +151,11 @@ async function uploadImage(buffer, options = {}) {
                         max_images: 5
                     }
                 },
-                (error, result) => {
-                    if (error) {
-                        console.error('Cloudinary upload error:', error);
+                (error, result) => {                if (error) {
+                        logger.error('Cloudinary upload error:', error);
                         reject(error);
                     } else {
-                        console.log('✅ Uploaded to Cloudinary:', result.public_id);
+                        logger.success('Uploaded to Cloudinary:', result.public_id);
                         
                         // Generate all preset URLs
                         const urls = generateImageUrls(result.public_id, type);
@@ -228,12 +241,11 @@ function generateSrcSet(publicId, options = {}) {
  * Delete image from Cloudinary
  */
 async function deleteImage(publicId) {
-    try {
-        const result = await cloudinary.uploader.destroy(publicId);
-        console.log('🗑️ Deleted from Cloudinary:', publicId);
+    try {        const result = await cloudinary.uploader.destroy(publicId);
+        logger.success('Deleted from Cloudinary:', publicId);
         return result;
     } catch (error) {
-        console.error('Delete error:', error);
+        logger.error('Delete error:', error);
         throw error;
     }
 }
@@ -270,14 +282,13 @@ async function uploadVideo(buffer, options = {}) {
                             quality: 'auto:good',
                             fetch_format: 'auto'
                         }
-                    ]
-                },
+                    ]                },
                 (error, result) => {
                     if (error) {
-                        console.error('Video upload error:', error);
+                        logger.error('Video upload error:', error);
                         reject(error);
                     } else {
-                        console.log('✅ Video uploaded:', result.public_id);
+                        logger.success('Video uploaded:', result.public_id);
                         resolve({
                             success: true,
                             public_id: result.public_id,

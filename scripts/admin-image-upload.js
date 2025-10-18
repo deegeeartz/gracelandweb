@@ -17,7 +17,7 @@ function initializeImageUpload() {
     const imagePreview = document.getElementById('imagePreview');
 
     if (!imageInput || !imagePreview) {
-        console.warn('Image upload elements not found');
+        logger.warn('Image upload elements not found');
         return;
     }
 
@@ -184,14 +184,13 @@ async function uploadImage(file) {
                 if (progressBar) {
                     progressBar.style.width = `${percent}%`;
                 }
-            },
-            onSuccess: (result) => {
-                console.log('Upload successful:', result);
+            },            onSuccess: (result) => {
+                logger.log('Upload successful:', result);
                 currentUploadedImage = result;
                 showUploadSuccess(result);
             },
             onError: (error) => {
-                console.error('Upload failed:', error);
+                logger.error('Upload failed:', error);
                 showUploadError(error);
             }
         });
@@ -199,23 +198,22 @@ async function uploadImage(file) {
         // Optional: Compress image before upload
         let fileToUpload = file;
         if (file.size > 1024 * 1024) { // If larger than 1MB
-            console.log('Compressing image...');
+            logger.log('Compressing image...');
             fileToUpload = await ImageUploader.compressImage(file, {
                 maxWidth: 1920,
                 maxHeight: 1080,
                 quality: 0.85
             });
-            console.log(`Compressed: ${(file.size / 1024).toFixed(1)}KB → ${(fileToUpload.size / 1024).toFixed(1)}KB`);
+            logger.log(`Compressed: ${(file.size / 1024).toFixed(1)}KB → ${(fileToUpload.size / 1024).toFixed(1)}KB`);
         }
 
-        // Upload with type specification
-        await uploader.upload(fileToUpload, {
+        // Upload with type specification        await uploader.upload(fileToUpload, {
             type: 'blog',
             maxSize: 5 * 1024 * 1024
         });
 
     } catch (error) {
-        console.error('Upload error:', error);
+        logger.error('Upload error:', error);
         showUploadError(error);
     }
 }

@@ -492,49 +492,47 @@
                     <p>&copy; 2025 RCCG Graceland Area HQ. All rights
                         reserved.</p>
                 </div>
-            </div> </footer>
-
-        <!-- Environment Configuration -->
+            </div> </footer>        <!-- Environment Configuration -->
+        <script src="scripts/logger.js"></script>
         <script src="config/environment.js"></script>
         <script>
         const API_BASE = window.ENV ? window.ENV.apiBaseUrl : '/api';
 
-        console.log('Post page loaded');
-        console.log('Environment:', window.ENV ? window.ENV.environment : 'unknown');
-        console.log('API Base URL:', API_BASE);
+        logger.log('Post page loaded');
+        logger.log('Environment:', window.ENV ? window.ENV.environment : 'unknown');
+        logger.log('API Base URL:', API_BASE);
 
-        // Get post ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
+        // Get post ID from URL        const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
         
-        console.log('Post ID from URL:', postId);
+        logger.log('Post ID from URL:', postId);
 
         if (!postId) {
-            console.log('No post ID found, showing error');
+            logger.log('No post ID found, showing error');
             showError();
         } else {
-            console.log('Loading post:', postId);
+            logger.log('Loading post:', postId);
             loadPost(postId);
         }        async function loadPost(id) {
-            console.log('loadPost called with id:', id);
+            logger.log('loadPost called with id:', id);
             try {
-                console.log('Fetching:', `${API_BASE}/blog/${id}`);
+                logger.log('Fetching:', `${API_BASE}/blog/${id}`);
                 const response = await fetch(`${API_BASE}/blog/${id}`);
                 
-                console.log('Response status:', response.status);
+                logger.log('Response status:', response.status);
                 
                 if (!response.ok) {
                     throw new Error('Post not found');
                 }
 
                 const post = await response.json();
-                console.log('Post data received:', post);
+                logger.log('Post data received:', post);
                 displayPost(post);
             } catch (error) {
-                console.error('Error loading post:', error);
+                logger.error('Error loading post:', error);
                 showError();
             }
-        }        function displayPost(post) {
+        }function displayPost(post) {
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('post-container').classList.remove('hidden');
 
@@ -664,10 +662,9 @@
               // Update canonical URL
             updateLinkTag('canonical', url);
             
-            // Add structured data (JSON-LD) for rich snippets
-            addStructuredData(post);
+            // Add structured data (JSON-LD) for rich snippets            addStructuredData(post);
             
-            console.log('Meta tags and structured data updated for SEO');
+            logger.log('Meta tags and structured data updated for SEO');
         }
 
         function addStructuredData(post) {

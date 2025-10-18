@@ -1,19 +1,20 @@
 // MySQL-only database connection manager
 require('dotenv').config();
 const mysql = require('mysql2/promise');
+const logger = require('../utils/logger');
 
-console.log('Database Manager: MySQL-only configuration');
+logger.log('Database Manager: MySQL-only configuration');
 
 // Debug: Show ALL environment variables related to MySQL/Database
-console.log('🔍 Checking environment variables:');
-console.log('MYSQLHOST:', process.env.MYSQLHOST || '❌ Not set');
-console.log('MYSQLUSER:', process.env.MYSQLUSER || '❌ Not set');
-console.log('MYSQLDATABASE:', process.env.MYSQLDATABASE || '❌ Not set');
-console.log('MYSQLPORT:', process.env.MYSQLPORT || '❌ Not set');
-console.log('MYSQLPASSWORD:', process.env.MYSQLPASSWORD ? '✅ Set (hidden)' : '❌ Not set');
-console.log('DB_HOST:', process.env.DB_HOST || '❌ Not set');
-console.log('DB_USER:', process.env.DB_USER || '❌ Not set');
-console.log('NODE_ENV:', process.env.NODE_ENV || '❌ Not set');
+logger.log('🔍 Checking environment variables:');
+logger.log('MYSQLHOST:', process.env.MYSQLHOST || '❌ Not set');
+logger.log('MYSQLUSER:', process.env.MYSQLUSER || '❌ Not set');
+logger.log('MYSQLDATABASE:', process.env.MYSQLDATABASE || '❌ Not set');
+logger.log('MYSQLPORT:', process.env.MYSQLPORT || '❌ Not set');
+logger.log('MYSQLPASSWORD:', process.env.MYSQLPASSWORD ? '✅ Set (hidden)' : '❌ Not set');
+logger.log('DB_HOST:', process.env.DB_HOST || '❌ Not set');
+logger.log('DB_USER:', process.env.DB_USER || '❌ Not set');
+logger.log('NODE_ENV:', process.env.NODE_ENV || '❌ Not set');
 
 // MySQL connection configuration
 // IMPORTANT: Use Railway's PRIVATE network variables to avoid egress fees!
@@ -28,11 +29,10 @@ const dbConfig = {
     database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'graceland_church',
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0,
-    charset: 'utf8mb4'
+    queueLimit: 0,    charset: 'utf8mb4'
 };
 
-console.log('✅ MySQL Configuration:', {
+logger.success('MySQL Configuration:', {
     host: dbConfig.host,
     port: dbConfig.port,
     user: dbConfig.user,

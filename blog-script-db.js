@@ -422,11 +422,10 @@ class BlogPage {
         e.preventDefault();
         const email = e.target.querySelector('input[type="email"]').value;
         
-        // Simulate newsletter signup
-        this.showNotification('Thank you for subscribing to our newsletter!', 'success');
+        // Simulate newsletter signup        this.showNotification('Thank you for subscribing to our newsletter!', 'success');
         e.target.reset();
         
-        console.log('Newsletter signup:', email);
+        logger.log('Newsletter signup:', email);
     }
 
     // Utility functions

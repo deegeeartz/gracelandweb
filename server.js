@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const multer = require('multer');
+const logger = require('./utils/logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const UPLOAD_DIR = 'uploads/';
 
-console.log('🚀 Starting RCCG Graceland Website...');
+logger.success('Starting RCCG Graceland Website...');
 
 // ============================================
 // MIDDLEWARE
@@ -39,11 +40,10 @@ app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps, Postman, curl)
         if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('railway.app')) {
+          if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('railway.app')) {
             callback(null, true);
         } else {
-            console.log('❌ CORS blocked origin:', origin);
+            logger.warn('CORS blocked origin:', origin);
             callback(null, true); // Allow all for now during development
         }
     },
@@ -73,7 +73,7 @@ app.use('/api/auth/login', authLimiter);
 // Request logging middleware
 app.use((req, res, next) => {
     const timestamp = new Date().toLocaleTimeString();
-    console.log(`${timestamp} - ${req.method} ${req.url}`);
+    logger.log(`${timestamp} - ${req.method} ${req.url}`);
     next();
 });
 
@@ -128,15 +128,13 @@ function loadRoutes() {
         { path: '/api/admin', file: './routes/admin', name: 'Admin' },
         { path: '/api/admin', file: './routes/reset-database', name: 'Database Reset' },
         { path: '/api/settings', file: './routes/settings', name: 'Settings' }
-    ];
-
-    routes.forEach(({ path, file, name }) => {
+    ];    routes.forEach(({ path, file, name }) => {
         try {
             const router = require(file);
             app.use(path, router);
-            console.log(`✅ ${name} routes loaded`);
+            logger.success(`${name} routes loaded`);
         } catch (error) {
-            console.error(`❌ Failed to load ${name} routes:`, error.message);
+            logger.error(`Failed to load ${name} routes:`, error.message);
         }
     });
 }
@@ -270,7 +268,7 @@ app.use((error, req, res, next) => {
 
 // 404 handler
 app.use((req, res) => {
-    console.log(`❌ 404 - Route not found: ${req.method} ${req.url}`);
+    logger.warn(`404 - Route not found: ${req.method} ${req.url}`);
     res.status(404).json({
         error: 'Route not found',
         path: req.url,
@@ -280,7 +278,7 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((error, req, res, next) => {
-    console.error('💥 Unhandled error:', error);
+    logger.error('Unhandled error:', error);
     res.status(500).json({
         error: 'Internal server error',
         message: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -296,10 +294,10 @@ setTimeout(async () => {
     try {
         const { initializeDatabase } = require('./database/init-database');
         await initializeDatabase();
-        console.log('✅ Database initialized');
+        logger.success('Database initialized');
     } catch (error) {
-        console.error('⚠️ Database initialization failed:', error.message);
-        console.log('Server will continue running...');
+        logger.error('Database initialization failed:', error.message);
+        logger.log('Server will continue running...');
     }
 }, 1000);
 
@@ -308,28 +306,28 @@ setTimeout(async () => {
 // ============================================
 
 const server = app.listen(PORT, () => {
-    console.log('========================================');
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📄 Main site: http://localhost:${PORT}`);
-    console.log(`📖 Blog: http://localhost:${PORT}/blog.html`);
-    console.log(`⚙️ Admin: http://localhost:${PORT}/admin.html`);
-    console.log(`🔧 Health: http://localhost:${PORT}/api/health`);
-    console.log('========================================');
+    logger.log('========================================');
+    logger.success(`Server running on http://localhost:${PORT}`);
+    logger.log(`📄 Main site: http://localhost:${PORT}`);
+    logger.log(`📖 Blog: http://localhost:${PORT}/blog.html`);
+    logger.log(`⚙️ Admin: http://localhost:${PORT}/admin.html`);
+    logger.log(`🔧 Health: http://localhost:${PORT}/api/health`);
+    logger.log('========================================');
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-    console.log('SIGTERM received, closing server gracefully...');
+    logger.log('SIGTERM received, closing server gracefully...');
     server.close(() => {
-        console.log('Server closed');
+        logger.log('Server closed');
         process.exit(0);
     });
 });
 
 process.on('SIGINT', () => {
-    console.log('\nSIGINT received, closing server gracefully...');
+    logger.log('\nSIGINT received, closing server gracefully...');
     server.close(() => {
-        console.log('Server closed');
+        logger.log('Server closed');
         process.exit(0);
     });
 });

@@ -364,7 +364,7 @@ class AdminPanel {    constructor() {
                             );
                         }
                         
-                        console.log('📸 Image stored locally, will upload on save');
+                        logger.log('Image stored locally, will upload on save');
                     };
                     
                     reader.readAsDataURL(file);
@@ -718,7 +718,7 @@ class AdminPanel {    constructor() {
                                 // Replace data URL with Cloudinary URL in content
                                 const cloudinaryUrl = result.optimized?.medium || result.url;
                                 contentHtml = contentHtml.replace(pendingImage.dataUrl, cloudinaryUrl);
-                                console.log('✓ Uploaded content image to Cloudinary');
+                                logger.log('Uploaded content image to Cloudinary');
                             },
                             onError: (error) => {
                                 throw error;
@@ -825,11 +825,9 @@ class AdminPanel {    constructor() {
     async filterPosts() {
         this.currentPage = 1;
         await this.loadBlogPosts();
-    }
-
-    async searchContent(query) {
+    }    async searchContent(query) {
         // Implement search functionality
-        console.log('Search:', query);
+        logger.log('Search:', query);
     }
 
     async loadSermons() {
