@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Store uploaded image data
 let currentUploadedImage = null;
+let pendingImageFile = null; // Store file before upload
 
 function initializeImageUpload() {
     const imageInput = document.getElementById('featuredImage');
@@ -43,14 +44,16 @@ function initializeImageUpload() {
                 `Maximum size is 5MB. Please resize, compress, or choose a smaller file.`
             );
             imageInput.value = ''; // Clear the input
-            return;
-        }
+            return;        }
 
-        // Show preview immediately
+        // Store file for later upload (don't upload immediately)
+        pendingImageFile = file;
+        
+        // Show preview immediately from local file
         showImagePreview(file);
-
-        // Upload image
-        await uploadImage(file);
+        
+        // Show ready state (not uploading yet)
+        showImageReady(file);
     });
 
     // Enable drag and drop
@@ -83,12 +86,12 @@ function initializeImageUpload() {
                 'error',
                 `Maximum size is 5MB. Please resize, compress, or choose a smaller file.`
             );
-            return;
-        }
+            return;        }
 
         imageInput.files = e.dataTransfer.files;
+        pendingImageFile = file;
         showImagePreview(file);
-        await uploadImage(file);
+        showImageReady(file);
     });
 }
 
@@ -133,18 +136,7 @@ function showToast(message, type = 'info', subtitle = '') {
 function showImagePreview(file) {
     const imagePreview = document.getElementById('imagePreview');
     
-    // Show loading state
-    imagePreview.innerHTML = `
-        <div class="upload-loading">
-            <div class="spinner"></div>
-            <span>Uploading...</span>
-            <div class="upload-progress-bar">
-                <div class="upload-progress-fill" id="uploadProgress"></div>
-            </div>
-        </div>
-    `;
-
-    // Create preview
+    // Create preview from local file (no upload yet)
     const reader = new FileReader();
     reader.onload = (e) => {
         imagePreview.style.backgroundImage = `url(${e.target.result})`;
@@ -152,6 +144,32 @@ function showImagePreview(file) {
         imagePreview.style.backgroundPosition = 'center';
     };
     reader.readAsDataURL(file);
+}
+
+function showImageReady(file) {
+    const imagePreview = document.getElementById('imagePreview');
+    const fileSizeKB = (file.size / 1024).toFixed(0);
+    
+    imagePreview.innerHTML = `
+        <div class="upload-ready">
+            <div class="ready-badge">
+                <i class="fas fa-check-circle"></i>
+                Ready to upload (${fileSizeKB}KB)
+            </div>
+            <div class="upload-actions">
+                <button type="button" class="btn-remove" onclick="removePendingImage()">
+                    <i class="fas fa-times"></i> Remove
+                </button>
+                <button type="button" class="btn-change" onclick="document.getElementById('featuredImage').click()">
+                    <i class="fas fa-sync"></i> Change
+                </button>
+            </div>
+            <small class="upload-note">
+                <i class="fas fa-info-circle"></i> 
+                Image will be uploaded when you save the post
+            </small>
+        </div>
+    `;
 }
 
 async function uploadImage(file) {
@@ -257,6 +275,27 @@ function removeUploadedImage() {
     
     imageInput.value = '';
     currentUploadedImage = null;
+    pendingImageFile = null;
+}
+
+function removePendingImage() {
+    const imagePreview = document.getElementById('imagePreview');
+    const imageInput = document.getElementById('featuredImage');
+    
+    imagePreview.style.backgroundImage = '';
+    imagePreview.innerHTML = `
+        <i class="fas fa-image"></i>
+        <span>Click to upload image</span>
+    `;
+    
+    imageInput.value = '';
+    pendingImageFile = null;
+    
+    showToast('Image removed', 'info', 'Select a new image if needed');
+}
+
+function getPendingImageFile() {
+    return pendingImageFile;
 }
 
 function getUploadedImageData() {
@@ -412,6 +451,46 @@ uploadStyles.textContent = `
         transform: translateY(-2px);
     }
 
+    /* Upload Ready State */
+    .upload-ready {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        padding: 1rem;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ready-badge {
+        background: rgba(33, 150, 243, 0.1);
+        color: #2196F3;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .upload-note {
+        color: var(--gray-600, #666);
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
     /* Toast Notifications */
     .upload-toast {
         position: fixed;
@@ -540,3 +619,4 @@ document.head.appendChild(uploadStyles);
 // Export for use in admin panel
 window.getUploadedImageData = getUploadedImageData;
 window.removeUploadedImage = removeUploadedImage;
+window.getPendingImageFile = getPendingImageFile; // NEW: Export pending file getter

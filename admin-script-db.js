@@ -86,8 +86,7 @@ class API {
 }
 
 // Updated Admin Panel Class
-class AdminPanel {
-    constructor() {
+class AdminPanel {    constructor() {
         this.currentTab = 'dashboard';
         this.posts = [];
         this.sermons = [];
@@ -96,6 +95,7 @@ class AdminPanel {
         this.currentEditingPost = null;
         this.currentPage = 1;
         this.totalPages = 1;
+        this.pendingQuillImages = []; // Store pending images from Quill editor
         
         this.init();
     }
@@ -289,12 +289,14 @@ class AdminPanel {
             [{ 'align': [] }],
             ['link', 'image', 'video'],
             ['clean']
-        ];        // Custom image handler to upload to Cloudinary instead of base64
+        ];        // Custom image handler to store images locally first
         const imageHandler = async () => {
             const input = document.createElement('input');
             input.setAttribute('type', 'file');
             input.setAttribute('accept', 'image/*');
-            input.click();            input.onchange = async () => {
+            input.click();
+
+            input.onchange = async () => {
                 const file = input.files[0];
                 if (!file) return;
 
@@ -324,82 +326,64 @@ class AdminPanel {
                     return;
                 }
 
-                // Create a progress indicator overlay
-                const progressOverlay = document.createElement('div');
-                progressOverlay.className = 'quill-upload-progress';
-                progressOverlay.innerHTML = `
-                    <div class="quill-upload-spinner"></div>
-                    <div class="quill-upload-text">Uploading image...</div>
-                    <div class="quill-progress-bar">
-                        <div class="quill-progress-fill"></div>
-                    </div>
-                    <div class="quill-upload-size">${(file.size / 1024).toFixed(0)}KB</div>
-                `;
-                document.querySelector('.ql-editor').appendChild(progressOverlay);
-
-                // Show uploading indicator in editor
-                const range = this.quillEditor.getSelection();
-                this.quillEditor.insertText(range.index, '📤 ');
+                // Show processing indicator
+                const range = this.quillEditor.getSelection(true);
+                this.quillEditor.insertText(range.index, '⏳ Processing image...\n');
                 
                 try {
-                    // Upload to Cloudinary via your API
-                    const formData = new FormData();
-                    formData.append('file', file);
-
-                    const response = await fetch(`${API_BASE}/upload`, {
-                        method: 'POST',
-                        headers: {
-                            ...Auth.getAuthHeaders()
-                            // Don't set Content-Type - browser sets it with boundary for FormData
-                        },
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.error || 'Upload failed');
-                    }
-
-                    const data = await response.json();
+                    // Convert image to data URL for preview
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const dataUrl = e.target.result;
+                        
+                        // Remove processing text
+                        const currentRange = this.quillEditor.getSelection();
+                        if (currentRange) {
+                            this.quillEditor.deleteText(range.index, '⏳ Processing image...\n'.length);
+                        }
+                        
+                        // Insert image as data URL temporarily
+                        this.quillEditor.insertEmbed(range.index, 'image', dataUrl);
+                        
+                        // Store file for later upload
+                        this.pendingQuillImages.push({
+                            file: file,
+                            dataUrl: dataUrl,
+                            position: range.index
+                        });
+                        
+                        // Move cursor after image
+                        this.quillEditor.setSelection(range.index + 1);
+                        
+                        // Show info message
+                        if (typeof showToast === 'function') {
+                            showToast(
+                                'Image added to post',
+                                'info',
+                                'Images will be uploaded when you save the post'
+                            );
+                        }
+                        
+                        console.log('📸 Image stored locally, will upload on save');
+                    };
                     
-                    // Remove progress overlay
-                    progressOverlay.remove();
+                    reader.readAsDataURL(file);
                     
-                    // Remove uploading emoji
-                    this.quillEditor.deleteText(range.index, 2);
-                    
-                    // Insert Cloudinary URL instead of base64
-                    const imageUrl = data.optimized?.medium || data.url;
-                    this.quillEditor.insertEmbed(range.index, 'image', imageUrl);
-                    
-                    // Move cursor after image
-                    this.quillEditor.setSelection(range.index + 1);
-                    
-                    // Show success message briefly
-                    const successMsg = document.createElement('div');
-                    successMsg.className = 'quill-upload-success';
-                    successMsg.innerHTML = '✓ Image uploaded successfully';
-                    document.querySelector('.ql-editor').appendChild(successMsg);
-                    setTimeout(() => successMsg.remove(), 2000);
-                    
-                    console.log('📸 Image uploaded to Cloudinary:', imageUrl);
                 } catch (error) {
-                    console.error('Error uploading image:', error);
+                    console.error('Error processing image:', error);
                     
-                    // Remove progress overlay
-                    progressOverlay.remove();
+                    // Remove processing text
+                    this.quillEditor.deleteText(range.index, '⏳ Processing image...\n'.length);
                     
-                    // Remove uploading emoji
-                    this.quillEditor.deleteText(range.index, 2);
-                      // Show error message
+                    // Show error message
                     if (typeof showToast === 'function') {
                         showToast(
-                            'Failed to upload image',
+                            'Failed to process image',
                             'error',
-                            `${error.message}. Please try again or use a smaller image.`
+                            `${error.message}. Please try again.`
                         );
                     } else {
-                        alert(`Failed to upload image: ${error.message}\n\nPlease try again or use a smaller image.`);
+                        alert(`Failed to process image: ${error.message}\n\nPlease try again.`);
                     }
                 }
             };
@@ -618,21 +602,174 @@ class AdminPanel {
             <i class="fas fa-image"></i>
             <span>Click to upload image</span>
         `;
-    }
-
-    closePostEditor() {
+    }    closePostEditor() {
         document.getElementById('postEditorModal').classList.remove('active');
         this.currentEditingPost = null;
+        this.pendingQuillImages = []; // Clear pending Quill images
         this.clearPostForm();
     }    async savePost() {
         try {
-            // Get uploaded image data if available
-            const uploadedImage = window.getUploadedImageData ? window.getUploadedImageData() : null;
+            // Show upload progress overlay
+            this.showUploadProgressOverlay();
+            
+            // Prevent page unload during upload
+            window.onbeforeunload = () => "Images are being uploaded. Are you sure you want to leave?";
+            
+            // Check if there's a pending image file that hasn't been uploaded yet
+            const pendingFile = window.getPendingImageFile ? window.getPendingImageFile() : null;
+            let uploadedImage = window.getUploadedImageData ? window.getUploadedImageData() : null;
+            
+            // Count total images to upload
+            const quillImages = this.pendingQuillImages ? this.pendingQuillImages.length : 0;
+            const totalImages = (pendingFile && !uploadedImage ? 1 : 0) + quillImages;
+            let uploadedCount = 0;
+            
+            this.updateUploadProgress(uploadedCount, totalImages, 'Preparing to upload images...');
+            
+            // If there's a pending file, upload it now
+            if (pendingFile && !uploadedImage) {
+                this.updateUploadProgress(uploadedCount, totalImages, 'Uploading featured image...');
+                
+                try {
+                    // Show upload progress in the preview
+                    const imagePreview = document.getElementById('imagePreview');
+                    if (imagePreview) {
+                        imagePreview.innerHTML = `
+                            <div class="upload-loading">
+                                <div class="spinner"></div>
+                                <span>Uploading image...</span>
+                                <div class="upload-progress-bar">
+                                    <div class="upload-progress-fill" id="uploadProgress"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Create uploader and upload the file
+                    const uploader = new ImageUploader({
+                        apiBaseUrl: API_BASE,
+                        onProgress: (percent) => {
+                            const progressBar = document.getElementById('uploadProgress');
+                            if (progressBar) {
+                                progressBar.style.width = `${percent}%`;
+                            }
+                        },
+                        onSuccess: (result) => {
+                            uploadedImage = result;
+                            window.currentUploadedImage = result;
+                        },
+                        onError: (error) => {
+                            throw error;
+                        }
+                    });
+
+                    // Compress if needed
+                    let fileToUpload = pendingFile;
+                    if (pendingFile.size > 1024 * 1024) { // If larger than 1MB
+                        fileToUpload = await ImageUploader.compressImage(pendingFile, {
+                            maxWidth: 1920,
+                            maxHeight: 1080,
+                            quality: 0.85
+                        });
+                    }
+
+                    await uploader.upload(fileToUpload, {
+                        type: 'blog',
+                        maxSize: 5 * 1024 * 1024
+                    });
+                      // Wait a moment for the onSuccess callback to complete
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    uploadedCount++;
+                    this.updateUploadProgress(uploadedCount, totalImages, 'Featured image uploaded successfully!');
+                    
+                } catch (uploadError) {
+                    console.error('Image upload failed:', uploadError);
+                    this.hideUploadProgressOverlay();
+                    window.onbeforeunload = null;
+                    this.showNotification('Image upload failed: ' + uploadError.message, 'error');
+                    return; // Don't save post if image upload fails
+                }}
+              // Upload any pending Quill editor images
+            let contentHtml = this.quillEditor.root.innerHTML;
+            if (this.pendingQuillImages && this.pendingQuillImages.length > 0) {
+                let imageIndex = 0;
+                
+                for (const pendingImage of this.pendingQuillImages) {
+                    imageIndex++;
+                    this.updateUploadProgress(
+                        uploadedCount + imageIndex,
+                        totalImages,
+                        `Uploading content image ${imageIndex} of ${this.pendingQuillImages.length}...`
+                    );
+                    
+                    try {
+                        // Create uploader
+                        const uploader = new ImageUploader({
+                            apiBaseUrl: API_BASE,
+                            onProgress: (percent) => {
+                                this.updateUploadProgress(
+                                    uploadedCount + imageIndex,
+                                    totalImages,
+                                    `Uploading content image ${imageIndex} of ${this.pendingQuillImages.length}... ${Math.round(percent)}%`
+                                );
+                            },
+                            onSuccess: (result) => {
+                                // Replace data URL with Cloudinary URL in content
+                                const cloudinaryUrl = result.optimized?.medium || result.url;
+                                contentHtml = contentHtml.replace(pendingImage.dataUrl, cloudinaryUrl);
+                                console.log('✓ Uploaded content image to Cloudinary');
+                            },
+                            onError: (error) => {
+                                throw error;
+                            }
+                        });
+
+                        // Compress if needed
+                        let fileToUpload = pendingImage.file;
+                        if (pendingImage.file.size > 1024 * 1024) {
+                            this.updateUploadProgress(
+                                uploadedCount + imageIndex,
+                                totalImages,
+                                `Compressing content image ${imageIndex}...`
+                            );
+                            fileToUpload = await ImageUploader.compressImage(pendingImage.file, {
+                                maxWidth: 1920,
+                                maxHeight: 1080,
+                                quality: 0.85
+                            });
+                        }
+
+                        await uploader.upload(fileToUpload, {
+                            type: 'blog',
+                            maxSize: 5 * 1024 * 1024
+                        });
+                        
+                        // Wait for callback
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                        uploadedCount++;
+                        
+                    } catch (uploadError) {
+                        console.error('Content image upload failed:', uploadError);
+                        this.hideUploadProgressOverlay();
+                        window.onbeforeunload = null;
+                        this.showNotification('Content image upload failed: ' + uploadError.message, 'error');
+                        return; // Stop if any image fails
+                    }
+                }
+                
+                // Clear pending images after upload
+                this.pendingQuillImages = [];
+            }
+            
+            // Update progress - all images uploaded
+            this.updateUploadProgress(totalImages, totalImages, 'All images uploaded! Saving post...');
             
             const formData = {
                 title: document.getElementById('postTitle').value,
                 excerpt: document.getElementById('postExcerpt').value,
-                content: this.quillEditor.root.innerHTML,
+                content: contentHtml, // Use processed HTML with Cloudinary URLs
                 category_id: document.getElementById('postCategory').value || null,
                 status: document.getElementById('postStatus').value,
                 published_at: document.getElementById('publishDate').value || null
@@ -648,9 +785,7 @@ class AdminPanel {
             if (!formData.title || !formData.content) {
                 this.showNotification('Title and content are required', 'error');
                 return;
-            }
-
-            if (this.currentEditingPost) {
+            }            if (this.currentEditingPost) {
                 await API.put(`/admin/posts/${this.currentEditingPost.id}`, formData);
                 this.showNotification('Post updated successfully!', 'success');
             } else {
@@ -658,11 +793,15 @@ class AdminPanel {
                 this.showNotification('Post created successfully!', 'success');
             }
 
+            // Hide upload progress overlay
+            this.hideUploadProgressOverlay();
+
             this.closePostEditor();
             await this.loadBlogPosts();
             await this.updateStats();
         } catch (error) {
             console.error('Error saving post:', error);
+            this.hideUploadProgressOverlay();
             this.showNotification(error.message, 'error');
         }
     }
@@ -871,6 +1010,66 @@ class AdminPanel {
             month: 'short', 
             day: 'numeric' 
         });
+    }
+
+    showUploadProgressOverlay() {
+        // Create overlay if it doesn't exist
+        let overlay = document.getElementById('uploadProgressOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'uploadProgressOverlay';
+            overlay.className = 'upload-progress-overlay';
+            overlay.innerHTML = `
+                <div class="upload-progress-modal">
+                    <div class="upload-progress-header">
+                        <h2><i class="fas fa-cloud-upload-alt"></i> Uploading Images</h2>
+                        <p class="upload-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Please don't close this page while uploading
+                        </p>
+                    </div>
+                    <div class="upload-progress-body">
+                        <div class="upload-status-text" id="uploadStatusText">Preparing...</div>
+                        <div class="upload-progress-counter" id="uploadProgressCounter">0 of 0 images</div>
+                        <div class="upload-main-progress">
+                            <div class="upload-main-progress-fill" id="uploadMainProgressFill"></div>
+                        </div>
+                        <div class="upload-percentage" id="uploadPercentage">0%</div>
+                    </div>
+                    <div class="upload-progress-spinner">
+                        <div class="spinner-large"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        overlay.classList.add('active');
+    }
+
+    updateUploadProgress(current, total, message) {
+        const overlay = document.getElementById('uploadProgressOverlay');
+        if (!overlay) return;
+
+        const percentage = total > 0 ? Math.round((current / total) * 100) : 0;
+        
+        document.getElementById('uploadStatusText').textContent = message;
+        document.getElementById('uploadProgressCounter').textContent = `${current} of ${total} images`;
+        document.getElementById('uploadMainProgressFill').style.width = `${percentage}%`;
+        document.getElementById('uploadPercentage').textContent = `${percentage}%`;
+    }
+
+    hideUploadProgressOverlay() {
+        const overlay = document.getElementById('uploadProgressOverlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, 300);
+        }
+        // Remove beforeunload warning
+        window.onbeforeunload = null;
     }
 }
 

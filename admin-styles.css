@@ -1135,3 +1135,215 @@ body {
     position: relative;
     min-height: 300px;
 }
+
+/* Upload Progress Overlay Styles */
+.upload-progress-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;    background: rgba(0, 0, 0, 0.85);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.upload-progress-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.upload-progress-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.upload-progress-header h2 {
+    color: var(--primary-color);
+    font-size: 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.upload-progress-header h2 i {
+    font-size: 28px;
+}
+
+.upload-warning {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #856404;
+    font-weight: 600;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.upload-warning i {
+    color: #ffc107;
+    font-size: 20px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+.upload-progress-body {
+    margin: 24px 0;
+}
+
+.upload-status-text {
+    font-size: 16px;
+    color: var(--gray-700);
+    margin-bottom: 12px;
+    font-weight: 500;
+    min-height: 24px;
+}
+
+.upload-progress-counter {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.upload-main-progress {
+    width: 100%;
+    height: 12px;
+    background: var(--gray-200);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.upload-main-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    border-radius: 6px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-main-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.upload-percentage {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.upload-progress-spinner {
+    margin-top: 24px;
+}
+
+.spinner-large {
+    width: 60px;
+    height: 60px;
+    border: 6px solid var(--gray-200);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .upload-progress-modal {
+        padding: 30px 20px;
+        max-width: 90%;
+    }
+
+    .upload-progress-header h2 {
+        font-size: 20px;
+    }
+
+    .upload-warning {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    .upload-status-text {
+        font-size: 14px;
+    }
+
+    .upload-percentage {
+        font-size: 20px;
+    }
+
+    .spinner-large {
+        width: 48px;
+        height: 48px;
+        border-width: 5px;
+    }
+}
