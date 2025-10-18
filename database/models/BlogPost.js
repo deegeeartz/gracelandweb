@@ -83,58 +83,70 @@ class BlogPostModel {    // Get all blog posts with pagination and filters
             WHERE bp.id = ?
         `;
         return await db.get(query, [id]);
-    }
-
-    // Create new blog post
+    }    // Create new blog post
     static async create(postData) {
         const {
             title,
             slug,
             excerpt,
             content,
+            featured_image = null,
+            image_public_id = null,
+            image_urls = null,
             author_id,
             category_id,
             status = 'draft',
             published_at = null
         } = postData;
 
+        // Convert image_urls object to JSON string if it exists
+        const imageUrlsJson = image_urls ? JSON.stringify(image_urls) : null;
+
         const query = `
             INSERT INTO blog_posts (
-                title, slug, excerpt, content, author_id, 
+                title, slug, excerpt, content, featured_image,
+                image_public_id, image_urls, author_id, 
                 category_id, status, published_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const result = await db.run(query, [
-            title, slug, excerpt, content, author_id,
+            title, slug, excerpt, content, featured_image,
+            image_public_id, imageUrlsJson, author_id,
             category_id, status, published_at
         ]);
         return result.lastID;
-    }
-
-    // Update blog post
+    }    // Update blog post
     static async update(id, postData) {
         const {
             title,
             slug,
             excerpt,
             content,
+            featured_image,
+            image_public_id,
+            image_urls,
             category_id,
             status,
             published_at
         } = postData;
 
+        // Convert image_urls object to JSON string if it exists
+        const imageUrlsJson = image_urls ? JSON.stringify(image_urls) : null;
+
         const query = `
             UPDATE blog_posts 
-            SET title = ?, slug = ?, excerpt = ?, content = ?, 
+            SET title = ?, slug = ?, excerpt = ?, content = ?,
+                featured_image = ?, image_public_id = ?, image_urls = ?,
                 category_id = ?, status = ?, published_at = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         `;
 
         const result = await db.run(query, [
-            title, slug, excerpt, content, category_id, 
-            status, published_at, id
+            title, slug, excerpt, content,
+            featured_image, image_public_id, imageUrlsJson,
+            category_id, status, published_at, id
         ]);
         return result.changes;
     }

@@ -16,9 +16,19 @@ const environment = {
             return 'http://localhost:3000/api';
         } else {
             // Production - Replace with your actual backend URL
+            // IMPORTANT: Update this to your Railway backend URL, NOT GitHub Pages!
             return 'https://gracelandweb-production.up.railway.app/api';
             // Or: 'https://your-app.onrender.com/api'
-            // Or: 'https://your-app.fly.io/api'
+        }
+    },
+
+    // Get base URL (for non-API requests like post.html)
+    getBaseUrl: () => {
+        if (environment.isDevelopment()) {
+            return 'http://localhost:3000';
+        } else {
+            // Production - this should be your frontend URL (GitHub Pages or Railway)
+            return window.location.origin; // Use current domain
         }
     },
 
@@ -31,6 +41,9 @@ const environment = {
     config: {
         get apiBaseUrl() {
             return environment.getApiUrl();
+        },
+        get baseUrl() {
+            return environment.getBaseUrl();
         },
         get environment() {
             return environment.getEnvironment();
@@ -47,3 +60,4 @@ window.ENV = environment.config;
 // Log current environment
 console.log(`🌍 Environment: ${window.ENV.environment}`);
 console.log(`🔗 API URL: ${window.ENV.apiBaseUrl}`);
+console.log(`🏠 Base URL: ${window.ENV.baseUrl}`);

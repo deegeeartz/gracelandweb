@@ -270,10 +270,13 @@ class BlogPage {
                 behavior: 'smooth', 
                 block: 'start' 
             });
-        }
-    }    async openPost(postId) {
-        // Redirect to dedicated post page instead of modal
-        window.location.href = `/post.html?id=${postId}`;
+        }    }
+
+    async openPost(postId) {
+        // Redirect to dedicated post page
+        // Use current domain to avoid cross-origin issues
+        const baseUrl = window.ENV ? window.ENV.baseUrl : window.location.origin;
+        window.location.href = `${baseUrl}/post.html?id=${postId}`;
     }
 
     showPostModal(post) {

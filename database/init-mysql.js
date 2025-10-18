@@ -90,9 +90,7 @@ async function createTables() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 INDEX idx_slug (slug)
             ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
-        `);
-
-        // Blog posts table
+        `);        // Blog posts table
         await connection.execute(`
             CREATE TABLE IF NOT EXISTS blog_posts (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -101,6 +99,8 @@ async function createTables() {
                 excerpt TEXT,
                 content LONGTEXT NOT NULL,
                 featured_image VARCHAR(500),
+                image_public_id VARCHAR(255) NULL,
+                image_urls JSON NULL,
                 author_id INT,
                 category_id INT,
                 status ENUM('draft', 'published', 'scheduled') DEFAULT 'draft',
@@ -115,6 +115,7 @@ async function createTables() {
                 INDEX idx_status (status),
                 INDEX idx_published_at (published_at),
                 INDEX idx_category_id (category_id),
+                INDEX idx_image_public_id (image_public_id),
                 FULLTEXT(title, excerpt, content)
             ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
         `);

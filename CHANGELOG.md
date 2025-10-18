@@ -46,6 +46,15 @@ All notable changes to the RCCG Graceland Area HQ Website project.
   - Print styles
   - Reduced motion support
 
+### 🧹 Project Cleanup
+- Removed 40+ redundant documentation files
+- Consolidated bug fixes and status updates into CHANGELOG
+- Removed 5 duplicate database initialization scripts
+- Removed 8 duplicate model files (*_new.js, *MySQL.js)
+- Removed 10 redundant test files
+- Cleaned up corrupted files from root directory
+- **Result:** 100+ files → 60 essential files (40% reduction)
+
 ### 📦 Dependencies Added
 - `cloudinary@^1.41.3` - Cloudinary SDK for image optimization
 - `sharp@^0.33.5` - High-performance image processing
@@ -84,10 +93,27 @@ All notable changes to the RCCG Graceland Area HQ Website project.
 - Improved troubleshooting sections
 
 ### 🐛 Bug Fixes
-- Fixed image upload endpoint to handle both Cloudinary and local storage
-- Fixed admin panel image data persistence
-- Enhanced error handling for file uploads
-- Improved CORS configuration for production
+
+#### Database Schema Updates
+- Added `image_public_id` column to blog_posts table for Cloudinary integration
+- Added `image_urls` JSON column to store all optimized image sizes
+- Added index on `image_public_id` for query performance
+- Created migration script (`database/migrate-cloudinary.js`) for existing databases
+
+#### Frontend URL Fixes
+- Fixed blog post links using GitHub Pages URL instead of current domain
+- Updated `config/environment.js` to include `baseUrl` property
+- Modified `blog-script-db.js` to use current domain for post navigation
+- Blog links now work correctly on localhost, Railway, and GitHub Pages
+
+#### Database Model Updates
+- Updated `BlogPost.create()` to accept Cloudinary fields
+- Updated `BlogPost.update()` to accept Cloudinary fields
+- Added JSON stringification for `image_urls` object storage
+
+#### API Route Updates
+- Updated POST `/api/admin/posts` to accept Cloudinary image data
+- Updated PUT `/api/admin/posts/:id` to accept Cloudinary image data
 
 ---
 

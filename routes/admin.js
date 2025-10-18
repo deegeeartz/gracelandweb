@@ -102,6 +102,8 @@ router.post('/posts', verifyToken, async (req, res) => {
             excerpt,
             content,
             featured_image,
+            image_public_id,
+            image_urls,
             category_id,
             status = 'draft',
             published_at
@@ -114,13 +116,15 @@ router.post('/posts', verifyToken, async (req, res) => {
         // Generate slug from title
         const slug = generateSlug(title);
 
-        // Create post
+        // Create post with Cloudinary image data
         const postId = await BlogPost.create({
             title,
             slug,
             excerpt,
             content,
             featured_image,
+            image_public_id,
+            image_urls,
             author_id: req.user.userId,
             category_id,
             status,
@@ -145,6 +149,8 @@ router.put('/posts/:id', verifyToken, async (req, res) => {
             excerpt,
             content,
             featured_image,
+            image_public_id,
+            image_urls,
             category_id,
             status,
             published_at
@@ -152,9 +158,7 @@ router.put('/posts/:id', verifyToken, async (req, res) => {
 
         if (!title || !content) {
             return res.status(400).json({ error: 'Title and content are required' });
-        }
-
-        // Generate slug from title
+        }        // Generate slug from title
         const slug = generateSlug(title);
 
         const updatedRows = await BlogPost.update(req.params.id, {
@@ -163,6 +167,8 @@ router.put('/posts/:id', verifyToken, async (req, res) => {
             excerpt,
             content,
             featured_image,
+            image_public_id,
+            image_urls,
             category_id,
             status,
             published_at: status === 'published' ? (published_at || new Date().toISOString()) : published_at
