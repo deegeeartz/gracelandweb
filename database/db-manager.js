@@ -16,8 +16,11 @@ console.log('DB_USER:', process.env.DB_USER || '❌ Not set');
 console.log('NODE_ENV:', process.env.NODE_ENV || '❌ Not set');
 
 // MySQL connection configuration
-// Support both Railway variables (MYSQLHOST, MYSQLUSER, etc.) and standard variables (DB_HOST, DB_USER, etc.)
+// IMPORTANT: Use Railway's PRIVATE network variables to avoid egress fees!
+// Private variables: MYSQL_PRIVATE_URL or individual MYSQLHOST (without _PUBLIC suffix)
 const dbConfig = {
+    // Railway private network: Use MYSQLHOST (not MYSQL_PUBLIC_URL)
+    // This connects through Railway's internal network (free!)
     host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT || 3306),
     user: process.env.MYSQLUSER || process.env.DB_USER || 'root',

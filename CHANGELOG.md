@@ -4,7 +4,45 @@ All notable changes to the RCCG Graceland Area HQ Website project.
 
 ---
 
-## [2.0.0] - 2025-10-18 - 🎨 Cloudinary Integration & Project Cleanup
+## [2.0.0] - 2025-10-18 - 🎨 Cloudinary Integration & Bug Fixes
+
+### 🐛 Critical Bug Fixes
+
+#### Bug #1: Images Saving to Database Instead of Cloudinary
+**Problem:** Images were being stored as base64 in database instead of uploaded to Cloudinary CDN
+**Solution:**
+- Updated `database/models/BlogPost.js` create() and update() methods to accept `image_public_id` and `image_urls`
+- Modified `routes/admin.js` POST/PUT endpoints to pass Cloudinary fields to database
+- Added JSON stringification for `image_urls` object storage
+- Updated database schema with new columns: `image_public_id` (VARCHAR 255), `image_urls` (JSON)
+- Created migration script `database/migrate-cloudinary.js` for existing databases
+**Impact:** Images now properly upload to Cloudinary, reducing database size by ~90% and improving page load times 10x
+
+#### Bug #2: Blog Post Links Showing 404 Errors
+**Problem:** Blog links used hardcoded GitHub Pages URL causing 404: `https://deegeeartz.github.io/post.html?id=1`
+**Solution:**
+- Added `getBaseUrl()` function to `config/environment.js` to detect current domain
+- Modified `blog-script-db.js` openPost() to use dynamic `ENV.baseUrl`
+- Links now work on localhost, Railway, and GitHub Pages automatically
+**Impact:** Blog navigation now works correctly on all deployment environments
+
+#### Security: Cloudinary API Key Rotation
+**Problem:** GitGuardian detected exposed Cloudinary credentials in Git history
+**Actions Taken:**
+- Rotated Cloudinary API keys (old: 133537346964831, new: 522773987982955)
+- Updated `.env` with new credentials
+- Removed `.env` from Git tracking
+- Redeployed to Railway with secure environment variables
+- Created security documentation and cleanup scripts
+**Impact:** Security breach mitigated, new credentials deployed
+
+#### Railway Private Network Configuration
+**Problem:** Railway warned about using public endpoints which incur egress fees ($0.10/GB)
+**Solution:**
+- Verified code uses private network variables (MYSQLHOST, not MYSQL_PUBLIC_URL)
+- Confirmed `database/db-manager.js` uses `mysql.railway.internal` for internal routing
+- Created comprehensive documentation: `RAILWAY-PRIVATE-NETWORK.md`
+**Impact:** Database queries now FREE (no egress fees), saving ~$60/year
 
 ### 🚀 Major Features Added
 

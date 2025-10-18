@@ -1,0 +1,10 @@
+[33m1d1c135[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Security: Remove .env from tracking
+[33mc986963[m optimized files
+[33m73bb75a[m env update
+[33m2230208[m Fix: Update Railway backend URL to gracelandweb-production.up.railway.app
+[33m0ba95cb[m Debug: Add environment variable logging for Railway MySQL connection
+[33mf664a37[m smart platform detection
+[33m6f840d5[m perfet
+[33m413c8d4[m Fix Railway deployment: auth route export and environment variable debugging
+[33m6ded39a[m Fix database models: replace Promise callbacks with async/await and add unified db-manager
+[33m09c3773[m done
