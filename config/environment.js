@@ -20,15 +20,32 @@ const environment = {
             return 'https://gracelandweb-production.up.railway.app/api';
             // Or: 'https://your-app.onrender.com/api'
         }
-    },
-
-    // Get base URL (for non-API requests like post.html)
+    },    // Get base URL (for non-API requests like post.html)
     getBaseUrl: () => {
         if (environment.isDevelopment()) {
             return 'http://localhost:3000';
         } else {
-            // Production - this should be your frontend URL (GitHub Pages or Railway)
-            return window.location.origin; // Use current domain
+            // Production - Build full base URL including subdirectory
+            // For GitHub Pages: https://deegeeartz.github.io/gracelandweb
+            // For Railway: https://your-app.up.railway.app
+            const origin = window.location.origin;
+            const pathname = window.location.pathname;
+            
+            // Extract base path from pathname (e.g., /gracelandweb from /gracelandweb/blog.html)
+            // If pathname is just "/" or a file in root, use origin only
+            if (pathname === '/' || !pathname.includes('/')) {
+                return origin;
+            }
+            
+            // Get the first part of the path (the base directory)
+            const pathParts = pathname.split('/').filter(part => part.length > 0);
+            
+            // If there's a subdirectory (like gracelandweb), include it
+            if (pathParts.length > 0 && !pathParts[0].includes('.')) {
+                return `${origin}/${pathParts[0]}`;
+            }
+            
+            return origin;
         }
     },
 

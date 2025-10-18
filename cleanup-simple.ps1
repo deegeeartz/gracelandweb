@@ -35,7 +35,8 @@ foreach ($file in $filesToRemove) {
     if (Test-Path $file) {
         Write-Host "  [X] $file" -ForegroundColor Red
         $foundFiles += $file
-    } else {
+    }
+    else {
         $notFoundFiles += $file
     }
 }
@@ -77,7 +78,8 @@ foreach ($file in $foundFiles) {
             Copy-Item $file -Destination $backupFolder -Force
             Write-Host "  Backed up: $file" -ForegroundColor Gray
             $backedUp++
-        } catch {
+        }
+        catch {
             Write-Host "  Error backing up: $file" -ForegroundColor Red
         }
     }
@@ -97,7 +99,8 @@ foreach ($file in $foundFiles) {
             Remove-Item $file -Force
             Write-Host "  Deleted: $file" -ForegroundColor Green
             $deleted++
-        } catch {
+        }
+        catch {
             Write-Host "  Error deleting: $file - $($_.Exception.Message)" -ForegroundColor Red
             $errors++
         }

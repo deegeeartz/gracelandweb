@@ -30,10 +30,19 @@ document.addEventListener('click', (e) => {
 });
 
 // Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+// Updated to exclude empty href="#" to prevent querySelector errors
+document.querySelectorAll('a[href^="#"]:not([href="#"])').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        
+        // Skip if href is just "#" or empty
+        if (!href || href === '#' || href.length <= 1) {
+            e.preventDefault();
+            return;
+        }
+        
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const target = document.querySelector(href);
         
         if (target) {
             const headerHeight = header.offsetHeight;
@@ -463,14 +472,31 @@ function toggleContactInfo() {
 document.addEventListener('DOMContentLoaded', () => {
     initializePage();
     enhanceAccessibility();
-    loadImages();
-    measurePagePerformance();
+    loadImages();    measurePagePerformance();
 });
 
 // Service Worker registration for offline support (optional)
+// DISABLED: Causes 404 errors if sw.js doesn't exist or is misconfigured
+// Uncomment below if you want to implement full PWA functionality
+/*
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        // Get base path for GitHub Pages subdirectory support
+        const getServiceWorkerPath = () => {
+            const pathname = window.location.pathname;
+            const pathParts = pathname.split('/').filter(part => part.length > 0);
+            
+            // If on GitHub Pages with subdirectory: /gracelandweb/sw.js
+            if (pathParts.length > 0 && !pathParts[0].includes('.')) {
+                return `/${pathParts[0]}/sw.js`;
+            }
+            // Otherwise: /sw.js
+            return '/sw.js';
+        };
+        
+        const swPath = getServiceWorkerPath();
+        
+        navigator.serviceWorker.register(swPath)
             .then(registration => {
                 console.log('SW registered: ', registration);
             })
@@ -479,6 +505,7 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+*/
 
 // Export functions for external use
 window.RCCGGraceland = {

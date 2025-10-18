@@ -2,14 +2,31 @@
 // This handles caching and offline functionality
 
 const CACHE_NAME = 'rccg-graceland-v1';
+
+// Get base path for GitHub Pages subdirectory support
+// On GitHub Pages: /gracelandweb/
+// On Railway/localhost: /
+const getBasePath = () => {
+  const pathname = self.location.pathname;
+  const pathParts = pathname.split('/').filter(part => part.length > 0);
+  
+  // If service worker is at /gracelandweb/sw.js, base is /gracelandweb
+  if (pathParts.length > 0 && !pathParts[0].includes('.')) {
+    return `/${pathParts[0]}`;
+  }
+  return '';
+};
+
+const basePath = getBasePath();
+
 const urlsToCache = [
-  '/',
-  '/styles.css',
-  '/script.js',
-  '/admin.html',
-  '/blog.html',
-  '/admin-styles.css',
-  '/blog-styles.css'
+  `${basePath}/`,
+  `${basePath}/index.html`,
+  `${basePath}/styles.css`,
+  `${basePath}/script.js`,
+  `${basePath}/blog.html`,
+  `${basePath}/blog-styles.css`,
+  `${basePath}/logo.png`
 ];
 
 self.addEventListener('install', function(event) {

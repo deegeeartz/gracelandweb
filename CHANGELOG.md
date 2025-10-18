@@ -18,13 +18,40 @@ All notable changes to the RCCG Graceland Area HQ Website project.
 - Created migration script `database/migrate-cloudinary.js` for existing databases
 **Impact:** Images now properly upload to Cloudinary, reducing database size by ~90% and improving page load times 10x
 
-#### Bug #2: Blog Post Links Showing 404 Errors
-**Problem:** Blog links used hardcoded GitHub Pages URL causing 404: `https://deegeeartz.github.io/post.html?id=1`
+#### Bug #2: Blog Post Links Showing 404 Errors (FIXED)
+**Problem:** Blog links caused 404 errors on GitHub Pages deployment
+- Clicking blog posts resulted in: `https://deegeeartz.github.io/post.html?id=1` (404 Error)
+- Expected: `https://deegeeartz.github.io/gracelandweb/post.html?id=1`
+- Issue: `window.location.origin` doesn't include GitHub Pages subdirectory path
+
+**Root Cause:**
+- GitHub Pages serves repository at: `https://username.github.io/repository-name/`
+- `window.location.origin` only returns: `https://username.github.io/`
+- Missing `/gracelandweb` subdirectory in navigation URLs
+
 **Solution:**
-- Added `getBaseUrl()` function to `config/environment.js` to detect current domain
-- Modified `blog-script-db.js` openPost() to use dynamic `ENV.baseUrl`
-- Links now work on localhost, Railway, and GitHub Pages automatically
-**Impact:** Blog navigation now works correctly on all deployment environments
+1. Updated `config/environment.js` `getBaseUrl()` function to intelligently extract base path:
+   ```javascript
+   // OLD: return window.location.origin; ❌
+   // NEW: Extract subdirectory from pathname ✅
+   const pathParts = pathname.split('/').filter(part => part.length > 0);
+   if (pathParts.length > 0 && !pathParts[0].includes('.')) {
+       return `${origin}/${pathParts[0]}`; // Returns: https://deegeeartz.github.io/gracelandweb
+   }
+   ```
+
+2. Created test page `test-blog-navigation.html` to verify:
+   - ✅ Local: `http://localhost:3000/post.html?id=X`
+   - ✅ GitHub Pages: `https://deegeeartz.github.io/gracelandweb/post.html?id=X`
+   - ✅ Railway: `https://your-app.up.railway.app/post.html?id=X`
+
+3. Blog navigation in `blog-script-db.js` remains unchanged (uses `ENV.baseUrl`)
+
+**Impact:** 
+- Blog navigation now works correctly across ALL deployment environments
+- No more 404 errors on GitHub Pages
+- Automatic subdirectory detection for any repository name
+- Works seamlessly on localhost, Railway, and GitHub Pages
 
 #### Security: Cloudinary API Key Rotation
 **Problem:** GitGuardian detected exposed Cloudinary credentials in Git history
