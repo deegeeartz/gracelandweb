@@ -1,5 +1,8 @@
 # Environment variables (contains sensitive data like passwords)
 .env
+.env.local
+.env.production
+.env.*.local
 
 # Node modules
 node_modules/
@@ -34,11 +37,27 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+*-backup.md
+*-OLD-*.md
 
 # Production build files
 dist/
 build/
 
-# Railway deployment files (if not needed in repo)
+# Test files (keep in /tests/ folder only)
+test-*.html
+test-*.js
+
+# Redundant documentation
+*-FIXED.md
+*-STATUS.md
+*-COMPLETE.md
+CLEANUP-*.md
+
+# Deployment scripts (use Railway dashboard)
+deploy-*.sh
+railway-*.js
+
+# Railway deployment files (managed by Railway)
 railway.json
 nixpacks.toml
