@@ -25,8 +25,30 @@ app.use(helmet({
     contentSecurityPolicy: false, // Allow inline scripts for now
 }));
 
-// CORS
-app.use(cors());
+// CORS - Allow GitHub Pages and localhost
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5500',
+    'https://deegeeartz.github.io', // GitHub Pages
+    'https://railway.app',
+    'https://railway.com'
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, Postman, curl)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('railway.app')) {
+            callback(null, true);
+        } else {
+            console.log('❌ CORS blocked origin:', origin);
+            callback(null, true); // Allow all for now during development
+        }
+    },
+    credentials: true
+}));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -121,46 +143,107 @@ function loadRoutes() {
 loadRoutes();
 
 // ============================================
-// FILE UPLOAD
+// FILE UPLOAD - Cloudinary Integration
 // ============================================
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, UPLOAD_DIR);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-    }
-});
+const cloudinaryService = require('./services/cloudinary.service');
+
+// Multer memory storage (store in memory, not disk)
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage: storage,
     limits: { fileSize: MAX_FILE_SIZE },
     fileFilter: (req, file, cb) => {
-        const allowedTypes = /jpeg|jpg|png|gif|mp3|mp4|wav/;
+        const allowedTypes = /jpeg|jpg|png|gif|webp|mp3|mp4|wav|mpeg/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
 
         if (mimetype && extname) {
             return cb(null, true);
         }
-        cb(new Error('Only images and audio files are allowed!'));
+        cb(new Error('Only images, videos, and audio files are allowed!'));
     }
 });
 
-app.post('/api/upload', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
-    }
+// Upload endpoint with Cloudinary integration
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
 
-    res.json({
-        success: true,
-        filename: req.file.filename,
-        url: `/uploads/${req.file.filename}`,
-        size: req.file.size
-    });
+        // Check if Cloudinary is configured
+        if (!cloudinaryService.isConfigured()) {
+            // Fallback to local storage if Cloudinary not configured
+            const fs = require('fs').promises;
+            const uploadDir = path.join(__dirname, 'uploads');
+            
+            // Ensure upload directory exists
+            try {
+                await fs.access(uploadDir);
+            } catch {
+                await fs.mkdir(uploadDir, { recursive: true });
+            }
+
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const ext = path.extname(req.file.originalname);
+            const filename = req.file.fieldname + '-' + uniqueSuffix + ext;
+            const filepath = path.join(uploadDir, filename);
+
+            await fs.writeFile(filepath, req.file.buffer);
+
+            return res.json({
+                success: true,
+                filename: filename,
+                url: `/uploads/${filename}`,
+                size: req.file.size,
+                storage: 'local'
+            });
+        }
+
+        // Determine resource type
+        const isImage = /image/.test(req.file.mimetype);
+        const isVideo = /video/.test(req.file.mimetype);
+        const resourceType = isVideo ? 'video' : 'image';
+
+        // Upload to Cloudinary
+        let result;
+        if (isVideo) {
+            result = await cloudinaryService.uploadVideo(req.file.buffer, {
+                type: 'media',
+                resourceType: 'video'
+            });
+        } else {
+            result = await cloudinaryService.uploadImage(req.file.buffer, {
+                type: req.body.type || 'blog',
+                optimizeLocally: true,
+                resourceType: 'image'
+            });
+        }
+
+        // Return optimized URLs
+        res.json({
+            success: true,
+            public_id: result.public_id,
+            url: result.url,
+            urls: result.urls,
+            thumbnail: result.urls?.thumbnail,
+            width: result.width,
+            height: result.height,
+            format: result.format,
+            size: result.bytes,
+            storage: 'cloudinary',
+            responsive_breakpoints: result.responsive_breakpoints
+        });
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ 
+            error: 'Upload failed', 
+            message: error.message 
+        });
+    }
 });
 
 // ============================================

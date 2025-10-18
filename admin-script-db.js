@@ -507,10 +507,11 @@ class AdminPanel {
         document.getElementById('postEditorModal').classList.remove('active');
         this.currentEditingPost = null;
         this.clearPostForm();
-    }
-
-    async savePost() {
+    }    async savePost() {
         try {
+            // Get uploaded image data if available
+            const uploadedImage = window.getUploadedImageData ? window.getUploadedImageData() : null;
+            
             const formData = {
                 title: document.getElementById('postTitle').value,
                 excerpt: document.getElementById('postExcerpt').value,
@@ -519,6 +520,13 @@ class AdminPanel {
                 status: document.getElementById('postStatus').value,
                 published_at: document.getElementById('publishDate').value || null
             };
+
+            // Add image URLs if uploaded
+            if (uploadedImage) {
+                formData.featured_image = uploadedImage.url;
+                formData.image_public_id = uploadedImage.public_id;
+                formData.image_urls = uploadedImage.urls; // Store all optimized URLs
+            }
 
             if (!formData.title || !formData.content) {
                 this.showNotification('Title and content are required', 'error');
