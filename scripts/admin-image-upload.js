@@ -23,23 +23,26 @@ function initializeImageUpload() {
     // Click on preview to trigger file input
     imagePreview.addEventListener('click', () => {
         imageInput.click();
-    });
-
-    // Handle file selection
+    });    // Handle file selection
     imageInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
-        if (!file) return;
-
-        // Validate file
+        if (!file) return;        // Validate file
         if (!file.type.startsWith('image/')) {
-            showNotification('Please select an image file', 'error');
+            showToast('Please select an image file', 'error');
+            imageInput.value = ''; // Clear the input
             return;
         }
 
         // Check file size (5MB max)
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-            showNotification('Image too large. Maximum size is 5MB', 'error');
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            showToast(
+                `Image too large (${sizeMB}MB)`,
+                'error',
+                `Maximum size is 5MB. Please resize, compress, or choose a smaller file.`
+            );
+            imageInput.value = ''; // Clear the input
             return;
         }
 
@@ -58,19 +61,73 @@ function initializeImageUpload() {
 
     imagePreview.addEventListener('dragleave', () => {
         imagePreview.classList.remove('drag-over');
-    });
-
-    imagePreview.addEventListener('drop', async (e) => {
+    });    imagePreview.addEventListener('drop', async (e) => {
         e.preventDefault();
         imagePreview.classList.remove('drag-over');
 
         const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-            imageInput.files = e.dataTransfer.files;
-            showImagePreview(file);
-            await uploadImage(file);
+        if (!file) return;
+
+        // Validate dropped file
+        if (!file.type.startsWith('image/')) {
+            showToast('Please drop an image file', 'error');
+            return;
         }
+
+        // Check file size for drag & drop too
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            showToast(
+                `Image too large (${sizeMB}MB)`,
+                'error',
+                `Maximum size is 5MB. Please resize, compress, or choose a smaller file.`
+            );
+            return;
+        }
+
+        imageInput.files = e.dataTransfer.files;
+        showImagePreview(file);
+        await uploadImage(file);
     });
+}
+
+// Toast notification system
+function showToast(message, type = 'info', subtitle = '') {
+    // Remove any existing toasts
+    const existingToasts = document.querySelectorAll('.upload-toast');
+    existingToasts.forEach(toast => toast.remove());
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `upload-toast upload-toast-${type}`;
+    
+    const icon = {
+        success: '✓',
+        error: '⚠',
+        warning: '⚠',
+        info: 'ℹ'
+    }[type] || 'ℹ';
+
+    toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div class="toast-content">
+            <div class="toast-message">${message}</div>
+            ${subtitle ? `<div class="toast-subtitle">${subtitle}</div>` : ''}
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+
+    document.body.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
 }
 
 function showImagePreview(file) {
@@ -350,11 +407,131 @@ uploadStyles.textContent = `
         cursor: pointer;
         font-size: 0.875rem;
         transition: all 0.3s ease;
-    }
-
-    .btn-retry:hover {
+    }    .btn-retry:hover {
         background: #45a049;
         transform: translateY(-2px);
+    }
+
+    /* Toast Notifications */
+    .upload-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        min-width: 320px;
+        max-width: 450px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        padding: 16px 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(400px);
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .upload-toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .upload-toast-success {
+        border-left: 4px solid #4CAF50;
+    }
+
+    .upload-toast-error {
+        border-left: 4px solid #f44336;
+    }
+
+    .upload-toast-warning {
+        border-left: 4px solid #ff9800;
+    }
+
+    .upload-toast-info {
+        border-left: 4px solid #2196F3;
+    }
+
+    .toast-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .upload-toast-success .toast-icon {
+        background: #e8f5e9;
+        color: #4CAF50;
+    }
+
+    .upload-toast-error .toast-icon {
+        background: #ffebee;
+        color: #f44336;
+    }
+
+    .upload-toast-warning .toast-icon {
+        background: #fff3e0;
+        color: #ff9800;
+    }
+
+    .upload-toast-info .toast-icon {
+        background: #e3f2fd;
+        color: #2196F3;
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-message {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .toast-subtitle {
+        font-size: 12px;
+        color: #666;
+        line-height: 1.4;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #999;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+        color: #333;
+        transform: rotate(90deg);
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .upload-toast {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+            min-width: auto;
+            max-width: none;
+        }
     }
 `;
 

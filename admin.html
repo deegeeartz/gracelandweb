@@ -414,6 +414,11 @@
                                 placeholder="Brief summary of the post..."></textarea>
                         </div> <div class="form-group">
                             <label for="featuredImage">Featured Image</label>
+                            <small class="form-text text-muted"
+                                style="display: block; margin-bottom: 10px;">
+                                Maximum file size: 5MB. Recommended size:
+                                1200x630px. Supports JPG, PNG, WebP.
+                            </small>
                             <div class="image-upload">
                                 <input type="file" id="featuredImage"
                                     accept="image/*"
@@ -422,9 +427,14 @@
                                     <i class="fas fa-image"></i>
                                     <span>Click to upload image</span>
                                 </div>
-                            </div>
-                        </div><div class="form-group">
+                            </div> </div><div class="form-group">
                             <label>Content</label>
+                            <small class="form-text text-muted"
+                                style="display: block; margin-bottom: 10px;">
+                                Use the toolbar to format text and insert
+                                images. Images are automatically optimized and
+                                uploaded to CDN (max 5MB per image).
+                            </small>
                             <div id="postContent"
                                 class="post-content-editor"></div>
                         </div>

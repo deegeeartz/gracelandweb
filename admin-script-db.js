@@ -294,18 +294,57 @@ class AdminPanel {
             const input = document.createElement('input');
             input.setAttribute('type', 'file');
             input.setAttribute('accept', 'image/*');
-            input.click();
-
-            input.onchange = async () => {
+            input.click();            input.onchange = async () => {
                 const file = input.files[0];
                 if (!file) return;
 
-                // Show uploading indicator
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    if (typeof showToast === 'function') {
+                        showToast('Please select an image file', 'error');
+                    } else {
+                        alert('Please select an image file');
+                    }
+                    return;
+                }
+
+                // Validate file size (5MB maximum)
+                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                if (file.size > maxSize) {
+                    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                    if (typeof showToast === 'function') {
+                        showToast(
+                            `Image too large (${sizeMB}MB)`,
+                            'error',
+                            'Maximum size is 5MB. Please resize, compress, or choose a smaller file.'
+                        );
+                    } else {
+                        alert(`Image too large (${sizeMB}MB). Maximum size is 5MB.\n\nPlease:\n- Resize the image\n- Compress it online\n- Choose a smaller file`);
+                    }
+                    return;
+                }
+
+                // Create a progress indicator overlay
+                const progressOverlay = document.createElement('div');
+                progressOverlay.className = 'quill-upload-progress';
+                progressOverlay.innerHTML = `
+                    <div class="quill-upload-spinner"></div>
+                    <div class="quill-upload-text">Uploading image...</div>
+                    <div class="quill-progress-bar">
+                        <div class="quill-progress-fill"></div>
+                    </div>
+                    <div class="quill-upload-size">${(file.size / 1024).toFixed(0)}KB</div>
+                `;
+                document.querySelector('.ql-editor').appendChild(progressOverlay);
+
+                // Show uploading indicator in editor
                 const range = this.quillEditor.getSelection();
-                this.quillEditor.insertText(range.index, 'Uploading image...');                try {
+                this.quillEditor.insertText(range.index, '📤 ');
+                
+                try {
                     // Upload to Cloudinary via your API
                     const formData = new FormData();
-                    formData.append('file', file); // Changed from 'image' to 'file'
+                    formData.append('file', file);
 
                     const response = await fetch(`${API_BASE}/upload`, {
                         method: 'POST',
@@ -317,13 +356,17 @@ class AdminPanel {
                     });
 
                     if (!response.ok) {
-                        throw new Error('Upload failed');
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || 'Upload failed');
                     }
 
                     const data = await response.json();
                     
-                    // Remove "Uploading..." text
-                    this.quillEditor.deleteText(range.index, 'Uploading image...'.length);
+                    // Remove progress overlay
+                    progressOverlay.remove();
+                    
+                    // Remove uploading emoji
+                    this.quillEditor.deleteText(range.index, 2);
                     
                     // Insert Cloudinary URL instead of base64
                     const imageUrl = data.optimized?.medium || data.url;
@@ -332,11 +375,32 @@ class AdminPanel {
                     // Move cursor after image
                     this.quillEditor.setSelection(range.index + 1);
                     
+                    // Show success message briefly
+                    const successMsg = document.createElement('div');
+                    successMsg.className = 'quill-upload-success';
+                    successMsg.innerHTML = '✓ Image uploaded successfully';
+                    document.querySelector('.ql-editor').appendChild(successMsg);
+                    setTimeout(() => successMsg.remove(), 2000);
+                    
                     console.log('📸 Image uploaded to Cloudinary:', imageUrl);
                 } catch (error) {
                     console.error('Error uploading image:', error);
-                    this.quillEditor.deleteText(range.index, 'Uploading image...'.length);
-                    alert('Failed to upload image. Please try again.');
+                    
+                    // Remove progress overlay
+                    progressOverlay.remove();
+                    
+                    // Remove uploading emoji
+                    this.quillEditor.deleteText(range.index, 2);
+                      // Show error message
+                    if (typeof showToast === 'function') {
+                        showToast(
+                            'Failed to upload image',
+                            'error',
+                            `${error.message}. Please try again or use a smaller image.`
+                        );
+                    } else {
+                        alert(`Failed to upload image: ${error.message}\n\nPlease try again or use a smaller image.`);
+                    }
                 }
             };
         };
