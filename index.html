@@ -118,12 +118,12 @@
                     <li><a href="#give">Give</a></li>
                 </ul>
             </nav>
-        </header> 
-        
+        </header>
+
         <!-- Floating Instagram Background -->
         <div class="floating-instagram-bg"></div>
-        
-        <!-- Hero Section --> 
+
+        <!-- Hero Section -->
         <section class="hero" id="home">
             <div class="hero-overlay"></div>
             <div class="hero-content">
@@ -283,21 +283,31 @@
                     <p>Stay connected with us on Instagram</p>
                 </div>
 
-                <!-- Instagram Feed Grid -->
-                <div class="instagram-feed-container">
-                    <blockquote class="instagram-media" 
-                                data-instgrm-permalink="https://www.instagram.com/rccggracelandparishbadagry/"
-                                data-instgrm-version="14"
-                                style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);">
+                <!-- Instagram Feed Grid (API Loaded) -->
+                <div class="instagram-feed-grid">
+                    <!-- Posts will be loaded via API -->
+                    <div class="instagram-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading Instagram posts...</p>
+                    </div>
+                </div>
+
+                <!-- Instagram Embed Widget (Fallback) -->
+                <div class="instagram-feed-container" style="display: none;">
+                    <blockquote class="instagram-media"
+                        data-instgrm-permalink="https://www.instagram.com/rccggracelandparishbadagry/"
+                        data-instgrm-version="14"
+                        style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);">
                     </blockquote>
                 </div>
 
                 <!-- Follow Button -->
                 <div style="text-align: center; margin-top: 3rem;">
-                    <a href="https://www.instagram.com/rccggracelandparishbadagry/" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       class="instagram-follow-btn">
+                    <a
+                        href="https://www.instagram.com/rccggracelandparishbadagry/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="instagram-follow-btn">
                         <i class="fab fa-instagram"></i>
                         Follow @rccggracelandparishbadagry
                     </a>
@@ -826,7 +836,7 @@
 
         <!-- Instagram Embed Script -->
         <script async src="//www.instagram.com/embed.js"></script>
-        
+
         <!-- Environment Configuration -->
         <script src="scripts/logger.js"></script>
         <script src="config/environment.js"></script>

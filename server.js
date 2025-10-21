@@ -145,7 +145,8 @@ function loadRoutes() {
         { path: '/api/sermons', file: './routes/sermons', name: 'Sermons' },
         { path: '/api/admin', file: './routes/admin', name: 'Admin' },
         { path: '/api/admin', file: './routes/reset-database', name: 'Database Reset' },
-        { path: '/api/settings', file: './routes/settings', name: 'Settings' }
+        { path: '/api/settings', file: './routes/settings', name: 'Settings' },
+        { path: '/api/instagram', file: './routes/instagram', name: 'Instagram' }
     ];    routes.forEach(({ path, file, name }) => {
         try {
             const router = require(file);
