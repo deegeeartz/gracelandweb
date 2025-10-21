@@ -6,21 +6,7 @@ const stream = require('stream');
 const logger = require('../utils/logger');
 
 // Configure Cloudinary
-c                    if (error) {
-                        logger.error('Video upload error:', error);
-                        reject(error);
-                    } else {
-                        logger.success('Video uploaded:', result.public_id);
-                        resolve({
-                            success: true,
-                            public_id: result.public_id,
-                            url: result.secure_url,
-                            duration: result.duration,
-                            format: result.format,
-                            bytes: result.bytes
-                        });
-                    }
-                });g({
+cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,

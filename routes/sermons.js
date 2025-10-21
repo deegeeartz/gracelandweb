@@ -1,5 +1,5 @@
-const express
-const logger = require('../utils/logger'); = require('express');
+const express = require('express');
+const logger = require('../utils/logger');
 const router = express.Router();
 const Sermon = require('../database/models/Sermon');
 
