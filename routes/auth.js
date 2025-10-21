@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../database/models/User');
+const logger = require('../utils/logger');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
 
@@ -44,12 +45,11 @@ router.post('/login', async (req, res) => {
         const { password_hash, ...userWithoutPassword } = user;
 
         res.json({
-            message: 'Login successful',
-            token,
+            message: 'Login successful',            token,
             user: userWithoutPassword
         });
     } catch (error) {
-        console.error('Login error:', error);
+        logger.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -82,11 +82,10 @@ router.post('/register', async (req, res) => {
         });
 
         res.status(201).json({
-            message: 'User created successfully',
-            userId
+            message: 'User created successfully',            userId
         });
     } catch (error) {
-        console.error('Registration error:', error);
+        logger.error('Registration error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -115,11 +114,9 @@ router.get('/verify', verifyToken, async (req, res) => {
         
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
-        }
-
-        res.json({ user });
+        }        res.json({ user });
     } catch (error) {
-        console.error('Token verification error:', error);
+        logger.error('Token verification error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -158,9 +155,8 @@ router.post('/change-password', verifyToken, async (req, res) => {
             password_hash: newPasswordHash
         });
 
-        res.json({ message: 'Password changed successfully' });
-    } catch (error) {
-        console.error('Change password error:', error);
+        res.json({ message: 'Password changed successfully' });    } catch (error) {
+        logger.error('Change password error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

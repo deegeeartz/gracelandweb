@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const BlogPost = require('../database/models/BlogPost');
 const Category = require('../database/models/Category');
+const logger = require('../utils/logger');
 
 // GET /api/blog - Get all blog posts with pagination and filters
 router.get('/', async (req, res) => {
@@ -40,10 +41,9 @@ router.get('/', async (req, res) => {
                 totalCount,
                 hasNextPage: options.page < totalPages,
                 hasPrevPage: options.page > 1
-            }
-        });
+            }        });
     } catch (error) {
-        console.error('Error fetching blog posts:', error);
+        logger.error('Error fetching blog posts:', error);
         res.status(500).json({ error: 'Failed to fetch blog posts' });
     }
 });
@@ -54,7 +54,7 @@ router.get('/categories', async (req, res) => {
         const categories = await Category.getAll();
         res.json(categories);
     } catch (error) {
-        console.error('Error fetching categories:', error);
+        logger.error('Error fetching categories:', error);
         res.status(500).json({ error: 'Failed to fetch categories' });
     }
 });
@@ -66,7 +66,7 @@ router.get('/recent', async (req, res) => {
         const posts = await BlogPost.getRecent(limit);
         res.json(posts);
     } catch (error) {
-        console.error('Error fetching recent posts:', error);
+        logger.error('Error fetching recent posts:', error);
         res.status(500).json({ error: 'Failed to fetch recent posts' });
     }
 });
@@ -95,11 +95,9 @@ router.get('/:id', async (req, res) => {
 
         // Increment view count
         await BlogPost.incrementViews(post.id);
-        post.views = (post.views || 0) + 1;
-
-        res.json(post);
+        post.views = (post.views || 0) + 1;        res.json(post);
     } catch (error) {
-        console.error('Error fetching blog post:', error);
+        logger.error('Error fetching blog post:', error);
         res.status(500).json({ error: 'Failed to fetch blog post' });
     }
 });
@@ -111,7 +109,7 @@ router.get('/category/:slug', async (req, res) => {
         const posts = await BlogPost.getByCategory(req.params.slug, limit);
         res.json(posts);
     } catch (error) {
-        console.error('Error fetching posts by category:', error);
+        logger.error('Error fetching posts by category:', error);
         res.status(500).json({ error: 'Failed to fetch posts by category' });
     }
 });

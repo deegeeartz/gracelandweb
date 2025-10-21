@@ -46,16 +46,15 @@ logger.success('MySQL Configuration:', {
 const pool = mysql.createPool(dbConfig);
 
 // Database interface with async/await
-const db = {
-    async all(query, params = []) {
+const db = {    async all(query, params = []) {
         try {
             // Use query() instead of execute() - it handles parameters better
             const [rows] = await pool.query(query, params);
             return rows;
         } catch (error) {
-            console.error('Database query error:', error);
-            console.error('Query:', query);
-            console.error('Params:', params);
+            logger.error('Database query error:', error);
+            logger.error('Query:', query);
+            logger.error('Params:', params);
             throw error;
         }
     },
@@ -65,9 +64,9 @@ const db = {
             const [rows] = await pool.query(query, params);
             return rows[0] || null;
         } catch (error) {
-            console.error('Database query error:', error);
-            console.error('Query:', query);
-            console.error('Params:', params);
+            logger.error('Database query error:', error);
+            logger.error('Query:', query);
+            logger.error('Params:', params);
             throw error;
         }
     },
@@ -80,9 +79,9 @@ const db = {
                 changes: result.affectedRows
             };
         } catch (error) {
-            console.error('Database query error:', error);
-            console.error('Query:', query);
-            console.error('Params:', params);
+            logger.error('Database query error:', error);
+            logger.error('Query:', query);
+            logger.error('Params:', params);
             throw error;
         }
     }
@@ -92,12 +91,12 @@ const db = {
 async function testConnection() {
     try {
         const connection = await pool.getConnection();
-        console.log('✅ MySQL connected successfully');
+        logger.success('MySQL connected successfully');
         connection.release();
         return true;
     } catch (error) {
-        console.error('❌ MySQL connection failed:', error.message);
-        console.log('💡 Make sure MySQL server is running and database exists');
+        logger.error('MySQL connection failed:', error.message);
+        logger.log('Make sure MySQL server is running and database exists');
         return false;
     }
 }

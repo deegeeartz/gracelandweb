@@ -4,6 +4,7 @@ const { verifyToken } = require('./auth');
 const BlogPost = require('../database/models/BlogPost');
 const Sermon = require('../database/models/Sermon');
 const Category = require('../database/models/Category');
+const logger = require('../utils/logger');
 
 // Helper function to generate slug from title
 const generateSlug = (title) => {
@@ -40,7 +41,7 @@ router.get('/stats', verifyToken, async (req, res) => {
             recentPosts
         });
     } catch (error) {
-        console.error('Error fetching admin stats:', error);
+        logger.error('Error fetching admin stats:', error);
         res.status(500).json({ error: 'Failed to fetch stats' });
     }
 });
@@ -89,7 +90,7 @@ router.get('/posts', verifyToken, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching admin posts:', error);
+        logger.error('Error fetching admin posts:', error);
         res.status(500).json({ error: 'Failed to fetch posts' });
     }
 });
@@ -136,7 +137,7 @@ router.post('/posts', verifyToken, async (req, res) => {
             postId
         });
     } catch (error) {
-        console.error('Error creating blog post:', error);
+        logger.error('Error creating blog post:', error);
         res.status(500).json({ error: 'Failed to create blog post' });
     }
 });
@@ -180,7 +181,7 @@ router.put('/posts/:id', verifyToken, async (req, res) => {
 
         res.json({ message: 'Blog post updated successfully' });
     } catch (error) {
-        console.error('Error updating blog post:', error);
+        logger.error('Error updating blog post:', error);
         res.status(500).json({ error: 'Failed to update blog post' });
     }
 });
@@ -196,7 +197,7 @@ router.delete('/posts/:id', verifyToken, async (req, res) => {
 
         res.json({ message: 'Blog post deleted successfully' });
     } catch (error) {
-        console.error('Error deleting blog post:', error);
+        logger.error('Error deleting blog post:', error);
         res.status(500).json({ error: 'Failed to delete blog post' });
     }
 });
@@ -245,7 +246,7 @@ router.get('/sermons', verifyToken, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching admin sermons:', error);
+        logger.error('Error fetching admin sermons:', error);
         res.status(500).json({ error: 'Failed to fetch sermons' });
     }
 });
@@ -294,7 +295,7 @@ router.post('/sermons', verifyToken, async (req, res) => {
             sermonId
         });
     } catch (error) {
-        console.error('Error creating sermon:', error);
+        logger.error('Error creating sermon:', error);
         res.status(500).json({ error: 'Failed to create sermon' });
     }
 });
@@ -344,7 +345,7 @@ router.put('/sermons/:id', verifyToken, async (req, res) => {
 
         res.json({ message: 'Sermon updated successfully' });
     } catch (error) {
-        console.error('Error updating sermon:', error);
+        logger.error('Error updating sermon:', error);
         res.status(500).json({ error: 'Failed to update sermon' });
     }
 });
@@ -360,7 +361,7 @@ router.delete('/sermons/:id', verifyToken, async (req, res) => {
 
         res.json({ message: 'Sermon deleted successfully' });
     } catch (error) {
-        console.error('Error deleting sermon:', error);
+        logger.error('Error deleting sermon:', error);
         res.status(500).json({ error: 'Failed to delete sermon' });
     }
 });
@@ -371,7 +372,7 @@ router.get('/categories', verifyToken, async (req, res) => {
         const categories = await Category.getAll();
         res.json(categories);
     } catch (error) {
-        console.error('Error fetching categories:', error);
+        logger.error('Error fetching categories:', error);
         res.status(500).json({ error: 'Failed to fetch categories' });
     }
 });

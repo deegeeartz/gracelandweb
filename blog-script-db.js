@@ -29,7 +29,7 @@ class BlogPage {
             this.categories = await response.json();
             this.updateCategoryCounts();
         } catch (error) {
-            console.error('Error loading categories:', error);
+            logger.error('Error loading categories:', error);
         }
     }
 
@@ -74,7 +74,7 @@ class BlogPage {
             this.renderPagination();
             this.updatePostsCount();
         } catch (error) {
-            console.error('Error loading posts:', error);
+            logger.error('Error loading posts:', error);
             this.showNotification('Failed to load blog posts', 'error');
         }
     }
@@ -270,9 +270,14 @@ class BlogPage {
                 behavior: 'smooth', 
                 block: 'start' 
             });
-        }    }
-
-    async openPost(postId) {
+        }    }    async openPost(postId) {
+        // Validate post ID
+        if (!postId || (typeof postId === 'string' && postId.trim() === '')) {
+            logger.error('Invalid post ID:', postId);
+            this.showNotification('Invalid post ID', 'error');
+            return;
+        }
+        
         // Redirect to dedicated post page
         // Use current domain to avoid cross-origin issues
         const baseUrl = window.ENV ? window.ENV.baseUrl : window.location.origin;
@@ -372,7 +377,7 @@ class BlogPage {
                 `).join('');
             }
         } catch (error) {
-            console.error('Error loading recent posts:', error);
+            logger.error('Error loading recent posts:', error);
         }
     }
 

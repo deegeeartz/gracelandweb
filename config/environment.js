@@ -74,7 +74,9 @@ const environment = {
 // Export for use in other scripts
 window.ENV = environment.config;
 
-// Log current environment
-console.log(`🌍 Environment: ${window.ENV.environment}`);
-console.log(`🔗 API URL: ${window.ENV.apiBaseUrl}`);
-console.log(`🏠 Base URL: ${window.ENV.baseUrl}`);
+// Log current environment (development only)
+if (environment.isDevelopment()) {
+    console.log(`🌍 Environment: ${window.ENV.environment}`);
+    console.log(`🔗 API URL: ${window.ENV.apiBaseUrl}`);
+    console.log(`🏠 Base URL: ${window.ENV.baseUrl}`);
+}

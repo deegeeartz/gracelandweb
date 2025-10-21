@@ -30,7 +30,7 @@ class Auth {
             });
             return response.ok;
         } catch (error) {
-            console.error('Auth check failed:', error);
+            logger.error('Auth check failed:', error);
             return false;
         }
     }
@@ -63,7 +63,7 @@ class API {
 
             return data;
         } catch (error) {
-            console.error('API request failed:', error);
+            logger.error('API request failed:', error);
             throw error;
         }
     }
@@ -256,7 +256,7 @@ class AdminPanel {    constructor() {
             this.categories = await API.get('/admin/categories');
             this.populateCategorySelects();
         } catch (error) {
-            console.error('Error loading categories:', error);
+            logger.error('Error loading categories:', error);
             this.showNotification('Failed to load categories', 'error');
         }
     }
@@ -370,7 +370,7 @@ class AdminPanel {    constructor() {
                     reader.readAsDataURL(file);
                     
                 } catch (error) {
-                    console.error('Error processing image:', error);
+                    logger.error('Error processing image:', error);
                     
                     // Remove processing text
                     this.quillEditor.deleteText(range.index, '⏳ Processing image...\n'.length);
@@ -464,7 +464,7 @@ class AdminPanel {    constructor() {
                 `).join('');
             }
         } catch (error) {
-            console.error('Error loading dashboard data:', error);
+            logger.error('Error loading dashboard data:', error);
             this.showNotification('Failed to load dashboard data', 'error');
         }
     }
@@ -477,7 +477,7 @@ class AdminPanel {    constructor() {
             document.getElementById('totalShares').textContent = stats.totalLikes;
             document.getElementById('totalComments').textContent = '0';
         } catch (error) {
-            console.error('Error updating stats:', error);
+            logger.error('Error updating stats:', error);
         }
     }
 
@@ -500,7 +500,7 @@ class AdminPanel {    constructor() {
             
             this.renderPostsTable(this.posts);
         } catch (error) {
-            console.error('Error loading blog posts:', error);
+            logger.error('Error loading blog posts:', error);
             this.showNotification('Failed to load blog posts', 'error');
         }
     }
@@ -571,7 +571,7 @@ class AdminPanel {    constructor() {
             this.currentEditingPost = post;
             this.populatePostForm(post);
         } catch (error) {
-            console.error('Error loading post for editing:', error);
+            logger.error('Error loading post for editing:', error);
             this.showNotification('Failed to load post', 'error');
         }
     }
@@ -684,7 +684,7 @@ class AdminPanel {    constructor() {
                     this.updateUploadProgress(uploadedCount, totalImages, 'Featured image uploaded successfully!');
                     
                 } catch (uploadError) {
-                    console.error('Image upload failed:', uploadError);
+                    logger.error('Image upload failed:', uploadError);
                     this.hideUploadProgressOverlay();
                     window.onbeforeunload = null;
                     this.showNotification('Image upload failed: ' + uploadError.message, 'error');
@@ -751,7 +751,7 @@ class AdminPanel {    constructor() {
                         uploadedCount++;
                         
                     } catch (uploadError) {
-                        console.error('Content image upload failed:', uploadError);
+                        logger.error('Content image upload failed:', uploadError);
                         this.hideUploadProgressOverlay();
                         window.onbeforeunload = null;
                         this.showNotification('Content image upload failed: ' + uploadError.message, 'error');
@@ -800,7 +800,7 @@ class AdminPanel {    constructor() {
             await this.loadBlogPosts();
             await this.updateStats();
         } catch (error) {
-            console.error('Error saving post:', error);
+            logger.error('Error saving post:', error);
             this.hideUploadProgressOverlay();
             this.showNotification(error.message, 'error');
         }
@@ -817,7 +817,7 @@ class AdminPanel {    constructor() {
             await this.loadBlogPosts();
             await this.updateStats();
         } catch (error) {
-            console.error('Error deleting post:', error);
+            logger.error('Error deleting post:', error);
             this.showNotification(error.message, 'error');
         }
     }
@@ -842,7 +842,7 @@ class AdminPanel {    constructor() {
             
             this.renderSermonsGrid(this.sermons);
         } catch (error) {
-            console.error('Error loading sermons:', error);
+            logger.error('Error loading sermons:', error);
             this.showNotification('Failed to load sermons', 'error');
         }
     }
@@ -907,7 +907,7 @@ class AdminPanel {    constructor() {
             this.showNotification('Sermon deleted successfully!', 'success');
             await this.loadSermons();
         } catch (error) {
-            console.error('Error deleting sermon:', error);
+            logger.error('Error deleting sermon:', error);
             this.showNotification(error.message, 'error');
         }
     }
@@ -959,7 +959,7 @@ class AdminPanel {    constructor() {
                 throw new Error(result.error);
             }
         } catch (error) {
-            console.error('Image upload error:', error);
+            logger.error('Image upload error:', error);
             this.showNotification(error.message, 'error');
         }
     }

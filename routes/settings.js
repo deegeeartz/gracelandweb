@@ -1,4 +1,5 @@
-const express = require('express');
+const express
+const logger = require('../utils/logger'); = require('express');
 const router = express.Router();
 const { verifyToken } = require('./auth');
 const Settings = require('../database/models/Settings');
@@ -34,7 +35,7 @@ router.get('/', async (req, res) => {
         // For authenticated requests, return all settings
         res.json(settings);
     } catch (error) {
-        console.error('Error fetching settings:', error);
+        logger.error('Error fetching settings:', error);
         res.status(500).json({ error: 'Failed to fetch settings' });
     }
 });
@@ -50,7 +51,7 @@ router.get('/:key', async (req, res) => {
         
         res.json({ [req.params.key]: value });
     } catch (error) {
-        console.error('Error fetching setting:', error);
+        logger.error('Error fetching setting:', error);
         res.status(500).json({ error: 'Failed to fetch setting' });
     }
 });
@@ -85,7 +86,7 @@ router.put('/', verifyToken, async (req, res) => {
         
         res.json({ message: 'Settings updated successfully' });
     } catch (error) {
-        console.error('Error updating settings:', error);
+        logger.error('Error updating settings:', error);
         res.status(500).json({ error: 'Failed to update settings' });
     }
 });
@@ -103,7 +104,7 @@ router.put('/:key', verifyToken, async (req, res) => {
         
         res.json({ message: 'Setting updated successfully' });
     } catch (error) {
-        console.error('Error updating setting:', error);
+        logger.error('Error updating setting:', error);
         res.status(500).json({ error: 'Failed to update setting' });
     }
 });
@@ -119,7 +120,7 @@ router.delete('/:key', verifyToken, async (req, res) => {
         
         res.json({ message: 'Setting deleted successfully' });
     } catch (error) {
-        console.error('Error deleting setting:', error);
+        logger.error('Error deleting setting:', error);
         res.status(500).json({ error: 'Failed to delete setting' });
     }
 });

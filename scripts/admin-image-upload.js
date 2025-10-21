@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Store uploaded image data
 let currentUploadedImage = null;
 let pendingImageFile = null; // Store file before upload
+let isProcessingImage = false; // Prevent race conditions
 
 function initializeImageUpload() {
     const imageInput = document.getElementById('featuredImage');
@@ -27,10 +28,22 @@ function initializeImageUpload() {
     });    // Handle file selection
     imageInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
-        if (!file) return;        // Validate file
+        if (!file) return;
+        
+        // Prevent processing multiple images at once
+        if (isProcessingImage) {
+            logger.warn('Image processing in progress, please wait');
+            showToast('Please wait, processing previous image', 'warning');
+            return;
+        }
+        
+        isProcessingImage = true;
+        
+        // Validate file
         if (!file.type.startsWith('image/')) {
             showToast('Please select an image file', 'error');
             imageInput.value = ''; // Clear the input
+            isProcessingImage = false;
             return;
         }
 
@@ -41,9 +54,9 @@ function initializeImageUpload() {
             showToast(
                 `Image too large (${sizeMB}MB)`,
                 'error',
-                `Maximum size is 5MB. Please resize, compress, or choose a smaller file.`
-            );
+                `Maximum size is 5MB. Please resize, compress, or choose a smaller file.`            );
             imageInput.value = ''; // Clear the input
+            isProcessingImage = false;
             return;        }
 
         // Store file for later upload (don't upload immediately)
@@ -54,6 +67,9 @@ function initializeImageUpload() {
         
         // Show ready state (not uploading yet)
         showImageReady(file);
+        
+        // Reset processing flag
+        isProcessingImage = false;
     });
 
     // Enable drag and drop

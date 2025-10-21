@@ -44,7 +44,12 @@ app.use(cors({
             callback(null, true);
         } else {
             logger.warn('CORS blocked origin:', origin);
-            callback(null, true); // Allow all for now during development
+            // Only allow blocked origins in development
+            if (process.env.NODE_ENV === 'production') {
+                callback(new Error('Not allowed by CORS'));
+            } else {
+                callback(null, true); // Allow all in development
+            }
         }
     },
     credentials: true
@@ -65,6 +70,12 @@ const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5, // Strict limit on login attempts
     message: 'Too many login attempts, please try again later.'
+});
+
+const uploadLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 10, // 10 uploads per 5 minutes
+    message: 'Too many uploads, please try again later.'
 });
 
 app.use('/api/', apiLimiter);
@@ -165,8 +176,8 @@ const upload = multer({
     }
 });
 
-// Upload endpoint with Cloudinary integration
-app.post('/api/upload', upload.single('file'), async (req, res) => {
+// Upload endpoint with Cloudinary integration (with rate limiting)
+app.post('/api/upload', uploadLimiter, upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
@@ -234,10 +245,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             size: result.bytes,
             storage: 'cloudinary',
             responsive_breakpoints: result.responsive_breakpoints
-        });
-
-    } catch (error) {
-        console.error('Upload error:', error);
+        });    } catch (error) {
+        logger.error('Upload error:', error);
         res.status(500).json({ 
             error: 'Upload failed', 
             message: error.message 
