@@ -574,7 +574,8 @@ body {
 .video-embed-container {
     position: relative;
     width: 100%;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    padding-bottom: 56.25%;
+    /* 16:9 aspect ratio */
     height: 0;
     overflow: hidden;
     background: var(--black);
@@ -634,8 +635,8 @@ body {
 /* Facebook plugin overrides - Force full width and responsive */
 .video-wrapper .fb-page,
 .video-wrapper .fb-video,
-.video-wrapper .fb-page > span,
-.video-wrapper .fb-video > span {
+.video-wrapper .fb-page>span,
+.video-wrapper .fb-video>span {
     width: 100% !important;
     max-width: 100% !important;
 }
@@ -1457,7 +1458,8 @@ body {
     }
 
     .video-embed-container {
-        padding-bottom: 56.25%; /* Maintain aspect ratio on tablet */
+        padding-bottom: 56.25%;
+        /* Maintain aspect ratio on tablet */
     }
 }
 
@@ -1651,7 +1653,8 @@ body {
     }
 
     .video-embed-container {
-        padding-bottom: 56.25%; /* Maintain 16:9 ratio on mobile */
+        padding-bottom: 56.25%;
+        /* Maintain 16:9 ratio on mobile */
     }
 
     .video-fallback {
