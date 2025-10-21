@@ -3,6 +3,7 @@ const router = express.Router();
 const BlogPost = require('../database/models/BlogPost');
 const Category = require('../database/models/Category');
 const logger = require('../utils/logger');
+const Sanitizer = require('../utils/sanitizer');
 
 // GET /api/blog - Get all blog posts with pagination and filters
 router.get('/', async (req, res) => {
@@ -16,11 +17,14 @@ router.get('/', async (req, res) => {
             sortOrder = 'DESC'
         } = req.query;
 
+        // Validate and sanitize pagination parameters
+        const sanitized = Sanitizer.sanitizePagination(page, limit);
+
         const options = {
-            page: parseInt(page),
-            limit: parseInt(limit),
-            category,
-            search,
+            page: sanitized.page,
+            limit: sanitized.limit,
+            category: category ? Sanitizer.sanitizeText(category) : undefined,
+            search: search ? Sanitizer.sanitizeText(search) : undefined,
             sortBy,
             sortOrder,
             status: 'published'
@@ -62,7 +66,7 @@ router.get('/categories', async (req, res) => {
 // GET /api/blog/recent - Get recent blog posts
 router.get('/recent', async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 5;
+        const limit = Sanitizer.sanitizeInt(req.query.limit, 5, 1, 20);
         const posts = await BlogPost.getRecent(limit);
         res.json(posts);
     } catch (error) {
@@ -105,8 +109,15 @@ router.get('/:id', async (req, res) => {
 // GET /api/blog/category/:slug - Get posts by category
 router.get('/category/:slug', async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 10;
-        const posts = await BlogPost.getByCategory(req.params.slug, limit);
+        // Validate and sanitize slug
+        const slug = Sanitizer.sanitizeSlug(req.params.slug);
+        
+        if (!slug) {
+            return res.status(400).json({ error: 'Invalid category slug' });
+        }
+        
+        const limit = Sanitizer.sanitizeInt(req.query.limit, 10, 1, 50);
+        const posts = await BlogPost.getByCategory(slug, limit);
         res.json(posts);
     } catch (error) {
         logger.error('Error fetching posts by category:', error);

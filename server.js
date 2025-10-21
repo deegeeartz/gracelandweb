@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const multer = require('multer');
 const logger = require('./utils/logger');
+const timeoutMiddleware = require('./middleware/timeout');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -58,6 +59,9 @@ app.use(cors({
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Timeout middleware - 30 seconds for all requests
+app.use(timeoutMiddleware(30000));
 
 // Rate limiting - Protect API endpoints
 const apiLimiter = rateLimit({
@@ -324,21 +328,52 @@ const server = app.listen(PORT, () => {
     logger.log('========================================');
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    logger.log('SIGTERM received, closing server gracefully...');
+// ============================================
+// GRACEFUL SHUTDOWN
+// ============================================
+
+function gracefulShutdown(signal) {
+    logger.info(`${signal} received, starting graceful shutdown...`);
+    
     server.close(() => {
-        logger.log('Server closed');
-        process.exit(0);
+        logger.info('HTTP server closed');
+        
+        // Close database connection
+        const db = require('./database/db-manager');
+        if (db.pool) {
+            db.pool.end((err) => {
+                if (err) {
+                    logger.error('Error closing database pool:', err);
+                    process.exit(1);
+                } else {
+                    logger.info('Database pool closed');
+                    process.exit(0);
+                }
+            });
+        } else {
+            process.exit(0);
+        }
     });
+    
+    // Force shutdown after 10 seconds
+    setTimeout(() => {
+        logger.error('Forced shutdown after timeout');
+        process.exit(1);
+    }, 10000);
+}
+
+// Listen for termination signals
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+    logger.error('Uncaught Exception:', error);
+    gracefulShutdown('uncaughtException');
 });
 
-process.on('SIGINT', () => {
-    logger.log('\nSIGINT received, closing server gracefully...');
-    server.close(() => {
-        logger.log('Server closed');
-        process.exit(0);
-    });
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
 module.exports = app;
