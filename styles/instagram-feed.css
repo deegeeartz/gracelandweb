@@ -1,0 +1,332 @@
+/**
+ * Instagram Feed Styles
+ * Beautiful carousels, floating animations, and Instagram integration
+ */
+
+/* ============================================
+   INSTAGRAM FEED SECTION
+   ============================================ */
+
+.instagram-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.instagram-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.instagram-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.instagram-section .section-header h2 {
+    color: var(--white);
+}
+
+.instagram-section .section-header p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Instagram Feed Grid */
+.instagram-feed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.instagram-post-card {
+    position: relative;
+    aspect-ratio: 1/1;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.instagram-post-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
+.instagram-post-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.instagram-post-card:hover img {
+    transform: scale(1.1);
+}
+
+.instagram-post-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.instagram-post-card:hover .instagram-post-overlay {
+    opacity: 1;
+}
+
+.instagram-post-caption {
+    color: var(--white);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.instagram-post-icon {
+    color: var(--white);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ============================================
+   FLOATING INSTAGRAM BACKGROUND
+   ============================================ */
+
+.floating-instagram-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.floating-post {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    opacity: 0.1;
+    animation: float 30s infinite ease-in-out;
+}
+
+.floating-post:nth-child(1) {
+    top: 10%;
+    left: 5%;
+    animation-duration: 25s;
+}
+
+.floating-post:nth-child(2) {
+    top: 40%;
+    right: 10%;
+    animation-duration: 30s;
+    animation-delay: 5s;
+}
+
+.floating-post:nth-child(3) {
+    bottom: 20%;
+    left: 15%;
+    animation-duration: 35s;
+    animation-delay: 10s;
+}
+
+.floating-post:nth-child(4) {
+    top: 60%;
+    right: 20%;
+    animation-duration: 28s;
+    animation-delay: 15s;
+}
+
+.floating-post-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.floating-post img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(2px);
+}
+
+.floating-post-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(131, 58, 180, 0.5), rgba(253, 29, 29, 0.5));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-post-overlay i {
+    font-size: 3rem;
+    color: var(--white);
+}
+
+/* ============================================
+   INSTAGRAM CAROUSEL
+   ============================================ */
+
+.instagram-carousel {
+    position: relative;
+    padding: 3rem 0;
+    overflow: hidden;
+}
+
+.instagram-carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    animation: scroll-carousel 40s linear infinite;
+}
+
+.instagram-carousel-item {
+    flex: 0 0 300px;
+    height: 300px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.instagram-carousel-item:hover {
+    transform: scale(1.05);
+}
+
+.instagram-carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Instagram Follow Button */
+.instagram-follow-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+    color: var(--white);
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(131, 58, 180, 0.4);
+}
+
+.instagram-follow-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(131, 58, 180, 0.6);
+}
+
+.instagram-follow-btn i {
+    font-size: 1.5rem;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+        transform: translate(50px, -50px) rotate(5deg);
+    }
+    50% {
+        transform: translate(100px, 50px) rotate(-5deg);
+    }
+    75% {
+        transform: translate(-50px, 100px) rotate(3deg);
+    }
+}
+
+@keyframes scroll-carousel {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Instagram Pulse Animation */
+@keyframes instagram-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(131, 58, 180, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 20px rgba(131, 58, 180, 0);
+    }
+}
+
+.instagram-pulse {
+    animation: instagram-pulse 2s infinite;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .instagram-feed-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .floating-post {
+        width: 100px;
+        height: 100px;
+    }
+
+    .instagram-carousel-item {
+        flex: 0 0 200px;
+        height: 200px;
+    }
+
+    .instagram-follow-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .instagram-feed-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .floating-post {
+        width: 80px;
+        height: 80px;
+    }
+}
