@@ -570,11 +570,44 @@ body {
     width: 100%;
 }
 
-.video-wrapper iframe {
-    display: block;
-    width: 100% !important;
-    min-height: 500px;
-    height: 500px;
+/* Responsive video container - maintains 16:9 aspect ratio */
+.video-embed-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    background: var(--black);
+}
+
+.video-embed-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Fallback message when no video available */
+.video-fallback {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    padding: 2rem;
+    text-align: center;
+    gap: 1.5rem;
+}
+
+.video-fallback p {
+    color: #ccc;
+    font-size: 1.1rem;
+}
+
+.video-fallback i {
+    margin-right: 0.5rem;
 }
 
 /* Loading state for Facebook live stream */
@@ -583,7 +616,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 500px;
+    min-height: 400px;
     color: var(--white);
     gap: 1rem;
 }
@@ -598,9 +631,11 @@ body {
     color: #ccc;
 }
 
-/* Facebook plugin overrides - Force full width */
+/* Facebook plugin overrides - Force full width and responsive */
 .video-wrapper .fb-page,
-.video-wrapper .fb-video {
+.video-wrapper .fb-video,
+.video-wrapper .fb-page > span,
+.video-wrapper .fb-video > span {
     width: 100% !important;
     max-width: 100% !important;
 }
@@ -609,6 +644,7 @@ body {
 .video-wrapper .fb-video iframe {
     width: 100% !important;
     max-width: 100% !important;
+    height: 100% !important;
 }
 
 .livestream-info {
@@ -1420,8 +1456,8 @@ body {
         gap: 2rem;
     }
 
-    .video-wrapper iframe {
-        min-height: 350px;
+    .video-embed-container {
+        padding-bottom: 56.25%; /* Maintain aspect ratio on tablet */
     }
 }
 
@@ -1614,10 +1650,13 @@ body {
         font-size: 2.5rem;
     }
 
-    .video-wrapper iframe {
+    .video-embed-container {
+        padding-bottom: 56.25%; /* Maintain 16:9 ratio on mobile */
+    }
+
+    .video-fallback {
         min-height: 300px;
-        height: 300px;
-        width: 100% !important;
+        padding: 1.5rem;
     }
 
     .livestream-info {

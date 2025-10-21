@@ -1,32 +1,61 @@
 /**
- * Facebook Live Stream Handler
- * Works with Facebook SDK to display page timeline with videos
+ * Facebook Video Embed Handler
+ * Manages responsive video embedding from Facebook page
  */
 
-// Wait for Facebook SDK to load
-window.fbAsyncInit = function() {
-    FB.init({
-        xfbml: true,
-        version: 'v18.0'
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    logger.log('Facebook video embed initialized');
     
-    logger.success('Facebook SDK loaded');
-};
+    const videoContainer = document.querySelector('.video-embed-container');
+    const videoFallback = document.querySelector('.video-fallback');
+    
+    if (!videoContainer) {
+        logger.warn('Video container not found');
+        return;
+    }
+    
+    // Check if iframe loads successfully
+    const iframe = videoContainer.querySelector('iframe');
+    
+    if (iframe) {
+        iframe.addEventListener('load', function() {
+            logger.success('Facebook video loaded');
+        });
+        
+        iframe.addEventListener('error', function() {
+            logger.warn('Video failed to load, showing fallback');
+            if (videoContainer && videoFallback) {
+                videoContainer.style.display = 'none';
+                videoFallback.style.display = 'flex';
+            }
+        });
+    }
+    
+    // Auto-refresh iframe every 5 minutes to check for new content
+    setInterval(() => {
+        if (iframe) {
+            logger.log('Refreshing video embed...');
+            const currentSrc = iframe.src;
+            iframe.src = '';
+            setTimeout(() => {
+                iframe.src = currentSrc;
+            }, 100);
+        }
+    }, 5 * 60 * 1000);
+});
 
 // Manual refresh function
-function refreshFacebookPlugin() {
-    if (typeof FB !== 'undefined') {
-        logger.log('Refreshing Facebook plugin...');
-        FB.XFBML.parse();
+function refreshFacebookVideo() {
+    const iframe = document.querySelector('.video-embed-container iframe');
+    if (iframe) {
+        logger.log('Manually refreshing video...');
+        const currentSrc = iframe.src;
+        iframe.src = '';
+        setTimeout(() => {
+            iframe.src = currentSrc;
+        }, 100);
     }
 }
 
-// Auto-refresh every 5 minutes
-setInterval(() => {
-    refreshFacebookPlugin();
-}, 5 * 60 * 1000);
-
 // Export for manual use
-window.refreshFacebookLive = refreshFacebookPlugin;
-
-logger.log('Facebook live handler initialized');
+window.refreshFacebookLive = refreshFacebookVideo;
