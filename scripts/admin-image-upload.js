@@ -223,7 +223,8 @@ async function uploadImage(file) {
             logger.log(`Compressed: ${(file.size / 1024).toFixed(1)}KB → ${(fileToUpload.size / 1024).toFixed(1)}KB`);
         }
 
-        // Upload with type specification        await uploader.upload(fileToUpload, {
+        // Upload with type specification
+        await uploader.upload(fileToUpload, {
             type: 'blog',
             maxSize: 5 * 1024 * 1024
         });
