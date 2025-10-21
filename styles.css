@@ -575,6 +575,39 @@ body {
     min-height: 400px;
 }
 
+/* Loading state for Facebook live stream */
+.loading-stream {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: var(--white);
+    gap: 1rem;
+}
+
+.loading-stream i {
+    font-size: 3rem;
+    color: var(--primary-color);
+}
+
+.loading-stream p {
+    font-size: 1.1rem;
+    color: #ccc;
+}
+
+/* Facebook plugin overrides */
+.video-wrapper .fb-page,
+.video-wrapper .fb-video {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.video-wrapper .fb-page iframe,
+.video-wrapper .fb-video iframe {
+    width: 100% !important;
+}
+
 .livestream-info {
     background: rgba(255, 255, 255, 0.05);
     padding: 2.5rem;
