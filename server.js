@@ -18,6 +18,9 @@ const UPLOAD_DIR = 'uploads/';
 
 logger.success('Starting RCCG Graceland Website...');
 
+// Trust proxy - Required for Railway, Heroku, and other proxies
+app.set('trust proxy', 1);
+
 // ============================================
 // MIDDLEWARE
 // ============================================
