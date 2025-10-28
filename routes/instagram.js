@@ -1,6 +1,6 @@
 /**
  * Instagram API Route
- * Fetches Instagram posts using web scraping (no API key needed)
+ * Fetches Instagram posts from Instagram profile (no API key needed)
  */
 
 const express = require('express');

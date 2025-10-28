@@ -1,7 +1,11 @@
 /**
  * Facebook Video Embed Handler
- * Manages responsive video embedding from Facebook page
+ * Dynamically fetches and displays latest video from Facebook timeline
  */
+
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000'
+    : '';
 
 document.addEventListener('DOMContentLoaded', function() {
     logger.log('Facebook video embed initialized');
@@ -14,48 +18,75 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // Check if iframe loads successfully
-    const iframe = videoContainer.querySelector('iframe');
+    // Fetch and load latest video
+    loadLatestVideo();
     
-    if (iframe) {
-        iframe.addEventListener('load', function() {
-            logger.success('Facebook video loaded');
-        });
+    // Auto-refresh every 5 minutes to check for new content
+    setInterval(() => {
+        loadLatestVideo();
+    }, 5 * 60 * 1000);
+});
+
+/**
+ * Fetch and load the latest video from Facebook
+ */
+async function loadLatestVideo() {
+    const videoContainer = document.querySelector('.video-embed-container');
+    const iframe = videoContainer?.querySelector('iframe');
+    const videoFallback = document.querySelector('.video-fallback');
+    
+    if (!iframe) {
+        logger.warn('Video iframe not found');
+        return;
+    }
+    
+    try {
+        logger.log('Fetching latest Facebook video...');
         
-        iframe.addEventListener('error', function() {
-            logger.warn('Video failed to load, showing fallback');
+        const response = await fetch(`${API_BASE}/api/facebook/latest-video`);
+        const data = await response.json();
+        
+        if (data.success && data.video && data.video.embedUrl) {
+            const newUrl = data.video.embedUrl;
+            
+            // Only update if URL has changed
+            if (iframe.src !== newUrl) {
+                logger.success('Loading new Facebook video:', data.video.id || 'latest');
+                
+                // Update iframe src
+                iframe.src = '';
+                setTimeout(() => {
+                    iframe.src = newUrl;
+                }, 100);
+                
+                // Hide fallback, show video
+                if (videoContainer && videoFallback) {
+                    videoContainer.style.display = 'block';
+                    videoFallback.style.display = 'none';
+                }
+            } else {
+                logger.log('Video URL unchanged, keeping current video');
+            }
+        } else {
+            logger.warn('No video available, showing fallback');
             if (videoContainer && videoFallback) {
                 videoContainer.style.display = 'none';
                 videoFallback.style.display = 'flex';
             }
-        });
-    }
-    
-    // Auto-refresh iframe every 5 minutes to check for new content
-    setInterval(() => {
-        if (iframe) {
-            logger.log('Refreshing video embed...');
-            const currentSrc = iframe.src;
-            iframe.src = '';
-            setTimeout(() => {
-                iframe.src = currentSrc;
-            }, 100);
         }
-    }, 5 * 60 * 1000);
-});
+    } catch (error) {
+        logger.error('Failed to fetch Facebook video:', error.message);
+        // Keep current video on error
+    }
+}
 
 // Manual refresh function
 function refreshFacebookVideo() {
-    const iframe = document.querySelector('.video-embed-container iframe');
-    if (iframe) {
-        logger.log('Manually refreshing video...');
-        const currentSrc = iframe.src;
-        iframe.src = '';
-        setTimeout(() => {
-            iframe.src = currentSrc;
-        }, 100);
-    }
+    logger.log('Manually refreshing video...');
+    loadLatestVideo();
 }
 
 // Export for manual use
 window.refreshFacebookLive = refreshFacebookVideo;
+window.loadLatestVideo = loadLatestVideo;
+
