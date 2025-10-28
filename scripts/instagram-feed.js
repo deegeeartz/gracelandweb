@@ -3,6 +3,11 @@
  * Fetches and displays real Instagram posts with animations
  */
 
+// Determine API base URL
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000'
+    : '';
+
 const INSTAGRAM_HANDLE = 'rccggracelandparishbadagry';
 const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}`;
 const API_ENDPOINT = `${API_BASE}/api/instagram/feed`;
