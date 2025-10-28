@@ -3,10 +3,6 @@
  * Dynamically fetches and displays latest video from Facebook timeline
  */
 
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3000'
-    : '';
-
 document.addEventListener('DOMContentLoaded', function() {
     logger.log('Facebook video embed initialized');
     
@@ -43,7 +39,7 @@ async function loadLatestVideo() {
     try {
         logger.log('Fetching latest Facebook video...');
         
-        const response = await fetch(`${API_BASE}/api/facebook/latest-video`);
+        const response = await fetch(`${window.API_BASE}/api/facebook/latest-video`);
         const data = await response.json();
         
         if (data.success && data.video && data.video.embedUrl) {

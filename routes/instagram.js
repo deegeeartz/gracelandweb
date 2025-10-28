@@ -159,8 +159,8 @@ function getFallbackPosts() {
     return [
         {
             id: '1',
-            image: 'https://via.placeholder.com/400?text=Sunday+Service',
-            thumbnail: 'https://via.placeholder.com/300?text=Sunday+Service',
+            image: 'https://placehold.co/400x400/8B5CF6/FFF?text=Sunday+Service',
+            thumbnail: 'https://placehold.co/300x300/8B5CF6/FFF?text=Sunday+Service',
             caption: 'Join us for Sunday Service! Experience an overflow of His grace. 🙏',
             likes: 0,
             comments: 0,
@@ -170,8 +170,8 @@ function getFallbackPosts() {
         },
         {
             id: '2',
-            image: 'https://via.placeholder.com/400?text=Prayer+Meeting',
-            thumbnail: 'https://via.placeholder.com/300?text=Prayer+Meeting',
+            image: 'https://placehold.co/400x400/EC4899/FFF?text=Prayer+Meeting',
+            thumbnail: 'https://placehold.co/300x300/EC4899/FFF?text=Prayer+Meeting',
             caption: 'Prayer changes things! Join our prayer meetings. 🕊️',
             likes: 0,
             comments: 0,
@@ -181,8 +181,8 @@ function getFallbackPosts() {
         },
         {
             id: '3',
-            image: 'https://via.placeholder.com/400?text=Youth+Fellowship',
-            thumbnail: 'https://via.placeholder.com/300?text=Youth+Fellowship',
+            image: 'https://placehold.co/400x400/F97316/FFF?text=Youth+Fellowship',
+            thumbnail: 'https://placehold.co/300x300/F97316/FFF?text=Youth+Fellowship',
             caption: 'Young and on fire for God! Join our youth fellowship. 🔥',
             likes: 0,
             comments: 0,
@@ -192,8 +192,8 @@ function getFallbackPosts() {
         },
         {
             id: '4',
-            image: 'https://via.placeholder.com/400?text=Community+Outreach',
-            thumbnail: 'https://via.placeholder.com/300?text=Community+Outreach',
+            image: 'https://placehold.co/400x400/EF4444/FFF?text=Community+Outreach',
+            thumbnail: 'https://placehold.co/300x300/EF4444/FFF?text=Community+Outreach',
             caption: 'Reaching out with love and compassion. 💖',
             likes: 0,
             comments: 0,
