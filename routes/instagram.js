@@ -8,6 +8,7 @@ const router = express.Router();
 const logger = require('../utils/logger');
 
 const INSTAGRAM_HANDLE = 'rccggracelandparishbadagry';
+const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}`;
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 // Cache for Instagram posts
@@ -67,35 +68,82 @@ router.get('/feed', async (req, res) => {
 });
 
 /**
- * Fetch Instagram posts using web scraping
+ * Fetch Instagram posts using web scraping from HTML
  */
 async function fetchInstagramPosts() {
     try {
         const https = require('https');
-        const url = `https://www.instagram.com/${INSTAGRAM_HANDLE}/?__a=1&__d=dis`;
+        const url = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             https.get(url, {
                 headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    'Accept': 'application/json'
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    'Connection': 'keep-alive',
+                    'Upgrade-Insecure-Requests': '1'
                 }
             }, (response) => {
                 let data = '';
 
-                response.on('data', (chunk) => {
-                    data += chunk;
+                // Handle gzip compression
+                const gunzip = require('zlib').createGunzip();
+                const stream = response.headers['content-encoding'] === 'gzip' 
+                    ? response.pipe(gunzip) 
+                    : response;
+
+                stream.on('data', (chunk) => {
+                    data += chunk.toString();
                 });
 
-                response.on('end', () => {
+                stream.on('end', () => {
                     try {
-                        const json = JSON.parse(data);
-                        const posts = parseInstagramData(json);
-                        resolve(posts);
+                        // Look for embedded JSON data in the HTML
+                        // Instagram embeds data in <script type="application/ld+json"> tags
+                        const jsonMatches = data.match(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs);
+                        
+                        if (jsonMatches && jsonMatches.length > 0) {
+                            for (const match of jsonMatches) {
+                                const jsonText = match.replace(/<script[^>]*>/, '').replace(/<\/script>/, '');
+                                try {
+                                    const json = JSON.parse(jsonText);
+                                    const posts = parseInstagramLDJSON(json);
+                                    if (posts && posts.length > 0) {
+                                        logger.success(`Fetched ${posts.length} Instagram posts from LD+JSON`);
+                                        resolve(posts);
+                                        return;
+                                    }
+                                } catch (e) {
+                                    // Try next match
+                                }
+                            }
+                        }
+
+                        // Fallback: Try to find window._sharedData
+                        const sharedDataMatch = data.match(/window\._sharedData\s*=\s*({.+?});/);
+                        if (sharedDataMatch) {
+                            const json = JSON.parse(sharedDataMatch[1]);
+                            const posts = parseInstagramData(json);
+                            if (posts && posts.length > 0) {
+                                logger.success(`Fetched ${posts.length} Instagram posts from sharedData`);
+                                resolve(posts);
+                                return;
+                            }
+                        }
+
+                        logger.warn('Could not extract Instagram posts from HTML');
+                        resolve(getFallbackPosts());
                     } catch (error) {
-                        logger.warn('Failed to parse Instagram JSON, trying alternative method');
+                        logger.error('Failed to parse Instagram HTML:', error.message);
                         resolve(getFallbackPosts());
                     }
+                });
+
+                stream.on('error', (error) => {
+                    logger.error('Instagram stream error:', error.message);
+                    resolve(getFallbackPosts());
                 });
             }).on('error', (error) => {
                 logger.error('Instagram fetch error:', error.message);
@@ -105,6 +153,41 @@ async function fetchInstagramPosts() {
     } catch (error) {
         logger.error('fetchInstagramPosts error:', error);
         return getFallbackPosts();
+    }
+}
+
+/**
+ * Parse Instagram LD+JSON data
+ */
+function parseInstagramLDJSON(json) {
+    try {
+        const posts = [];
+        
+        // Check if it's a profile page with posts
+        if (json['@type'] === 'ProfilePage' && json.mainEntity) {
+            const images = json.mainEntity.image;
+            if (Array.isArray(images)) {
+                images.slice(0, 12).forEach((imageUrl, index) => {
+                    posts.push({
+                        id: `post_${index}`,
+                        image: imageUrl,
+                        thumbnail: imageUrl,
+                        caption: json.mainEntity.description || '',
+                        likes: 0,
+                        comments: 0,
+                        timestamp: Date.now() / 1000,
+                        permalink: `https://www.instagram.com/${INSTAGRAM_HANDLE}/`,
+                        type: 'scraped'
+                    });
+                });
+                return posts;
+            }
+        }
+
+        return null;
+    } catch (error) {
+        logger.error('Parse LD+JSON error:', error.message);
+        return null;
     }
 }
 
@@ -153,52 +236,76 @@ function parseInstagramData(json) {
 }
 
 /**
- * Fallback posts when Instagram API fails
+ * Fallback posts when Instagram scraping fails
+ * These show church-related content as placeholders
  */
 function getFallbackPosts() {
+    logger.warn('Using fallback Instagram posts - real scraping failed');
     return [
         {
             id: '1',
             image: 'https://placehold.co/400x400/8B5CF6/FFF?text=Sunday+Service',
             thumbnail: 'https://placehold.co/300x300/8B5CF6/FFF?text=Sunday+Service',
-            caption: 'Join us for Sunday Service! Experience an overflow of His grace. 🙏',
+            caption: `Join us for Sunday Service! Experience an overflow of His grace. 🙏\n\nFollow us: @${INSTAGRAM_HANDLE}`,
             likes: 0,
             comments: 0,
             timestamp: Date.now() / 1000,
-            permalink: `https://www.instagram.com/${INSTAGRAM_HANDLE}/`,
+            permalink: INSTAGRAM_URL,
             type: 'placeholder'
         },
         {
             id: '2',
             image: 'https://placehold.co/400x400/EC4899/FFF?text=Prayer+Meeting',
             thumbnail: 'https://placehold.co/300x300/EC4899/FFF?text=Prayer+Meeting',
-            caption: 'Prayer changes things! Join our prayer meetings. 🕊️',
+            caption: `Prayer changes things! Join our prayer meetings. 🕊️\n\nVisit our Instagram for updates: @${INSTAGRAM_HANDLE}`,
             likes: 0,
             comments: 0,
             timestamp: Date.now() / 1000,
-            permalink: `https://www.instagram.com/${INSTAGRAM_HANDLE}/`,
+            permalink: INSTAGRAM_URL,
             type: 'placeholder'
         },
         {
             id: '3',
             image: 'https://placehold.co/400x400/F97316/FFF?text=Youth+Fellowship',
             thumbnail: 'https://placehold.co/300x300/F97316/FFF?text=Youth+Fellowship',
-            caption: 'Young and on fire for God! Join our youth fellowship. 🔥',
+            caption: `Young and on fire for God! Join our youth fellowship. 🔥\n\nConnect with us: @${INSTAGRAM_HANDLE}`,
             likes: 0,
             comments: 0,
             timestamp: Date.now() / 1000,
-            permalink: `https://www.instagram.com/${INSTAGRAM_HANDLE}/`,
+            permalink: INSTAGRAM_URL,
             type: 'placeholder'
         },
         {
             id: '4',
             image: 'https://placehold.co/400x400/EF4444/FFF?text=Community+Outreach',
             thumbnail: 'https://placehold.co/300x300/EF4444/FFF?text=Community+Outreach',
-            caption: 'Reaching out with love and compassion. 💖',
+            caption: `Reaching out with love and compassion. 💖\n\nSee more on Instagram: @${INSTAGRAM_HANDLE}`,
             likes: 0,
             comments: 0,
             timestamp: Date.now() / 1000,
-            permalink: `https://www.instagram.com/${INSTAGRAM_HANDLE}/`,
+            permalink: INSTAGRAM_URL,
+            type: 'placeholder'
+        },
+        {
+            id: '5',
+            image: 'https://placehold.co/400x400/10B981/FFF?text=Bible+Study',
+            thumbnail: 'https://placehold.co/300x300/10B981/FFF?text=Bible+Study',
+            caption: `Dive deeper into God's Word with us! 📖\n\nFollow for more: @${INSTAGRAM_HANDLE}`,
+            likes: 0,
+            comments: 0,
+            timestamp: Date.now() / 1000,
+            permalink: INSTAGRAM_URL,
+            type: 'placeholder'
+        },
+        {
+            id: '6',
+            image: 'https://placehold.co/400x400/3B82F6/FFF?text=Worship+Night',
+            thumbnail: 'https://placehold.co/300x300/3B82F6/FFF?text=Worship+Night',
+            caption: `Experience powerful worship and praise! 🎵\n\nVisit: @${INSTAGRAM_HANDLE}`,
+            likes: 0,
+            comments: 0,
+            timestamp: Date.now() / 1000,
+            permalink: INSTAGRAM_URL,
             type: 'placeholder'
         }
     ];
