@@ -68,15 +68,14 @@ router.get('/latest-video', async (req, res) => {
 });
 
 /**
- * Fetch latest video from Facebook page
+ * Fetch latest video from Facebook page (live or recent)
  */
 async function fetchLatestVideo() {
     try {
         const https = require('https');
         
-        // Try to scrape Facebook page for latest video
-        // Note: This is a basic implementation - Facebook's structure changes frequently
-        const url = `https://www.facebook.com/${FACEBOOK_PAGE}/videos`;
+        // Fetch from main page to get any recent videos (live or recorded)
+        const url = `https://www.facebook.com/${FACEBOOK_PAGE}`;
 
         return new Promise((resolve) => {
             https.get(url, {
@@ -94,22 +93,45 @@ async function fetchLatestVideo() {
 
                 response.on('end', () => {
                     try {
-                        // Look for video ID in the HTML
-                        const videoIdMatch = data.match(/\/videos\/(\d+)/);
+                        // Look for video IDs in the HTML (match multiple patterns)
+                        // Pattern 1: /videos/1234567890
+                        // Pattern 2: /watch/?v=1234567890
+                        const videoPatterns = [
+                            /\/videos\/(\d{10,})/g,
+                            /\/watch\/\?v=(\d{10,})/g,
+                            /"video_id":"(\d{10,})"/g
+                        ];
                         
-                        if (videoIdMatch && videoIdMatch[1]) {
-                            const videoId = videoIdMatch[1];
+                        let videoIds = new Set();
+                        
+                        for (const pattern of videoPatterns) {
+                            let match;
+                            while ((match = pattern.exec(data)) !== null) {
+                                videoIds.add(match[1]);
+                            }
+                        }
+                        
+                        if (videoIds.size > 0) {
+                            // Get the first video ID found
+                            const videoId = Array.from(videoIds)[0];
                             logger.success(`Found video ID: ${videoId}`);
                             
                             resolve({
                                 id: videoId,
-                                embedUrl: `https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2F${FACEBOOK_PAGE}%2Fvideos%2F${videoId}%2F&show_text=false&width=800&height=450`,
+                                embedUrl: `https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2F${FACEBOOK_PAGE}%2Fvideos%2F${videoId}%2F&show_text=false&width=800&height=450&appId`,
                                 pageUrl: `https://www.facebook.com/${FACEBOOK_PAGE}/videos/${videoId}`,
                                 timestamp: Date.now()
                             });
                         } else {
-                            logger.warn('No video ID found in Facebook page');
-                            resolve(getFallbackVideo());
+                            logger.warn('No video ID found, using page plugin');
+                            // Use the page plugin to show all videos
+                            resolve({
+                                id: 'page-plugin',
+                                embedUrl: `https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F${FACEBOOK_PAGE}&tabs=timeline&width=800&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=false`,
+                                pageUrl: `https://www.facebook.com/${FACEBOOK_PAGE}/videos`,
+                                timestamp: Date.now(),
+                                isPagePlugin: true
+                            });
                         }
                     } catch (error) {
                         logger.error('Failed to parse Facebook page:', error.message);
@@ -129,15 +151,17 @@ async function fetchLatestVideo() {
 
 /**
  * Fallback video when Facebook API fails
+ * Uses Page Plugin to show recent posts and videos
  */
 function getFallbackVideo() {
-    // Return default embed URL pointing to videos page
+    // Return Page Plugin that shows timeline with recent videos
     return {
-        id: null,
-        embedUrl: `https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2F${FACEBOOK_PAGE}%2Fvideos%2F&show_text=false&width=800&height=450`,
-        pageUrl: `https://www.facebook.com/${FACEBOOK_PAGE}/videos`,
+        id: 'page-plugin',
+        embedUrl: `https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F${FACEBOOK_PAGE}&tabs=timeline&width=800&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=false`,
+        pageUrl: `https://www.facebook.com/${FACEBOOK_PAGE}`,
         timestamp: Date.now(),
-        fallback: true
+        fallback: true,
+        isPagePlugin: true
     };
 }
 

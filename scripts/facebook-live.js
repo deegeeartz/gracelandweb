@@ -48,15 +48,23 @@ async function loadLatestVideo() {
         
         if (data.success && data.video && data.video.embedUrl) {
             const newUrl = data.video.embedUrl;
+            const videoType = data.video.isPagePlugin ? 'page timeline' : `video ${data.video.id}`;
             
             // Only update if URL has changed
             if (iframe.src !== newUrl) {
-                logger.success('Loading new Facebook video:', data.video.id || 'latest');
+                logger.success(`Loading Facebook ${videoType}`);
                 
                 // Update iframe src
                 iframe.src = '';
                 setTimeout(() => {
                     iframe.src = newUrl;
+                    
+                    // Adjust height for page plugin
+                    if (data.video.isPagePlugin) {
+                        videoContainer.style.paddingBottom = '62.5%'; // Taller for page plugin
+                    } else {
+                        videoContainer.style.paddingBottom = '56.25%'; // Standard 16:9 for videos
+                    }
                 }, 100);
                 
                 // Hide fallback, show video
@@ -65,7 +73,7 @@ async function loadLatestVideo() {
                     videoFallback.style.display = 'none';
                 }
             } else {
-                logger.log('Video URL unchanged, keeping current video');
+                logger.log('Video URL unchanged, keeping current content');
             }
         } else {
             logger.warn('No video available, showing fallback');
