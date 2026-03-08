@@ -869,6 +869,11 @@ body {
     height: 300px;
 }
 
+.form-help-text {
+    display: block;
+    margin-bottom: 10px;
+}
+
 /* Loading Overlay */
 .loading-overlay {
     display: none;

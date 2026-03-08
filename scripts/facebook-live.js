@@ -1,6 +1,6 @@
 /**
  * Facebook Video Embed Handler
- * Dynamically fetches and displays latest video from Facebook timeline
+ * Dynamically fetches and displays Facebook timeline embed
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -37,7 +37,7 @@ async function loadLatestVideo() {
     }
     
     try {
-        logger.log('Fetching latest Facebook video...');
+        logger.log('Fetching Facebook embed...');
         
         const response = await fetch(`${window.API_BASE}/api/facebook/latest-video`);
         const data = await response.json();

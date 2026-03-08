@@ -5,11 +5,51 @@ const router = express.Router();
 const User = require('../database/models/User');
 const logger = require('../utils/logger');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+function getJwtSecret(res) {
+    if (!JWT_SECRET) {
+        logger.error('JWT_SECRET is not configured');
+        if (res) {
+            res.status(500).json({ error: 'Authentication is not configured on server' });
+        }
+        return null;
+    }
+    return JWT_SECRET;
+}
+
+function verifyToken(req, res, next) {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+
+    if (!token) {
+        return res.status(401).json({ error: 'Access denied. No token provided.' });
+    }
+
+    const secret = getJwtSecret(res);
+    if (!secret) return;
+
+    try {
+        const decoded = jwt.verify(token, secret);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(400).json({ error: 'Invalid token.' });
+    }
+}
+
+function requireAdmin(req, res, next) {
+    if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required' });
+    }
+    next();
+}
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
     try {
+        const secret = getJwtSecret(res);
+        if (!secret) return;
+
         const { username, password } = req.body;
 
         if (!username || !password) {
@@ -37,7 +77,7 @@ router.post('/login', async (req, res) => {
                 username: user.username,
                 role: user.role 
             },
-            JWT_SECRET,
+            secret,
             { expiresIn: '24h' }
         );
 
@@ -55,12 +95,16 @@ router.post('/login', async (req, res) => {
 });
 
 // POST /api/auth/register (for creating new admin users)
-router.post('/register', async (req, res) => {
+router.post('/register', verifyToken, requireAdmin, async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
         if (!username || !email || !password) {
             return res.status(400).json({ error: 'Username, email, and password are required' });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({ error: 'Password must be at least 8 characters' });
         }
 
         // Check if user already exists
@@ -89,23 +133,6 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-// Middleware to verify JWT token
-const verifyToken = (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-
-    if (!token) {
-        return res.status(401).json({ error: 'Access denied. No token provided.' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        res.status(400).json({ error: 'Invalid token.' });
-    }
-};
 
 // GET /api/auth/verify - Verify token and get user info
 router.get('/verify', verifyToken, async (req, res) => {
