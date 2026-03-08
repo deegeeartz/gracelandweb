@@ -1,26 +1,20 @@
 /**
- * Database Initialization
- * Creates required tables if they don't exist
+ * Database Initialization - Calls the full MySQL setup
  */
 
-const db = require('./db-manager');
+const { initDatabase } = require('./init-mysql');
 const logger = require('../utils/logger');
 
-async function initializeDatabase() {
+async function initializeDatabaseWrapper() {
     try {
-        logger.log('Initializing database...');
-        
-        // Test connection first
-        await db.testConnection();
-        
-        logger.success('Database connection verified');
-        logger.log('Database initialization complete');
-        
+        logger.log('🚀 Starting database initialization...');
+        await initDatabase();
+        logger.success('✅ Database initialization complete');
         return true;
     } catch (error) {
-        logger.error('Database initialization error:', error.message);
+        logger.error('❌ Database initialization error:', error.message);
         throw error;
     }
 }
 
-module.exports = { initializeDatabase };
+module.exports = { initializeDatabase: initializeDatabaseWrapper };

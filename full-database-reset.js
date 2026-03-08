@@ -127,7 +127,7 @@ async function fullDatabaseReset() {
         console.log('✍️  Step 7: Creating default author...');
         await pool.query(
             'INSERT INTO authors (name, email, bio) VALUES (?, ?, ?)',
-            ['RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Apapa Family, Lagos, Nigeria. Experiencing An Overflow Of His Grace.']
+            ['RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Favored Family, Lagos, Nigeria. Experiencing An Overflow Of His Grace.']
         );
         console.log('✅ Default author created\n');
         

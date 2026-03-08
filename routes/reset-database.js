@@ -112,7 +112,7 @@ router.post('/reset-database', verifyAdminToken, async (req, res) => {
         console.log('✍️  Creating default author...');
         await db.query(
             'INSERT INTO authors (name, email, bio) VALUES (?, ?, ?)',
-            ['RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Apapa Family']
+            ['RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Favored Family']
         );
         
         // Step 8: Insert categories

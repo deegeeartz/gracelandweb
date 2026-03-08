@@ -121,7 +121,7 @@ async function resetDatabase() {
         console.log('✍️  Step 7: Creating default author...');
         await connection.query(`
             INSERT INTO authors (name, email, bio) 
-            VALUES ('RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Apapa Family')
+            VALUES ('RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Favored Family')
         `);
         console.log('✅ Default author created\n');
         

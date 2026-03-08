@@ -16,6 +16,16 @@ logger.log('DB_HOST:', process.env.DB_HOST || '❌ Not set');
 logger.log('DB_USER:', process.env.DB_USER || '❌ Not set');
 logger.log('NODE_ENV:', process.env.NODE_ENV || '❌ Not set');
 
+// Detect environment
+const isProduction = process.env.NODE_ENV === 'production' || !!process.env.MYSQLHOST;
+const isLocal = !isProduction;
+
+logger.log('🌍 Environment:', isProduction ? 'PRODUCTION (Railway)' : 'LOCAL DEVELOPMENT');
+
+if (isProduction && !process.env.MYSQLHOST) {
+    logger.warn('⚠️ NODE_ENV is production but Railway MySQL vars not set!');
+}
+
 // MySQL connection configuration
 // IMPORTANT: Use Railway's PRIVATE network variables to avoid egress fees!
 // Private variables: MYSQL_PRIVATE_URL or individual MYSQLHOST (without _PUBLIC suffix)

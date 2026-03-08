@@ -169,7 +169,7 @@ VALUES ('admin', '$2b$10$XqN5YfZJ9X.Vk8aL5QZ0.eK3xN5YfZJ9X.Vk8aL5QZ0.eK3xN5YfZ',
 
 -- 7. Insert default author
 INSERT INTO authors (name, email, bio) 
-VALUES ('RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Apapa Family');
+VALUES ('RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Favored Family');
 
 -- 8. Insert default categories
 INSERT INTO categories (name, slug, description) VALUES

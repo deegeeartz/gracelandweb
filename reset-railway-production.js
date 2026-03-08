@@ -139,7 +139,7 @@ async function resetRailwayDatabase() {
         console.log('✍️  Creating default author...');
         await connection.query(
             'INSERT INTO authors (name, email, bio) VALUES (?, ?, ?)',
-            ['RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Apapa Family, Lagos, Nigeria.']
+            ['RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Favored Family, Lagos, Nigeria.']
         );
         
         console.log('📁 Creating default categories...');
