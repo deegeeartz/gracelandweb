@@ -3,12 +3,14 @@
 ## 🚨 Current Problems
 
 ### 1. **500 Error When Creating Blog Posts**
+
 ```
 POST https://gracelandweb-production.up.railway.app/api/admin/posts 500 (Internal Server Error)
 Error: Failed to create blog post
 ```
 
 ### 2. **Database Not Clearing Old Data**
+
 - Old blog posts still showing
 - Want fresh start with empty tables
 
@@ -21,6 +23,7 @@ Error: Failed to create blog post
 This is the MOST IMPORTANT step to see the actual error!
 
 1. **Go to Railway Dashboard:**
+
    ```
    https://railway.app/dashboard
    ```
@@ -39,27 +42,35 @@ This is the MOST IMPORTANT step to see the actual error!
 **Common errors you might see:**
 
 #### Error A: Database Connection Failed
+
 ```
 Error: connect ECONNREFUSED mysql.railway.internal:3306
 ```
+
 **Solution:** MySQL service not running or wrong credentials
 
 #### Error B: Table Doesn't Exist
+
 ```
 Error: Table 'railway.blog_posts' doesn't exist
 ```
+
 **Solution:** Need to run database initialization
 
 #### Error C: Column Missing
+
 ```
 Error: Unknown column 'image_public_id' in 'field list'
 ```
+
 **Solution:** Need to run migration for Cloudinary columns
 
 #### Error D: Foreign Key Constraint
+
 ```
 Error: Cannot add or update a child row: a foreign key constraint fails
 ```
+
 **Solution:** Category or author doesn't exist
 
 ---
@@ -71,13 +82,14 @@ Error: Cannot add or update a child row: a foreign key constraint fails
 1. **Go to Railway Project → Variables Tab**
 
 2. **Check these variables exist:**
+
    ```bash
    MYSQLHOST=mysql.railway.internal
    MYSQLPORT=3306
    MYSQLUSER=root
    MYSQLPASSWORD=<your-password>
    MYSQLDATABASE=railway
-   
+
    # Also check for:
    JWT_SECRET=<your-secret>
    CLOUDINARY_CLOUD_NAME=<your-cloud-name>
@@ -164,11 +176,11 @@ CREATE TABLE blog_posts (
 );
 
 -- 6. Insert default admin user
-INSERT INTO users (username, password, email, role) 
+INSERT INTO users (username, password, email, role)
 VALUES ('admin', '$2b$10$XqN5YfZJ9X.Vk8aL5QZ0.eK3xN5YfZJ9X.Vk8aL5QZ0.eK3xN5YfZ', 'admin@rccggraceland.org', 'admin');
 
 -- 7. Insert default author
-INSERT INTO authors (name, email, bio) 
+INSERT INTO authors (name, email, bio)
 VALUES ('RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Favored Family');
 
 -- 8. Insert default categories
@@ -228,6 +240,7 @@ I've created an automated script to reset your database!
 ### **How to Use:**
 
 1. **Get your Railway MySQL Public URL:**
+
    ```bash
    # Go to Railway Dashboard
    # → Click MySQL service (not web service)
@@ -237,16 +250,18 @@ I've created an automated script to reset your database!
    ```
 
 2. **Add it to your .env file:**
+
    ```bash
    # Open .env file and add:
    MYSQL_PUBLIC_URL=mysql://root:password@proxy.railway.app:1234/railway
    ```
 
 3. **Run the reset script:**
+
    ```bash
    # Double-click this file:
    RESET-RAILWAY-DB.bat
-   
+
    # Or run in terminal:
    node reset-railway-database.js
    ```
@@ -259,13 +274,14 @@ I've created an automated script to reset your database!
    - ✅ Adds default categories (Sermon, Testimony, Prayer, etc.)
 
 5. **After reset:**
+
    ```bash
    # Test locally first:
    node server.js
    # Open: http://localhost:3000/admin.html
    # Login: admin / admin123
    # Try creating a post
-   
+
    # If it works, deploy to Railway:
    git add .
    git commit -m "Database reset and working"
@@ -290,25 +306,33 @@ If the script doesn't work, you can reset manually:
 ## 🚨 Most Common Issues & Fixes
 
 ### Issue 1: "MYSQL_PUBLIC_URL not found"
+
 **Fix:**
+
 ```bash
 # Add to .env file:
 MYSQL_PUBLIC_URL=<copy from Railway>
 ```
 
 ### Issue 2: "Connection refused"
+
 **Fix:**
+
 - Make sure MySQL service is running in Railway
 - Check the URL is correct
 - Verify you copied the full URL including password
 
 ### Issue 3: "Access denied"
+
 **Fix:**
+
 - Check the password in the URL is correct
 - Try copying MYSQL_PUBLIC_URL again from Railway
 
 ### Issue 4: "Table already exists"
+
 **Fix:**
+
 - The script drops tables first, but if it fails:
 - Run: `DROP TABLE IF EXISTS blog_posts, categories, authors, users;`
 - Then run the script again
@@ -320,6 +344,7 @@ MYSQL_PUBLIC_URL=<copy from Railway>
 After resetting the database:
 
 ### Test Locally:
+
 - [ ] Start server: `node server.js`
 - [ ] Open: http://localhost:3000/admin.html
 - [ ] Login: admin / admin123
@@ -328,6 +353,7 @@ After resetting the database:
 - [ ] Delete the test post
 
 ### Test on Railway:
+
 - [ ] Push to GitHub: `git push`
 - [ ] Wait 2 minutes for Railway to deploy
 - [ ] Open: https://gracelandweb-production.up.railway.app/admin.html
@@ -359,6 +385,7 @@ After running the reset script, you should see:
 ## 🆘 Still Having Issues?
 
 ### Step 1: Check Railway Deployment Logs
+
 ```
 1. Go to Railway Dashboard
 2. Click on your web service (gracelandweb)
@@ -369,6 +396,7 @@ After running the reset script, you should see:
 ```
 
 ### Step 2: Check Server Logs When Creating Post
+
 ```
 1. Open Railway logs
 2. Try creating a post from admin panel
@@ -395,26 +423,30 @@ After running the reset script, you should see:
 ## 📞 Quick Support Commands
 
 ### Check if tables exist:
+
 ```sql
 SHOW TABLES;
 ```
 
 ### Check blog_posts structure:
+
 ```sql
 DESCRIBE blog_posts;
 ```
 
 ### Check if Cloudinary columns exist:
+
 ```sql
-SELECT COLUMN_NAME 
-FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_NAME = 'blog_posts' 
+SELECT COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'blog_posts'
 AND COLUMN_NAME IN ('image_public_id', 'image_urls');
 ```
 
 ### Count records:
+
 ```sql
-SELECT 
+SELECT
     (SELECT COUNT(*) FROM users) as users,
     (SELECT COUNT(*) FROM authors) as authors,
     (SELECT COUNT(*) FROM categories) as categories,
@@ -425,4 +457,3 @@ SELECT
 
 **Last Updated:** October 18, 2025  
 **Status:** Ready to use - run `RESET-RAILWAY-DB.bat`
-

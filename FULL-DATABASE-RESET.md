@@ -1,9 +1,11 @@
 # 🔄 FULL DATABASE RESET - Clean Slate
 
 ## ⚠️ WARNING
+
 This will **DELETE ALL** existing blog posts, users, categories, and data!
 
 Only do this if:
+
 - ✅ You have test data you don't need
 - ✅ You want to start completely fresh
 - ✅ You haven't published any real blog posts yet
@@ -85,11 +87,11 @@ CREATE TABLE blog_posts (
 );
 
 -- Step 6: Insert default admin user (password: admin123)
-INSERT INTO users (username, password, email, role) 
+INSERT INTO users (username, password, email, role)
 VALUES ('admin', '$2b$10$YourHashedPasswordHere', 'admin@rccggraceland.org', 'admin');
 
 -- Step 7: Insert default author
-INSERT INTO authors (name, email, bio) 
+INSERT INTO authors (name, email, bio)
 VALUES ('RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Favored Family');
 
 -- Step 8: Insert default categories
@@ -126,6 +128,7 @@ SELECT COUNT(*) as post_count FROM blog_posts;
 ## 🎯 After Reset
 
 ### **Login to Admin:**
+
 ```
 URL: https://gracelandweb-production.up.railway.app/admin.html
 Username: admin
@@ -133,12 +136,14 @@ Password: admin123
 ```
 
 ### **Create Your First Real Post:**
+
 1. Write your content
 2. Upload image (goes to Cloudinary)
 3. Select category
 4. Publish
 
 ### **Result:**
+
 - ✅ Images in Cloudinary (not database)
 - ✅ Fast performance
 - ✅ No base64 bloat

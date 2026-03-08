@@ -3,6 +3,7 @@
 ## 🚨 Current Problem
 
 You're getting **500 Internal Server Error** when trying to create blog posts:
+
 ```
 POST /api/admin/posts 500 (Internal Server Error)
 Error: Failed to create blog post
@@ -33,16 +34,19 @@ This means your Railway backend can't connect to the database properly.
 ### **Step 3: Reset Database**
 
 Double-click this file:
+
 ```
 RESET-RAILWAY-DB.bat
 ```
 
 Or run in terminal:
+
 ```bash
 node reset-railway-database.js
 ```
 
 **This will:**
+
 - ✅ Clear all old data
 - ✅ Create fresh tables with Cloudinary support
 - ✅ Add default admin user (admin / admin123)
@@ -159,11 +163,11 @@ CREATE TABLE blog_posts (
 );
 
 -- 6. Insert admin user (password: admin123)
-INSERT INTO users (username, password, email, role) 
+INSERT INTO users (username, password, email, role)
 VALUES ('admin', '$2b$10$XqN5YfZJ9X.Vk8aL5QZ0.eK3xN5YfZJ9X.Vk8aL5QZ0.eK3xN5YfZ', 'admin@rccggraceland.org', 'admin');
 
 -- 7. Insert default author
-INSERT INTO authors (name, email, bio) 
+INSERT INTO authors (name, email, bio)
 VALUES ('RCCG Graceland', 'info@rccggraceland.org', 'RCCG Graceland Area HQ - Favored Family');
 
 -- 8. Insert categories
@@ -181,6 +185,7 @@ INSERT INTO categories (name, slug, description) VALUES
 ## 📋 Complete Troubleshooting
 
 ### Check 1: Railway Logs
+
 ```
 1. Railway Dashboard → Web Service → Deployments
 2. Click latest deployment → View Logs
@@ -188,6 +193,7 @@ INSERT INTO categories (name, slug, description) VALUES
 ```
 
 ### Check 2: Environment Variables
+
 ```
 Railway Dashboard → Web Service → Variables
 
@@ -204,6 +210,7 @@ Must have:
 ```
 
 ### Check 3: Database Connection
+
 ```
 # Test connection with:
 node test-direct-db.js
@@ -214,17 +221,19 @@ node test-direct-db.js
 ## 🎯 Expected Results
 
 ### After Reset:
+
 ```
 ✅ Database reset completed successfully!
 
 📊 Database Status:
    - Users: 1
-   - Authors: 1  
+   - Authors: 1
    - Categories: 6
    - Blog Posts: 0
 ```
 
 ### After Creating Post:
+
 ```
 ✅ Post created successfully
 ✅ Image uploaded to Cloudinary
@@ -237,6 +246,7 @@ node test-direct-db.js
 ## 🆘 Still Not Working?
 
 ### Option 1: Check Railway Logs
+
 The logs will show the EXACT error. Common ones:
 
 **"Table doesn't exist"**
@@ -252,6 +262,7 @@ The logs will show the EXACT error. Common ones:
 → Reset database (creates default author/categories)
 
 ### Option 2: Test Locally First
+
 ```bash
 # Use local MySQL to isolate the issue
 # Edit .env to use localhost
@@ -259,6 +270,7 @@ node server.js
 ```
 
 ### Option 3: Fresh Railway Deployment
+
 ```bash
 # Sometimes redeploy fixes issues
 railway up --force
@@ -269,16 +281,19 @@ railway up --force
 ## 📞 Quick Commands
 
 ### Test database connection:
+
 ```bash
 node -e "require('dotenv').config(); console.log(process.env.MYSQLHOST)"
 ```
 
 ### Check if tables exist:
+
 ```bash
 node -e "require('./database/db-manager').db.query('SHOW TABLES', console.log)"
 ```
 
 ### View Railway logs:
+
 ```bash
 railway logs
 ```
@@ -304,6 +319,7 @@ railway logs
 ---
 
 **Files Created:**
+
 - `reset-railway-database.js` - Automated reset script
 - `RESET-RAILWAY-DB.bat` - Easy-click reset tool
 - `RAILWAY-DATABASE-DEBUG.md` - Complete troubleshooting guide
