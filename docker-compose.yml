@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      # Database connection (overriding .env to point to db container)
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=Goxi@1234
+      - DB_NAME=graceland_church
+      # Cloudinary Configuration
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - CLOUDINARY_FOLDER=${CLOUDINARY_FOLDER:-graceland-church}
+      - CLOUDINARY_AUTO_OPTIMIZE=${CLOUDINARY_AUTO_OPTIMIZE:-true}
+      - CLOUDINARY_QUALITY=${CLOUDINARY_QUALITY:-auto:good}
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production-graceland-2024}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - graceland-net
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=Goxi@1234
+      - MYSQL_DATABASE=graceland_church
+    ports:
+      - "3307:3306" # Exposing on 3307 locally to avoid conflicts if local MySQL is running on 3306
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - graceland-net
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+networks:
+  graceland-net:
+    driver: bridge
+
+volumes:
+  db_data:

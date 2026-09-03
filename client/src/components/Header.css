@@ -1,0 +1,9 @@
+/* Header styles are inherited from global.css */
+.header {
+  transition: all 0.3s ease;
+}
+
+.header.scrolled {
+  background: linear-gradient(135deg, #6B0000 0%, #8B0000 100%) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+}

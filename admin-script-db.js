@@ -423,10 +423,16 @@ class AdminPanel {    constructor() {
             'dashboard': 'Dashboard',
             'blog-posts': 'Blog Posts',
             'sermons': 'Sermons',
+            'events': 'Events',
+            'fellowships': 'House Fellowships',
+            'gallery': 'Gallery',
+            'prayers': 'Prayer Requests',
+            'members': 'Connect Cards',
+            'comments': 'Comments',
             'social-media': 'Social Media',
             'settings': 'Settings'
         };
-        document.getElementById('pageTitle').textContent = titles[tab];
+        document.getElementById('pageTitle').textContent = titles[tab] || 'Admin';
 
         this.currentTab = tab;
 
@@ -435,6 +441,18 @@ class AdminPanel {    constructor() {
             await this.loadBlogPosts();
         } else if (tab === 'sermons') {
             await this.loadSermons();
+        } else if (tab === 'events') {
+            await this.loadEvents();
+        } else if (tab === 'fellowships') {
+            await this.loadFellowships();
+        } else if (tab === 'gallery') {
+            await this.loadGalleryAdmin();
+        } else if (tab === 'prayers') {
+            await this.loadPrayers();
+        } else if (tab === 'members') {
+            await this.loadMembers();
+        } else if (tab === 'comments') {
+            await this.loadComments();
         }
     }
 
@@ -1001,6 +1019,277 @@ class AdminPanel {    constructor() {
         }, 3000);
     }
 
+    // --- EVENTS MANAGEMENT ---
+    async loadEvents() {
+        try {
+            const events = await API.get('/events');
+            this.renderEvents(events);
+        } catch (error) {
+            logger.error('Error loading events:', error);
+            if(typeof showToast === 'function') showToast('Failed to load events', 'error');
+        }
+    }
+
+    renderEvents(events) {
+        const tbody = document.getElementById('eventsList');
+        if (events.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No events found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = events.map(event => `
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">${this.escapeHtml(event.title)}</td>
+                <td style="padding: 10px;">${new Date(event.event_date).toLocaleString()}</td>
+                <td style="padding: 10px;">${this.escapeHtml(event.location || '')}</td>
+                <td style="padding: 10px;">${event.rsvp_count || 0}</td>
+                <td style="padding: 10px;">
+                    <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteEvent(${event.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async deleteEvent(id) {
+        if (!confirm('Are you sure you want to delete this event?')) return;
+        try {
+            await API.delete(`/events/${id}`);
+            if(typeof showToast === 'function') showToast('Event deleted successfully', 'success');
+            await this.loadEvents();
+        } catch (error) {
+            logger.error('Error deleting event:', error);
+            if(typeof showToast === 'function') showToast('Failed to delete event', 'error');
+        }
+    }
+
+    // --- FELLOWSHIPS MANAGEMENT ---
+    async loadFellowships() {
+        try {
+            const fellowships = await API.get('/fellowships');
+            this.renderFellowships(fellowships);
+        } catch (error) {
+            logger.error('Error loading fellowships:', error);
+            if(typeof showToast === 'function') showToast('Failed to load fellowships', 'error');
+        }
+    }
+
+    renderFellowships(fellowships) {
+        const tbody = document.getElementById('fellowshipsList');
+        if (fellowships.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No fellowships found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = fellowships.map(f => `
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">${this.escapeHtml(f.name)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(f.leader_name)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(f.contact_phone || '')}</td>
+                <td style="padding: 10px;">
+                    <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteFellowship(${f.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async deleteFellowship(id) {
+        if (!confirm('Are you sure you want to delete this fellowship?')) return;
+        try {
+            await API.delete(`/fellowships/${id}`);
+            if(typeof showToast === 'function') showToast('Fellowship deleted successfully', 'success');
+            await this.loadFellowships();
+        } catch (error) {
+            logger.error('Error deleting fellowship:', error);
+            if(typeof showToast === 'function') showToast('Failed to delete fellowship', 'error');
+        }
+    }
+
+    // --- PRAYER REQUESTS MANAGEMENT ---
+    async loadPrayers() {
+        try {
+            const prayers = await API.get('/prayers');
+            this.renderPrayers(prayers);
+        } catch (error) {
+            logger.error('Error loading prayers:', error);
+            if(typeof showToast === 'function') showToast('Failed to load prayer requests', 'error');
+        }
+    }
+
+    renderPrayers(prayers) {
+        const tbody = document.getElementById('prayersList');
+        if (prayers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No prayer requests found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = prayers.map(p => `
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">${new Date(p.created_at).toLocaleDateString()}</td>
+                <td style="padding: 10px;">${this.escapeHtml(p.name)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(p.request)}</td>
+                <td style="padding: 10px;">${p.is_public ? 'Yes' : 'No'}</td>
+                <td style="padding: 10px;"><span class="status-badge status-${p.status}">${p.status}</span></td>
+                <td style="padding: 10px;">
+                    ${p.status === 'pending' ? `<button class="btn btn-sm btn-primary" onclick="adminPanel.updatePrayerStatus(${p.id}, 'approved')"><i class="fas fa-check"></i></button>` : ''}
+                    <button class="btn btn-sm btn-danger" onclick="adminPanel.deletePrayer(${p.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async updatePrayerStatus(id, status) {
+        try {
+            await API.put(`/prayers/${id}/status`, { status });
+            if(typeof showToast === 'function') showToast('Prayer status updated', 'success');
+            await this.loadPrayers();
+        } catch (error) {
+            logger.error('Error updating prayer status:', error);
+            if(typeof showToast === 'function') showToast('Failed to update prayer', 'error');
+        }
+    }
+
+    async deletePrayer(id) {
+        if (!confirm('Are you sure you want to delete this prayer request?')) return;
+        try {
+            await API.delete(`/prayers/${id}`);
+            if(typeof showToast === 'function') showToast('Prayer request deleted', 'success');
+            await this.loadPrayers();
+        } catch (error) {
+            logger.error('Error deleting prayer:', error);
+            if(typeof showToast === 'function') showToast('Failed to delete prayer', 'error');
+        }
+    }
+
+    // --- MEMBERS MANAGEMENT ---
+    async loadMembers() {
+        try {
+            const members = await API.get('/members');
+            this.renderMembers(members);
+        } catch (error) {
+            logger.error('Error loading members:', error);
+            if(typeof showToast === 'function') showToast('Failed to load members', 'error');
+        }
+    }
+
+    renderMembers(members) {
+        const tbody = document.getElementById('membersList');
+        if (members.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No connect cards found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = members.map(m => `
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">${this.escapeHtml(m.first_name)} ${this.escapeHtml(m.last_name)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(m.email)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(m.phone || '')}</td>
+                <td style="padding: 10px;">${this.escapeHtml(m.address || '')}</td>
+                <td style="padding: 10px;">${new Date(m.created_at).toLocaleDateString()}</td>
+            </tr>
+        `).join('');
+    }
+
+    // --- COMMENTS MANAGEMENT ---
+    async loadComments() {
+        try {
+            const comments = await API.get('/admin/comments');
+            this.renderComments(comments);
+        } catch (error) {
+            logger.error('Error loading comments:', error);
+            if(typeof showToast === 'function') showToast('Failed to load comments', 'error');
+        }
+    }
+
+    renderComments(comments) {
+        const tbody = document.getElementById('commentsList');
+        if (!comments || comments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No comments found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = comments.map(c => `
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">${new Date(c.created_at).toLocaleDateString()}</td>
+                <td style="padding: 10px;">${this.escapeHtml(c.author_name)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(c.content)}</td>
+                <td style="padding: 10px;"><span class="status-badge status-${c.status}">${c.status}</span></td>
+                <td style="padding: 10px;">
+                    ${c.status === 'pending' ? `<button class="btn btn-sm btn-primary" onclick="adminPanel.updateCommentStatus(${c.id}, 'approved')"><i class="fas fa-check"></i></button>` : ''}
+                    <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteComment(${c.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async updateCommentStatus(id, status) {
+        try {
+            await API.put(`/comments/${id}/status`, { status });
+            if(typeof showToast === 'function') showToast('Comment status updated', 'success');
+            await this.loadComments();
+        } catch (error) {
+            logger.error('Error updating comment status:', error);
+            if(typeof showToast === 'function') showToast('Failed to update comment', 'error');
+        }
+    }
+
+    async deleteComment(id) {
+        if (!confirm('Are you sure you want to delete this comment?')) return;
+        try {
+            await API.delete(`/comments/${id}`);
+            if(typeof showToast === 'function') showToast('Comment deleted', 'success');
+            await this.loadComments();
+        } catch (error) {
+            logger.error('Error deleting comment:', error);
+            if(typeof showToast === 'function') showToast('Failed to delete comment', 'error');
+        }
+    }
+
+    // --- GALLERY MANAGEMENT ---
+    async loadGalleryAdmin() {
+        try {
+            const items = await API.get('/gallery');
+            this.renderGalleryAdmin(items);
+        } catch (error) {
+            logger.error('Error loading gallery admin:', error);
+            if(typeof showToast === 'function') showToast('Failed to load gallery items', 'error');
+        }
+    }
+
+    renderGalleryAdmin(items) {
+        const grid = document.getElementById('galleryAdminList');
+        if (items.length === 0) {
+            grid.innerHTML = '<p>No images in gallery.</p>';
+            return;
+        }
+        grid.innerHTML = items.map(item => `
+            <div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                <img src="${item.image_url}" alt="${this.escapeHtml(item.title)}" style="width: 100%; height: 150px; object-fit: cover; display: block;">
+                <div style="padding: 10px; background: #fff;">
+                    <p style="margin: 0 0 5px 0; font-weight: bold; font-size: 0.9em;">${this.escapeHtml(item.title)}</p>
+                    <span style="font-size: 0.8em; color: var(--primary-color); display: block; margin-bottom: 10px;">${this.escapeHtml(item.category)}</span>
+                    <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteGalleryItem(${item.id})" style="width: 100%;"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async deleteGalleryItem(id) {
+        if (!confirm('Are you sure you want to delete this gallery item?')) return;
+        try {
+            await API.delete(`/gallery/${id}`);
+            if(typeof showToast === 'function') showToast('Gallery item deleted', 'success');
+            await this.loadGalleryAdmin();
+        } catch (error) {
+            logger.error('Error deleting gallery item:', error);
+            if(typeof showToast === 'function') showToast('Failed to delete gallery item', 'error');
+        }
+    }
+
+    escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+    }
+
     formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', { 
@@ -1118,5 +1407,88 @@ window.adminPanel = {
     openPostEditor: (postId) => adminPanel.openPostEditor(postId),
     deletePost: (id) => adminPanel.deletePost(id),
     deleteSermon: (id) => adminPanel.deleteSermon(id),
-    editSermon: (id) => adminPanel.editSermon(id)
+    editSermon: (id) => adminPanel.editSermon(id),
+    deleteEvent: (id) => adminPanel.deleteEvent(id),
+    deleteFellowship: (id) => adminPanel.deleteFellowship(id),
+    updatePrayerStatus: (id, status) => adminPanel.updatePrayerStatus(id, status),
+    deletePrayer: (id) => adminPanel.deletePrayer(id),
+    updateCommentStatus: (id, status) => adminPanel.updateCommentStatus(id, status),
+    deleteComment: (id) => adminPanel.deleteComment(id),
+    deleteGalleryItem: (id) => adminPanel.deleteGalleryItem(id)
+};
+
+// Global Submit Handlers for Modals
+window.submitEvent = async function(e) {
+    e.preventDefault();
+    const data = {
+        title: document.getElementById('eventTitle').value,
+        description: document.getElementById('eventDescription').value,
+        event_date: document.getElementById('eventDate').value,
+        location: document.getElementById('eventLocation').value
+    };
+    try {
+        await API.post('/events', data);
+        if(typeof showToast === 'function') showToast('Event created successfully', 'success');
+        document.getElementById('eventEditorModal').style.display = 'none';
+        document.getElementById('eventForm').reset();
+        adminPanel.loadEvents();
+    } catch (error) {
+        logger.error('Error saving event:', error);
+        if(typeof showToast === 'function') showToast('Failed to save event', 'error');
+    }
+};
+
+window.submitFellowship = async function(e) {
+    e.preventDefault();
+    const data = {
+        name: document.getElementById('fellowshipName').value,
+        leader_name: document.getElementById('fellowshipLeader').value,
+        address: document.getElementById('fellowshipAddress').value,
+        meeting_time: document.getElementById('fellowshipTime').value,
+        contact_phone: document.getElementById('fellowshipPhone').value
+    };
+    try {
+        await API.post('/fellowships', data);
+        if(typeof showToast === 'function') showToast('Fellowship created successfully', 'success');
+        document.getElementById('fellowshipEditorModal').style.display = 'none';
+        document.getElementById('fellowshipForm').reset();
+        adminPanel.loadFellowships();
+    } catch (error) {
+        logger.error('Error saving fellowship:', error);
+        if(typeof showToast === 'function') showToast('Failed to save fellowship', 'error');
+    }
+};
+
+window.submitGalleryUpload = async function(e) {
+    e.preventDefault();
+    const title = document.getElementById('galleryTitle').value;
+    const category = document.getElementById('galleryCategory').value;
+    const fileInput = document.getElementById('galleryFile');
+    
+    if (!fileInput.files[0]) {
+        if(typeof showToast === 'function') showToast('Please select a file', 'error');
+        return;
+    }
+    
+    // Check if Cloudinary upload script handles it
+    if (window.adminImageUpload && window.adminImageUpload.uploadToCloudinary) {
+        adminPanel.showUploadProgressOverlay();
+        adminPanel.updateUploadProgress(1, 1, 'Uploading image...');
+        try {
+            const url = await window.adminImageUpload.uploadToCloudinary(fileInput.files[0]);
+            await API.post('/gallery', { title, category, image_url: url });
+            if(typeof showToast === 'function') showToast('Image uploaded successfully', 'success');
+            document.getElementById('galleryUploadModal').style.display = 'none';
+            document.getElementById('galleryForm').reset();
+            adminPanel.loadGalleryAdmin();
+        } catch (error) {
+            logger.error('Error uploading gallery image:', error);
+            if(typeof showToast === 'function') showToast('Failed to upload image', 'error');
+        } finally {
+            adminPanel.hideUploadProgressOverlay();
+        }
+    } else {
+        // Fallback or error
+        if(typeof showToast === 'function') showToast('Image upload functionality is not loaded', 'error');
+    }
 };

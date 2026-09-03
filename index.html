@@ -93,6 +93,14 @@
         </script>
     </head>
     <body>
+        <!-- Announcement Banner -->
+        <div id="announcement-banner" class="announcement-banner" style="display: none;">
+            <div class="container banner-content">
+                <span id="announcement-text"></span>
+                <button class="close-banner" onclick="document.getElementById('announcement-banner').style.display='none'"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
         <!-- Header --> <header class="header"> <nav class="nav">
                 <div class="logo">
                     <img src="logo.png" alt="RCCG Graceland Area HQ Logo"
@@ -643,6 +651,30 @@
             </div>
         </section>
 
+        <!-- Connect Section -->
+        <section class="connect-section bg-light" id="connect" style="padding: 4rem 0; background-color: var(--gray-50);">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Connect With Us</h2>
+                    <p>We'd love to hear from you and pray with you</p>
+                </div>
+                <div class="connect-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 30px;">
+                    <div class="connect-card" style="background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: var(--shadow);">
+                        <div class="icon" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;"><i class="fas fa-praying-hands"></i></div>
+                        <h3>Prayer Requests</h3>
+                        <p style="margin-bottom: 20px;">Submit your prayer requests. Our intercessory team is standing by to pray with you.</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('prayerModal').style.display='flex'">Submit Request</button>
+                    </div>
+                    <div class="connect-card" style="background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: var(--shadow);">
+                        <div class="icon" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;"><i class="fas fa-user-plus"></i></div>
+                        <h3>New Member Connect</h3>
+                        <p style="margin-bottom: 20px;">New here? We'd love to get to know you better and welcome you to the family.</p>
+                        <button class="btn btn-secondary" onclick="document.getElementById('memberModal').style.display='flex'">Fill Connect Card</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Location Section -->
         <section class="location" id="contact">
             <div class="container">
@@ -696,7 +728,7 @@
                                 </div>
                                 <div class="contact-details">
                                     <strong>Phone</strong>
-                                    <p>+234 XXX XXX XXXX</p>
+                                    <p>+234 708 713 0095<br>+234 818 418 6051</p>
                                 </div>
                             </div>
                             <div class="contact-item">
@@ -729,41 +761,35 @@
                 <div class="section-header">
                     <h2>Give Online</h2>
                     <p>Support the work of God's kingdom</p>
-                </div> <div class="give-content">
-                    <p class="give-description">Your tithes and offerings help
-                        us fulfill the great commission. Thank you for your
-                        generosity!</p>
-                    <div class="giving-contact">
-                        <h4><i class="fas fa-hands-helping"></i> Partner With
-                            Us</h4>
+                </div> 
+                <div class="give-content">
+                    <p class="give-description">Your tithes and offerings help us fulfill the great commission. Thank you for your generosity!</p>
+                    
+                    <div class="bank-details-card">
+                        <h3>Bank Transfer Details</h3>
+                        <div class="bank-account">
+                            <p><strong>Bank:</strong> Access Bank</p>
+                            <p><strong>Account Name:</strong> RCCG Graceland</p>
+                            <p class="account-number"><strong>Account Number:</strong> <span class="highlight">0718947376</span></p>
+                        </div>
+                    </div>
+
+                    <div class="giving-contact mt-4">
+                        <h4><i class="fas fa-hands-helping"></i> Prayer & Giving Support</h4>
                         <div class="contact-info">
-                            <p><i class="fas fa-info-circle"></i> For those who
-                                want to support God's work through RCCG
-                                Graceland Area HQ, please contact us for giving
-                                information:</p>
-                            <div class="contact-methods">
+                            <p>For those who need prayer or have questions regarding giving, please contact us:</p>
+                            <div class="contact-methods" style="justify-content: center; margin-top: 15px;">
                                 <div class="contact-item">
                                     <i class="fas fa-phone"></i>
-                                    <span><strong>Phone:</strong>
-                                        +234-XXX-XXX-XXXX</span>
+                                    <span>+234 708 713 0095</span>
                                 </div>
                                 <div class="contact-item">
-                                    <i class="fas fa-envelope"></i>
-                                    <span><strong>Email:</strong>
-                                        info@rccggraceland.org</span>
-                                </div>
-                                <div class="contact-item">
-                                    <i class="fab fa-whatsapp"></i>
-                                    <span><strong>WhatsApp:</strong>
-                                        +234-XXX-XXX-XXXX</span>
+                                    <i class="fas fa-phone"></i>
+                                    <span>+234 818 418 6051</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-large"
-                        onclick="toggleContactInfo()">
-                        <i class="fas fa-phone"></i> Contact for Giving Info
-                    </button>
                 </div>
             </div>
         </section>
@@ -819,7 +845,7 @@
                         <p>Jah Michael Bus Stop<br>Lagos-Badagry
                             Expressway<br>Lagos, Nigeria</p>
                         <p class="footer-contact">
-                            <i class="fas fa-phone"></i> +234 XXX XXX XXXX<br>
+                            <i class="fas fa-phone"></i> +234 708 713 0095, +234 818 418 6051<br>
                             <i class="fas fa-envelope"></i>
                             graceland@rccgapapa.org
                         </p>
@@ -833,6 +859,56 @@
         </footer> <!-- Loading indicator -->
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Modals -->
+        <div id="prayerModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+            <div class="modal-content" style="background-color: #fefefe; margin: auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; position: relative;">
+                <span class="close-modal" onclick="document.getElementById('prayerModal').style.display='none'" style="position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer;">&times;</span>
+                <h3 style="margin-bottom: 20px; color: var(--primary-color);">Submit Prayer Request</h3>
+                <form id="prayerForm" onsubmit="submitPrayerRequest(event)">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="text" id="prayerName" placeholder="Your Name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="email" id="prayerEmail" placeholder="Your Email (Optional)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <textarea id="prayerText" rows="4" placeholder="Your Prayer Request" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label><input type="checkbox" id="prayerPublic"> Make this public (approved before showing)</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Request</button>
+                    <p id="prayerMessage" style="margin-top: 15px; display: none;"></p>
+                </form>
+            </div>
+        </div>
+
+        <div id="memberModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+            <div class="modal-content" style="background-color: #fefefe; margin: auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; position: relative;">
+                <span class="close-modal" onclick="document.getElementById('memberModal').style.display='none'" style="position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer;">&times;</span>
+                <h3 style="margin-bottom: 20px; color: var(--primary-color);">Connect Card</h3>
+                <form id="memberForm" onsubmit="submitMemberConnect(event)">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="text" id="memberFirstName" placeholder="First Name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="text" id="memberLastName" placeholder="Last Name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="email" id="memberEmail" placeholder="Your Email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="tel" id="memberPhone" placeholder="Phone Number" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <textarea id="memberAddress" rows="2" placeholder="Home Address" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-secondary" style="width: 100%;">Submit Connect Card</button>
+                    <p id="memberMessage" style="margin-top: 15px; display: none;"></p>
+                </form>
+            </div>
         </div>
 
         <!-- Instagram Embed Script -->

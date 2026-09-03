@@ -56,10 +56,46 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
+                <li class="menu-item" data-tab="events">
+                    <a href="#events">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Events</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="fellowships">
+                    <a href="#fellowships">
+                        <i class="fas fa-users"></i>
+                        <span>Fellowships</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="gallery">
+                    <a href="#gallery">
+                        <i class="fas fa-images"></i>
+                        <span>Gallery</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="prayers">
+                    <a href="#prayers">
+                        <i class="fas fa-praying-hands"></i>
+                        <span>Prayer Requests</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="members">
+                    <a href="#members">
+                        <i class="fas fa-address-card"></i>
+                        <span>Connect Cards</span>
+                    </a>
+                </li>
                 <li class="menu-item" data-tab="blog-posts">
                     <a href="#blog-posts">
                         <i class="fas fa-blog"></i>
                         <span>Blog Posts</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="comments">
+                    <a href="#comments">
+                        <i class="fas fa-comments"></i>
+                        <span>Comments</span>
                     </a>
                 </li>
                 <li class="menu-item" data-tab="sermons">
@@ -335,6 +371,146 @@
                 </div>
             </section>
 
+            <!-- Events Tab -->
+            <section class="tab-content" id="events">
+                <div class="content-header">
+                    <h2>Manage Events</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="createEventBtn" onclick="document.getElementById('eventEditorModal').style.display='flex'">
+                            <i class="fas fa-plus"></i> Add New Event
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container" style="overflow-x:auto;">
+                    <table class="data-table" id="eventsTable" style="width:100%; text-align:left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <th style="padding: 10px;">Title</th>
+                                <th style="padding: 10px;">Date</th>
+                                <th style="padding: 10px;">Location</th>
+                                <th style="padding: 10px;">RSVPs</th>
+                                <th style="padding: 10px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsList">
+                            <!-- Events loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Fellowships Tab -->
+            <section class="tab-content" id="fellowships">
+                <div class="content-header">
+                    <h2>Manage House Fellowships</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="createFellowshipBtn" onclick="document.getElementById('fellowshipEditorModal').style.display='flex'">
+                            <i class="fas fa-plus"></i> Add Fellowship
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container" style="overflow-x:auto;">
+                    <table class="data-table" id="fellowshipsTable" style="width:100%; text-align:left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <th style="padding: 10px;">Name</th>
+                                <th style="padding: 10px;">Leader</th>
+                                <th style="padding: 10px;">Phone</th>
+                                <th style="padding: 10px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fellowshipsList">
+                            <!-- Fellowships loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Gallery Tab -->
+            <section class="tab-content" id="gallery">
+                <div class="content-header">
+                    <h2>Manage Gallery</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="uploadGalleryBtn" onclick="document.getElementById('galleryUploadModal').style.display='flex'">
+                            <i class="fas fa-upload"></i> Upload Media
+                        </button>
+                    </div>
+                </div>
+                <div class="gallery-admin-grid" id="galleryAdminList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                    <!-- Gallery items loaded here -->
+                </div>
+            </section>
+
+            <!-- Prayers Tab -->
+            <section class="tab-content" id="prayers">
+                <div class="content-header">
+                    <h2>Prayer Requests</h2>
+                </div>
+                <div class="table-container" style="overflow-x:auto;">
+                    <table class="data-table" id="prayersTable" style="width:100%; text-align:left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <th style="padding: 10px;">Date</th>
+                                <th style="padding: 10px;">Name</th>
+                                <th style="padding: 10px;">Request</th>
+                                <th style="padding: 10px;">Public</th>
+                                <th style="padding: 10px;">Status</th>
+                                <th style="padding: 10px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prayersList">
+                            <!-- Prayers loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Members Tab -->
+            <section class="tab-content" id="members">
+                <div class="content-header">
+                    <h2>Connect Cards (Members)</h2>
+                </div>
+                <div class="table-container" style="overflow-x:auto;">
+                    <table class="data-table" id="membersTable" style="width:100%; text-align:left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <th style="padding: 10px;">Name</th>
+                                <th style="padding: 10px;">Email</th>
+                                <th style="padding: 10px;">Phone</th>
+                                <th style="padding: 10px;">Address</th>
+                                <th style="padding: 10px;">Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersList">
+                            <!-- Members loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Comments Tab -->
+            <section class="tab-content" id="comments">
+                <div class="content-header">
+                    <h2>Blog Comments</h2>
+                </div>
+                <div class="table-container" style="overflow-x:auto;">
+                    <table class="data-table" id="commentsTable" style="width:100%; text-align:left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <th style="padding: 10px;">Date</th>
+                                <th style="padding: 10px;">Author</th>
+                                <th style="padding: 10px;">Comment</th>
+                                <th style="padding: 10px;">Status</th>
+                                <th style="padding: 10px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commentsList">
+                            <!-- Comments loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Settings Tab -->
             <section class="tab-content" id="settings">
                 <div class="settings-container">
@@ -532,6 +708,112 @@
                         id="cancelShare">Cancel</button>
                     <button type="button" class="btn btn-primary"
                         id="confirmShare">Share Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Editor Modal -->
+        <div class="modal" id="eventEditorModal" style="display: none; align-items: center; justify-content: center; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background-color: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Add New Event</h2>
+                    <button class="modal-close" onclick="document.getElementById('eventEditorModal').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="eventForm" onsubmit="submitEvent(event)">
+                        <input type="hidden" id="eventId">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Title</label>
+                            <input type="text" id="eventTitle" required style="width:100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Description</label>
+                            <textarea id="eventDescription" rows="3" required style="width:100%; padding: 8px;"></textarea>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Event Date & Time</label>
+                            <input type="datetime-local" id="eventDate" required style="width:100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Location</label>
+                            <input type="text" id="eventLocation" style="width:100%; padding: 8px;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Event</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fellowship Editor Modal -->
+        <div class="modal" id="fellowshipEditorModal" style="display: none; align-items: center; justify-content: center; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background-color: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Add House Fellowship</h2>
+                    <button class="modal-close" onclick="document.getElementById('fellowshipEditorModal').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="fellowshipForm" onsubmit="submitFellowship(event)">
+                        <input type="hidden" id="fellowshipId">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Name / Zone</label>
+                            <input type="text" id="fellowshipName" required style="width:100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Leader Name</label>
+                            <input type="text" id="fellowshipLeader" required style="width:100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Address</label>
+                            <input type="text" id="fellowshipAddress" required style="width:100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Meeting Time</label>
+                            <input type="text" id="fellowshipTime" required style="width:100%; padding: 8px;" placeholder="e.g. Sundays 5:00 PM">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Contact Phone</label>
+                            <input type="text" id="fellowshipPhone" style="width:100%; padding: 8px;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Fellowship</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Upload Modal -->
+        <div class="modal" id="galleryUploadModal" style="display: none; align-items: center; justify-content: center; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background-color: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Upload to Gallery</h2>
+                    <button class="modal-close" onclick="document.getElementById('galleryUploadModal').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="galleryForm" onsubmit="submitGalleryUpload(event)">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Title / Description</label>
+                            <input type="text" id="galleryTitle" required style="width:100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Category</label>
+                            <select id="galleryCategory" required style="width:100%; padding: 8px;">
+                                <option value="Sunday Service">Sunday Service</option>
+                                <option value="Special Event">Special Event</option>
+                                <option value="Holy Ghost Service">Holy Ghost Service</option>
+                                <option value="Youth">Youth</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Image File (Optimized automatically via Cloudinary)</label>
+                            <input type="file" id="galleryFile" accept="image/*" required style="width:100%; padding: 8px;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Upload</button>
+                    </form>
                 </div>
             </div>
         </div>

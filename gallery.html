@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Primary Meta Tags -->
+        <title>Media Gallery - RCCG Graceland Area HQ</title>
+        <meta name="title" content="Media Gallery - RCCG Graceland Area HQ">
+        <meta name="description"
+            content="View photos and media from recent events at RCCG Graceland Area HQ.">
+        <meta name="keywords"
+            content="RCCG, Media Gallery, Photos, Church Events, Worship">
+        <meta name="author" content="RCCG Graceland Area HQ">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="https://rccggraceland.org/gallery.html">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://rccggraceland.org/gallery.html">
+        <meta property="og:title"
+            content="Media Gallery - RCCG Graceland Area HQ">
+        <meta property="og:description"
+            content="View photos and media from recent events.">
+        <meta property="og:image" content="https://rccggraceland.org/logo.png">
+        <meta property="og:site_name" content="RCCG Graceland Area HQ">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url"
+            content="https://rccggraceland.org/gallery.html">
+        <meta property="twitter:title"
+            content="Media Gallery - RCCG Graceland Area HQ">
+        <meta property="twitter:description"
+            content="View photos and media from recent events.">
+        <meta property="twitter:image"
+            content="https://rccggraceland.org/logo.png">
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="logo.png">
+        <link rel="apple-touch-icon" href="logo.png">
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="blog-styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet">
+
+        <!-- Performance Optimization -->
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+        <!-- Structured Data (JSON-LD) -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "RCCG Graceland Area HQ Blog",
+            "description": "Inspiring articles, testimonies, and biblical insights from RCCG Graceland Area HQ",
+            "url": "https://rccggraceland.org/blog.html",
+            "publisher": {
+                "@type": "Organization",
+                "name": "RCCG Graceland Area HQ",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://rccggraceland.org/logo.png"
+                }
+            }
+        }
+        </script>
+    </head>
+    <body>
+        <!-- Header -->
+        <header class="header">
+            <nav class="nav">
+                <div class="logo">
+                    <img src="logo.png" alt="RCCG Graceland Area HQ Logo"
+                        class="logo-image">
+                    <div class="logo-text">
+                        <h1>RCCG GRACELAND AREA HQ</h1>
+                        <p>Favored Family | Lagos, Nigeria</p>
+                    </div>
+                </div>
+                <button class="menu-toggle" aria-label="Toggle menu">
+                    <span class="hamburger"></span>
+                    <span class="hamburger"></span>
+                    <span class="hamburger"></span>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#livestream">Live</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#sermons">Sermons</a></li>
+                    <li><a href="blog.html" class="active">Blog</a></li>
+                    <li><a href="index.html#ministries">Ministries</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="index.html#give">Give</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="page-header-overlay"></div>
+            <div class="container">
+                <div class="page-header-content">
+                    <div class="breadcrumb">
+                        <a href="index.html"><i class="fas fa-home"></i>
+                            Home</a>
+                        <span class="breadcrumb-separator"><i
+                                class="fas fa-chevron-right"></i></span>
+                        <span>Gallery</span>
+                    </div>
+                    <h1>Media Gallery</h1>
+                    <p>Reliving glorious moments in His presence</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Filters -->
+        <section class="blog-filters">
+            <div class="container">
+                <div class="filter-controls">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-category="">All</button>
+                        <button class="filter-btn" data-category="Sunday Service">Sunday Service</button>
+                        <button class="filter-btn" data-category="Special Event">Special Event</button>
+                        <button class="filter-btn" data-category="Holy Ghost Service">Holy Ghost Service</button>
+                        <button class="filter-btn" data-category="Youth">Youth</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Content -->
+        <section class="gallery-content" style="padding: 4rem 0;">
+            <div class="container">
+                <div class="gallery-grid" id="galleryContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                    <!-- Images injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <div class="footer-logo">
+                            <img src="logo.png"
+                                alt="RCCG Graceland Area HQ Logo"
+                                class="footer-logo-image">
+                        </div>
+                        <h3>RCCG Graceland Area HQ</h3>
+                        <p>An Area HQ under the Redeemed Christian Church of
+                            God, Favored Family</p>
+                        <p
+                            class="footer-motto">"Experiencing An Overflow Of His Grace"</p>
+                        <p>Making heaven, taking as many people with us.</p>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Quick Links</h3>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="index.html#about">About Us</a></li>
+                            <li><a href="index.html#services">Service
+                                    Times</a></li>
+                            <li><a
+                                    href="index.html#ministries">Ministries</a></li>
+                            <li><a href="gallery.html">Gallery</a></li>
+                            <li><a href="index.html#contact">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Contact Info</h3>
+                        <div class="footer-contact">
+                            <p><i class="fas fa-map-marker-alt"></i> Jah Michael
+                                Bus Stop, Lagos-Badagry Expressway, Lagos</p>
+                            <p><i class="fas fa-phone"></i>
+                                +234-XXX-XXX-XXXX</p>
+                            <p><i class="fas fa-envelope"></i>
+                                info@rccggraceland.org</p>
+                        </div>
+                    </div>
+                    <div class="footer-section"> <h3>Follow Us</h3>
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/RCCGLP4GRACELAND/"
+                                target="_blank" rel="noopener"
+                                aria-label="Follow us on Facebook"
+                                title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://www.youtube.com/@rccggraceland"
+                                target="_blank" rel="noopener"
+                                aria-label="Subscribe on YouTube"
+                                title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a
+                                href="https://www.instagram.com/rccggracelandparishbadagry/"
+                                target="_blank" rel="noopener"
+                                aria-label="Follow us on Instagram"
+                                title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com/rccggraceland"
+                                target="_blank" rel="noopener"
+                                aria-label="Follow us on Twitter"
+                                title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container"> <p>&copy; 2024 RCCG Graceland Area HQ.
+                        All rights reserved.
+                        | Built with ❤️ for the Kingdom</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Instagram Embed Script -->
+        <script async src="https://www.instagram.com/embed.js"></script>
+
+        <!-- Environment Configuration -->
+        <script src="scripts/logger.js"></script>
+        <script src="scripts/config.js"></script>
+        <script src="config/environment.js"></script>
+        <script src="scripts/instagram-feed.js"></script>
+        <script src="scripts/facebook-live.js"></script>
+        <script src="script.js"></script>
+        <script>
+            let currentCategory = '';
+
+            async function loadGallery() {
+                try {
+                    const url = currentCategory ? `/api/gallery?category=${encodeURIComponent(currentCategory)}` : '/api/gallery';
+                    const response = await fetch(url);
+                    const images = await response.json();
+                    
+                    const container = document.getElementById('galleryContainer');
+                    if (images.length === 0) {
+                        container.innerHTML = '<p>No images found in this category.</p>';
+                        container.style.display = 'block';
+                        return;
+                    }
+
+                    container.style.display = 'grid';
+                    container.innerHTML = images.map(img => `
+                        <div class="gallery-item" style="border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); position: relative; group;">
+                            <img src="${img.image_url}" alt="${img.title}" loading="lazy" style="width: 100%; height: 250px; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <div class="overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); padding: 10px; color: white;">
+                                <h4 style="margin:0; font-size: 1rem;">${img.title}</h4>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (err) {
+                    console.error('Error loading gallery:', err);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                loadGallery();
+
+                const buttons = document.querySelectorAll('.filter-btn');
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        buttons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentCategory = btn.dataset.category;
+                        loadGallery();
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

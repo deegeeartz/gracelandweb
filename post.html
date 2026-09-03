@@ -249,6 +249,53 @@
             font-weight: 500;
         }
 
+        /* Comments Section Styles */
+        .comments-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        .comments-list {
+            margin-bottom: 2rem;
+        }
+        .comment-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .comment-author {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        .comment-date {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .comment-form input, .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        .comment-form button {
+            align-self: flex-start;
+        }
+
         .stat-item i {
             color: var(--primary-color);
         }
@@ -621,7 +668,24 @@
                         ` : ''}
                     </div>
                 </div>
+
+                <!-- Comments Section -->
+                <div class="comments-section" id="commentsSection">
+                    <h3>Comments</h3>
+                    <div class="comments-list" id="commentsList">
+                        <!-- Comments loaded here -->
+                    </div>
+                    <h4>Leave a Comment</h4>
+                    <form class="comment-form" id="commentForm" onsubmit="submitComment(event)">
+                        <input type="hidden" id="commentPostId" value="${post.id}">
+                        <input type="text" id="commentName" placeholder="Your Name" required>
+                        <textarea id="commentContent" rows="4" placeholder="Your Comment" required></textarea>
+                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                        <p id="commentMessage" style="display:none; margin-top: 10px;"></p>
+                    </form>
+                </div>
             `;            document.getElementById('post-container').innerHTML = postHTML;
+            loadComments(post.id);
 
             // Update page title and meta tags for SEO
             updateMetaTags(post);
@@ -658,13 +722,74 @@
             updateMetaTag('property', 'twitter:title', title);
             updateMetaTag('property', 'twitter:description', description);
             updateMetaTag('property', 'twitter:image', image);
-            updateMetaTag('property', 'twitter:url', url);
-              // Update canonical URL
+            if (url) updateMetaTag('property', 'twitter:url', url);
+
+            // Update canonical URL
             updateLinkTag('canonical', url);
             
-            // Add structured data (JSON-LD) for rich snippets            addStructuredData(post);
+            // Add structured data (JSON-LD) for rich snippets
+            addStructuredData(post);
             
-            logger.log('Meta tags and structured data updated for SEO');
+            logger.log('Social sharing tags updated');
+        }
+
+        async function loadComments(postId) {
+            try {
+                const response = await fetch(`/api/comments/${postId}`);
+                if (!response.ok) throw new Error('Failed to load comments');
+                const comments = await response.json();
+                
+                const commentsList = document.getElementById('commentsList');
+                if (comments.length === 0) {
+                    commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                    return;
+                }
+                
+                commentsList.innerHTML = comments.map(c => `
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <span class="comment-author">${escapeHtml(c.author_name)}</span>
+                            <span class="comment-date">${new Date(c.created_at).toLocaleString()}</span>
+                        </div>
+                        <div class="comment-content">${escapeHtml(c.content)}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+            }
+        }
+
+        async function submitComment(e) {
+            e.preventDefault();
+            const msg = document.getElementById('commentMessage');
+            const data = {
+                post_id: document.getElementById('commentPostId').value,
+                author_name: document.getElementById('commentName').value,
+                content: document.getElementById('commentContent').value
+            };
+
+            try {
+                const res = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                msg.style.display = 'block';
+                if (res.ok) {
+                    msg.style.color = 'green';
+                    msg.textContent = 'Comment submitted for approval!';
+                    document.getElementById('commentForm').reset();
+                } else {
+                    const error = await res.json();
+                    msg.style.color = 'red';
+                    msg.textContent = error.error || 'Failed to submit comment.';
+                }
+            } catch (error) {
+                msg.style.display = 'block';
+                msg.style.color = 'red';
+                msg.textContent = 'Network error.';
+            }
         }
 
         function addStructuredData(post) {

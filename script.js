@@ -522,3 +522,321 @@ console.log(`
     
     Made with ❤️ for the Kingdom
 `);
+
+// Fetch settings for Announcement Banner
+async function fetchAnnouncementBanner() {
+    try {
+        const response = await fetch('/api/settings');
+        if (!response.ok) return;
+        const data = await response.json();
+        
+        // Find announcement settings
+        const textSetting = data.find(s => s.key === 'announcement_text');
+        const activeSetting = data.find(s => s.key === 'announcement_active');
+        const linkSetting = data.find(s => s.key === 'announcement_link');
+
+        if (activeSetting && activeSetting.value === 'true' && textSetting && textSetting.value) {
+            const banner = document.getElementById('announcement-banner');
+            const textSpan = document.getElementById('announcement-text');
+            
+            if (banner && textSpan) {
+                if (linkSetting && linkSetting.value) {
+                    textSpan.innerHTML = `<a href="${linkSetting.value}" style="color: white; text-decoration: underline;">${textSetting.value}</a>`;
+                } else {
+                    textSpan.textContent = textSetting.value;
+                }
+                banner.style.display = 'block';
+            }
+        }
+// Performance monitoring
+function measurePagePerformance() {
+    if ('performance' in window) {
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const perfData = performance.getEntriesByType('navigation')[0];
+                console.log('Page Load Time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+                console.log('DOM Content Loaded:', perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart, 'ms');
+            }, 0);
+        });
+    }
+}
+
+// Error handling
+window.addEventListener('error', (e) => {
+    console.error('JavaScript Error:', e.error);
+    // Could send error to logging service in production
+});
+
+// Resize handler for responsive adjustments
+const handleResize = debounce(() => {
+    // Update header height for scroll calculations
+    window.headerHeight = header.offsetHeight;
+    
+    // Close mobile menu on resize to larger screen
+    if (window.innerWidth > 768) {
+        navLinks.classList.remove('active');
+        menuToggle.classList.remove('active');
+    }
+    
+    // Adjust video player aspect ratio if needed
+    adjustVideoPlayer();
+}, 250);
+
+function adjustVideoPlayer() {
+    const videoWrapper = document.querySelector('.video-wrapper iframe');
+    if (videoWrapper && window.innerWidth < 768) {
+        const containerWidth = videoWrapper.parentElement.offsetWidth;
+        const aspectRatio = 16 / 9;
+        const newHeight = containerWidth / aspectRatio;
+        videoWrapper.style.height = newHeight + 'px';
+    }
+}
+
+window.addEventListener('resize', handleResize);
+
+// Accessibility improvements
+function enhanceAccessibility() {
+    // Add skip link
+    const skipLink = document.createElement('a');
+    skipLink.href = '#main-content';
+    skipLink.textContent = 'Skip to main content';
+    skipLink.className = 'skip-link';
+    skipLink.style.cssText = `
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: var(--primary-color);
+        color: white;
+        padding: 8px;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 10001;
+        transition: top 0.3s;
+    `;
+    
+    skipLink.addEventListener('focus', () => {
+        skipLink.style.top = '6px';
+    });
+    
+    skipLink.addEventListener('blur', () => {
+        skipLink.style.top = '-40px';
+    });
+    
+    document.body.insertBefore(skipLink, document.body.firstChild);
+    
+    // Add main content id
+    const heroSection = document.querySelector('.hero');
+    if (heroSection) {
+        heroSection.id = 'main-content';
+    }
+    
+    // Improve button accessibility
+    const buttons = document.querySelectorAll('button:not([aria-label])');
+    buttons.forEach(button => {
+        if (button.classList.contains('menu-toggle')) {
+            button.setAttribute('aria-label', 'Toggle navigation menu');
+            button.setAttribute('aria-expanded', 'false');
+        }
+    });
+    
+    // Update aria-expanded for mobile menu
+    menuToggle.addEventListener('click', () => {
+        const isExpanded = navLinks.classList.contains('active');
+        menuToggle.setAttribute('aria-expanded', isExpanded.toString());
+    });
+}
+
+// Toggle contact info in giving section
+function toggleContactInfo() {
+    const contactMethods = document.querySelector('.contact-methods');
+    const button = document.querySelector('.give-section .btn-primary');
+    
+    if (contactMethods.style.display === 'none' || contactMethods.style.display === '') {
+        contactMethods.style.display = 'flex';
+        contactMethods.classList.add('show');
+        button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Contact Info';
+    } else {
+        contactMethods.style.display = 'none';
+        contactMethods.classList.remove('show');
+        button.innerHTML = '<i class="fas fa-phone"></i> Contact for Giving Info';
+    }
+}
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializePage();
+    enhanceAccessibility();
+    loadImages();    measurePagePerformance();
+});
+
+// Service Worker registration for offline support (optional)
+// DISABLED: Causes 404 errors if sw.js doesn't exist or is misconfigured
+// Uncomment below if you want to implement full PWA functionality
+/*
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // Get base path for GitHub Pages subdirectory support
+        const getServiceWorkerPath = () => {
+            const pathname = window.location.pathname;
+            const pathParts = pathname.split('/').filter(part => part.length > 0);
+            
+            // If on GitHub Pages with subdirectory: /gracelandweb/sw.js
+            if (pathParts.length > 0 && !pathParts[0].includes('.')) {
+                return `/${pathParts[0]}/sw.js`;
+            }
+            // Otherwise: /sw.js
+            return '/sw.js';
+        };
+        
+        const swPath = getServiceWorkerPath();
+        
+        navigator.serviceWorker.register(swPath)
+            .then(registration => {
+                console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+    });
+}
+*/
+
+// Export functions for external use
+window.RCCGGraceland = {
+    toggleMenu,
+    showNotification,
+    hideLoading
+};
+
+// Console message
+console.log(`
+    🏛️ RCCG Graceland Area HQ Website
+    📍 Jah Michael Bus Stop, Lagos-Badagry Expressway
+    ✝️ Experiencing An Overflow Of His Grace
+    
+    Made with ❤️ for the Kingdom
+`);
+
+// Fetch settings for Announcement Banner
+async function fetchAnnouncementBanner() {
+    try {
+        const response = await fetch('/api/settings');
+        if (!response.ok) return;
+        const data = await response.json();
+        
+        // Find announcement settings
+        const textSetting = data.find(s => s.key === 'announcement_text');
+        const activeSetting = data.find(s => s.key === 'announcement_active');
+        const linkSetting = data.find(s => s.key === 'announcement_link');
+
+        if (activeSetting && activeSetting.value === 'true' && textSetting && textSetting.value) {
+            const banner = document.getElementById('announcement-banner');
+            const textSpan = document.getElementById('announcement-text');
+            
+            if (banner && textSpan) {
+                if (linkSetting && linkSetting.value) {
+                    textSpan.innerHTML = `<a href="${linkSetting.value}" style="color: white; text-decoration: underline;">${textSetting.value}</a>`;
+                } else {
+                    textSpan.textContent = textSetting.value;
+                }
+                banner.style.display = 'block';
+            }
+        }
+    } catch (err) {
+        console.error('Error fetching announcement banner:', err);
+    }
+}
+
+// Call fetchAnnouncementBanner on load
+document.addEventListener('DOMContentLoaded', () => {
+    fetchAnnouncementBanner();
+});
+
+// Modal Close logic for clicks outside
+window.onclick = function(event) {
+    const prayerModal = document.getElementById('prayerModal');
+    const memberModal = document.getElementById('memberModal');
+    if (event.target == prayerModal) {
+        prayerModal.style.display = "none";
+    }
+    if (event.target == memberModal) {
+        memberModal.style.display = "none";
+    }
+}
+
+async function submitPrayerRequest(e) {
+    e.preventDefault();
+    const messageEl = document.getElementById('prayerMessage');
+    messageEl.style.display = 'none';
+    
+    const data = {
+        name: document.getElementById('prayerName').value,
+        email: document.getElementById('prayerEmail').value,
+        request_text: document.getElementById('prayerText').value,
+        is_public: document.getElementById('prayerPublic').checked
+    };
+
+    try {
+        const res = await fetch('/api/prayer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        
+        messageEl.style.display = 'block';
+        if (res.ok) {
+            messageEl.style.color = 'green';
+            messageEl.textContent = 'Prayer request submitted successfully.';
+            document.getElementById('prayerForm').reset();
+            setTimeout(() => { document.getElementById('prayerModal').style.display = 'none'; }, 2000);
+        } else {
+            messageEl.style.color = 'red';
+            messageEl.textContent = result.error || 'Failed to submit.';
+        }
+    } catch (err) {
+        console.error(err);
+        messageEl.style.display = 'block';
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'An error occurred. Please try again.';
+    }
+}
+
+async function submitMemberConnect(e) {
+    e.preventDefault();
+    const messageEl = document.getElementById('memberMessage');
+    messageEl.style.display = 'none';
+    
+    const data = {
+        first_name: document.getElementById('memberFirstName').value,
+        last_name: document.getElementById('memberLastName').value,
+        email: document.getElementById('memberEmail').value,
+        phone: document.getElementById('memberPhone').value,
+        address: document.getElementById('memberAddress').value
+    };
+
+    try {
+        const res = await fetch('/api/members/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        
+        messageEl.style.display = 'block';
+        if (res.ok) {
+            messageEl.style.color = 'green';
+            messageEl.textContent = 'Connect card submitted successfully.';
+            document.getElementById('memberForm').reset();
+            setTimeout(() => { document.getElementById('memberModal').style.display = 'none'; }, 2000);
+        } else {
+            messageEl.style.color = 'red';
+            messageEl.textContent = result.error || 'Failed to submit.';
+        }
+    } catch (err) {
+        console.error(err);
+        messageEl.style.display = 'block';
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'An error occurred. Please try again.';
+    }
+}

@@ -147,7 +147,14 @@ function loadRoutes() {
         { path: '/api/admin', file: './routes/reset-database', name: 'Database Reset' },
         { path: '/api/settings', file: './routes/settings', name: 'Settings' },
         { path: '/api/instagram', file: './routes/instagram', name: 'Instagram' },
-        { path: '/api/facebook', file: './routes/facebook', name: 'Facebook' }
+        { path: '/api/facebook', file: './routes/facebook', name: 'Facebook' },
+        { path: '/api/events', file: './routes/events', name: 'Events' },
+        { path: '/api/prayer', file: './routes/prayer', name: 'Prayer' },
+        { path: '/api/members', file: './routes/members', name: 'Members' },
+        { path: '/api/fellowships', file: './routes/fellowships', name: 'Fellowships' },
+        { path: '/api/comments', file: './routes/comments', name: 'Comments' },
+        { path: '/api/search', file: './routes/search', name: 'Search' },
+        { path: '/api/gallery', file: './routes/gallery', name: 'Gallery' }
     ];    routes.forEach(({ path, file, name }) => {
         try {
             const router = require(file);

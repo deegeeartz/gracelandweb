@@ -214,6 +214,97 @@ async function createTables() {
             ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
         `);
 
+        // Events table
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS events (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                description TEXT,
+                start_time DATETIME NOT NULL,
+                end_time DATETIME NOT NULL,
+                location VARCHAR(255),
+                image_url VARCHAR(500),
+                status ENUM('draft', 'published', 'cancelled') DEFAULT 'published',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_start_time (start_time),
+                INDEX idx_status (status)
+            ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+        `);
+
+        // Event RSVPs table
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS event_rsvps (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                event_id INT NOT NULL,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) NOT NULL,
+                phone VARCHAR(50),
+                status ENUM('attending', 'maybe', 'declined') DEFAULT 'attending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+                INDEX idx_event_id (event_id)
+            ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+        `);
+
+        // Prayer Requests table
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS prayer_requests (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100),
+                phone VARCHAR(50),
+                request_text TEXT NOT NULL,
+                is_public BOOLEAN DEFAULT FALSE,
+                status ENUM('pending', 'approved', 'prayed', 'answered') DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_status (status),
+                INDEX idx_is_public (is_public)
+            ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+        `);
+
+        // Members table (Connect Cards / Directory)
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS members (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                first_name VARCHAR(100) NOT NULL,
+                last_name VARCHAR(100) NOT NULL,
+                email VARCHAR(100),
+                phone VARCHAR(50),
+                address TEXT,
+                joined_date DATE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+        `);
+
+        // House Fellowships table
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS house_fellowships (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                leader_name VARCHAR(100) NOT NULL,
+                address TEXT NOT NULL,
+                meeting_time VARCHAR(100),
+                phone VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+        `);
+
+        // Gallery table
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS gallery (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                image_url VARCHAR(500) NOT NULL,
+                image_public_id VARCHAR(255),
+                category VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_category (category)
+            ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+        `);
+
         console.log('✅ All tables created successfully');
         
     } catch (error) {

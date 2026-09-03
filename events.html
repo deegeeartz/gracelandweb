@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Primary Meta Tags -->
+        <title>Upcoming Events - RCCG Graceland Area HQ</title>
+        <meta name="title" content="Upcoming Events - RCCG Graceland Area HQ">
+        <meta name="description"
+            content="View and register for upcoming events at RCCG Graceland Area HQ.">
+        <meta name="keywords"
+            content="RCCG, Events, Calendar, Registration, RSVP, Church Events">
+        <meta name="author" content="RCCG Graceland Area HQ">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="https://rccggraceland.org/events.html">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://rccggraceland.org/events.html">
+        <meta property="og:title"
+            content="Upcoming Events - RCCG Graceland Area HQ">
+        <meta property="og:description"
+            content="View and register for upcoming events.">
+        <meta property="og:image" content="https://rccggraceland.org/logo.png">
+        <meta property="og:site_name" content="RCCG Graceland Area HQ">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url"
+            content="https://rccggraceland.org/events.html">
+        <meta property="twitter:title"
+            content="Upcoming Events - RCCG Graceland Area HQ">
+        <meta property="twitter:description"
+            content="View and register for upcoming events.">
+        <meta property="twitter:image"
+            content="https://rccggraceland.org/logo.png">
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="logo.png">
+        <link rel="apple-touch-icon" href="logo.png">
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="blog-styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet">
+
+        <!-- Performance Optimization -->
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+        <!-- Structured Data (JSON-LD) -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "RCCG Graceland Area HQ Blog",
+            "description": "Inspiring articles, testimonies, and biblical insights from RCCG Graceland Area HQ",
+            "url": "https://rccggraceland.org/blog.html",
+            "publisher": {
+                "@type": "Organization",
+                "name": "RCCG Graceland Area HQ",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://rccggraceland.org/logo.png"
+                }
+            }
+        }
+        </script>
+    </head>
+    <body>
+        <!-- Header -->
+        <header class="header">
+            <nav class="nav">
+                <div class="logo">
+                    <img src="logo.png" alt="RCCG Graceland Area HQ Logo"
+                        class="logo-image">
+                    <div class="logo-text">
+                        <h1>RCCG GRACELAND AREA HQ</h1>
+                        <p>Favored Family | Lagos, Nigeria</p>
+                    </div>
+                </div>
+                <button class="menu-toggle" aria-label="Toggle menu">
+                    <span class="hamburger"></span>
+                    <span class="hamburger"></span>
+                    <span class="hamburger"></span>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#livestream">Live</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#sermons">Sermons</a></li>
+                    <li><a href="blog.html" class="active">Blog</a></li>
+                    <li><a href="index.html#ministries">Ministries</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="index.html#give">Give</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="page-header-overlay"></div>
+            <div class="container">
+                <div class="page-header-content">
+                    <div class="breadcrumb">
+                        <a href="index.html"><i class="fas fa-home"></i>
+                            Home</a>
+                        <span class="breadcrumb-separator"><i
+                                class="fas fa-chevron-right"></i></span>
+                        <span>Events</span>
+                    </div>
+                    <h1>Upcoming Events</h1>
+                    <p>Join us in worship and fellowship</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Events Content -->
+        <section class="events-content" style="padding: 4rem 0;">
+            <div class="container">
+                <div class="events-grid" id="eventsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+                    <!-- Events injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- RSVP Modal -->
+        <div id="rsvpModal" class="modal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 8px;">
+                <span class="close-modal" onclick="closeRSVPModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                <h2 style="margin-bottom: 20px;">RSVP for <span id="rsvpEventTitle">Event</span></h2>
+                <form id="rsvpForm" onsubmit="submitRSVP(event)">
+                    <input type="hidden" id="rsvpEventId">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display:block; margin-bottom: 5px;">Name</label>
+                        <input type="text" id="rsvpName" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display:block; margin-bottom: 5px;">Email</label>
+                        <input type="email" id="rsvpEmail" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display:block; margin-bottom: 5px;">Number of Guests</label>
+                        <input type="number" id="rsvpGuests" value="1" min="1" max="10" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Submit RSVP</button>
+                    <p id="rsvpMessage" style="display: none; margin-top: 15px; text-align: center;"></p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <div class="footer-logo">
+                            <img src="logo.png"
+                                alt="RCCG Graceland Area HQ Logo"
+                                class="footer-logo-image">
+                        </div>
+                        <h3>RCCG Graceland Area HQ</h3>
+                        <p>An Area HQ under the Redeemed Christian Church of
+                            God, Favored Family</p>
+                        <p
+                            class="footer-motto">"Experiencing An Overflow Of His Grace"</p>
+                        <p>Making heaven, taking as many people with us.</p>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Quick Links</h3>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="index.html#about">About Us</a></li>
+                            <li><a href="index.html#services">Service
+                                    Times</a></li>
+                            <li><a
+                                    href="index.html#ministries">Ministries</a></li>
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="index.html#contact">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Contact Info</h3>
+                        <div class="footer-contact">
+                            <p><i class="fas fa-map-marker-alt"></i> Jah Michael
+                                Bus Stop, Lagos-Badagry Expressway, Lagos</p>
+                            <p><i class="fas fa-phone"></i>
+                                +234-XXX-XXX-XXXX</p>
+                            <p><i class="fas fa-envelope"></i>
+                                info@rccggraceland.org</p>
+                        </div>
+                    </div>
+                    <div class="footer-section"> <h3>Follow Us</h3>
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/RCCGLP4GRACELAND/"
+                                target="_blank" rel="noopener"
+                                aria-label="Follow us on Facebook"
+                                title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://www.youtube.com/@rccggraceland"
+                                target="_blank" rel="noopener"
+                                aria-label="Subscribe on YouTube"
+                                title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a
+                                href="https://www.instagram.com/rccggracelandparishbadagry/"
+                                target="_blank" rel="noopener"
+                                aria-label="Follow us on Instagram"
+                                title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com/rccggraceland"
+                                target="_blank" rel="noopener"
+                                aria-label="Follow us on Twitter"
+                                title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container"> <p>&copy; 2024 RCCG Graceland Area HQ.
+                        All rights reserved.
+                        | Built with ❤️ for the Kingdom</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Instagram Embed Script -->
+        <script async src="https://www.instagram.com/embed.js"></script>
+
+        <!-- Environment Configuration -->
+        <script src="scripts/logger.js"></script>
+        <script src="scripts/config.js"></script>
+        <script src="config/environment.js"></script>
+        <script src="scripts/instagram-feed.js"></script>
+        <script src="scripts/facebook-live.js"></script>
+        <script src="script.js"></script>
+        <script>
+            async function loadEvents() {
+                try {
+                    const response = await fetch('/api/events/upcoming');
+                    const events = await response.json();
+                    const container = document.getElementById('eventsContainer');
+                    
+                    if (events.length === 0) {
+                        container.innerHTML = '<p>No upcoming events at the moment. Please check back later!</p>';
+                        return;
+                    }
+
+                    container.innerHTML = events.map(e => `
+                        <div class="event-card" style="background: white; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow);">
+                            ${e.image_url ? `<img src="${e.image_url}" style="width: 100%; height: 200px; object-fit: cover;">` : ''}
+                            <div style="padding: 20px;">
+                                <h3 style="color: var(--primary-color); margin-bottom: 10px; font-size: 1.4rem;">${e.title}</h3>
+                                <p style="margin-bottom: 10px; color: #666;"><i class="far fa-calendar-alt"></i> ${new Date(e.event_date).toLocaleString()}</p>
+                                <p style="margin-bottom: 15px; color: #666;"><i class="fas fa-map-marker-alt"></i> ${e.location || 'Church Premises'}</p>
+                                <p style="margin-bottom: 20px; line-height: 1.5;">${e.description}</p>
+                                <button class="btn btn-primary" onclick="openRSVPModal(${e.id}, '${e.title.replace(/'/g, "\\'")}')" style="width: 100%;">RSVP Now</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('Error fetching events:', error);
+                }
+            }
+
+            function openRSVPModal(id, title) {
+                document.getElementById('rsvpEventId').value = id;
+                document.getElementById('rsvpEventTitle').textContent = title;
+                document.getElementById('rsvpModal').style.display = 'block';
+                document.getElementById('rsvpMessage').style.display = 'none';
+                document.getElementById('rsvpForm').reset();
+            }
+
+            function closeRSVPModal() {
+                document.getElementById('rsvpModal').style.display = 'none';
+            }
+
+            async function submitRSVP(e) {
+                e.preventDefault();
+                const msg = document.getElementById('rsvpMessage');
+                const data = {
+                    event_id: document.getElementById('rsvpEventId').value,
+                    name: document.getElementById('rsvpName').value,
+                    email: document.getElementById('rsvpEmail').value,
+                    number_of_guests: document.getElementById('rsvpGuests').value
+                };
+
+                try {
+                    const res = await fetch('/api/events/rsvp', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(data)
+                    });
+                    const result = await res.json();
+                    
+                    msg.style.display = 'block';
+                    if (res.ok) {
+                        msg.style.color = 'green';
+                        msg.textContent = 'RSVP submitted successfully!';
+                        setTimeout(closeRSVPModal, 2000);
+                    } else {
+                        msg.style.color = 'red';
+                        msg.textContent = result.error || 'Failed to RSVP.';
+                    }
+                } catch (err) {
+                    msg.style.display = 'block';
+                    msg.style.color = 'red';
+                    msg.textContent = 'Network error. Please try again.';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', loadEvents);
+        </script>
+    </body>
+</html>
