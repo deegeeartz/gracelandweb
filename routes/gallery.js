@@ -21,14 +21,42 @@ const upload = multer({
     }
 });
 
-// Admin Middleware (assuming it's passed or defined here, for simplicity we'll just check if they are logged in if this route is mounted under /api/admin/gallery, but wait, gallery view is public, upload is admin)
+// In-memory cache for gallery items to eliminate repeated database queries
+let cachedGallery = null;
+let lastCacheTime = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache
 
-// Public: Get random gallery images
+async function getCachedGallery() {
+    const now = Date.now();
+    if (!cachedGallery || (now - lastCacheTime > CACHE_TTL_MS)) {
+        cachedGallery = await db.all(`SELECT id, title, category, image_url, created_at FROM gallery ORDER BY created_at DESC`);
+        lastCacheTime = now;
+    }
+    return cachedGallery;
+}
+
+function invalidateGalleryCache() {
+    cachedGallery = null;
+    lastCacheTime = 0;
+}
+
+// Public: Get random gallery images (served from memory cache to avoid DB load)
 router.get('/random', async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 6;
-        const images = await db.all(`SELECT * FROM gallery ORDER BY RAND() LIMIT ?`, [limit]);
-        res.json(images);
+        const limit = Math.min(parseInt(req.query.limit) || 6, 20);
+        const allItems = await getCachedGallery();
+        
+        if (!allItems || allItems.length === 0) {
+            return res.json([]);
+        }
+
+        // Shuffle in-memory array (0 database queries)
+        const shuffled = [...allItems].sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, limit);
+
+        // Tell browser to cache for 3 minutes to prevent repeated HTTP requests
+        res.set('Cache-Control', 'public, max-age=180');
+        res.json(selected);
     } catch (error) {
         logger.error('Error fetching random gallery images:', error);
         res.status(500).json({ error: 'Failed to fetch random gallery images' });
@@ -61,19 +89,25 @@ router.post('/', upload.single('image'), async (req, res) => {
     try {
         const { title, category } = req.body;
         
-        if (!req.file) {
+        let imageUrl = req.body.image_url || null;
+        let imagePublicId = req.body.image_public_id || null;
+
+        if (req.file) {
+            const uploadResult = await cloudinaryService.uploadImage(req.file.buffer, {
+                folder: 'graceland-church/gallery',
+                type: 'gallery',
+                optimizeLocally: true
+            });
+            imageUrl = uploadResult.url;
+            imagePublicId = uploadResult.public_id;
+        }
+
+        if (!imageUrl) {
             return res.status(400).json({ error: 'Image file is required' });
         }
         if (!title) {
             return res.status(400).json({ error: 'Title is required' });
         }
-
-        // Upload to Cloudinary with local optimization
-        const uploadResult = await cloudinaryService.uploadImage(req.file.buffer, {
-            folder: 'graceland-church/gallery',
-            type: 'gallery',
-            optimizeLocally: true // Ensures web/space optimization
-        });
 
         const sanitizedTitle = Sanitizer.sanitizeText(title);
         const sanitizedCategory = category ? Sanitizer.sanitizeText(category) : null;
@@ -81,13 +115,15 @@ router.post('/', upload.single('image'), async (req, res) => {
         await db.run(
             `INSERT INTO gallery (title, image_url, image_public_id, category) 
              VALUES (?, ?, ?, ?)`,
-            [sanitizedTitle, uploadResult.url, uploadResult.public_id, sanitizedCategory]
+            [sanitizedTitle, imageUrl, imagePublicId, sanitizedCategory]
         );
+
+        invalidateGalleryCache();
 
         res.json({ 
             success: true, 
             message: 'Image uploaded to gallery',
-            url: uploadResult.url 
+            url: imageUrl 
         });
 
     } catch (error) {
@@ -110,6 +146,7 @@ router.delete('/:id', async (req, res) => {
         }
 
         await db.run(`DELETE FROM gallery WHERE id = ?`, [req.params.id]);
+        invalidateGalleryCache();
 
         res.json({ success: true, message: 'Image deleted' });
     } catch (error) {

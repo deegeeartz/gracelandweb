@@ -652,6 +652,7 @@ async function submitMemberConnect(e) {
 // ============================================
 
 async function loadDynamicContent() {
+    const API_URL = '/api';
     try {
         // Load Settings (Hero Image)
         const settingsRes = await fetch(`${API_URL}/settings`);
@@ -660,9 +661,10 @@ async function loadDynamicContent() {
             if (settings.hero_image) {
                 const heroSection = document.querySelector('.hero');
                 if (heroSection) {
-                    heroSection.style.backgroundImage = `url(${settings.hero_image})`;
+                    heroSection.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('${settings.hero_image}')`;
                     heroSection.style.backgroundSize = 'cover';
                     heroSection.style.backgroundPosition = 'center';
+                    heroSection.style.backgroundRepeat = 'no-repeat';
                 }
             }
         }
@@ -672,13 +674,33 @@ async function loadDynamicContent() {
         if (ministriesRes.ok) {
             const ministries = await ministriesRes.json();
             const ministriesGrid = document.getElementById('ministriesGrid');
-            if (ministriesGrid && ministries.length > 0) {
+            if (ministriesGrid && Array.isArray(ministries) && ministries.length > 0) {
+                const getMinistryIcon = (name) => {
+                    const n = (name || '').toLowerCase();
+                    if (n.includes('child')) return 'fa-child';
+                    if (n.includes('choir') || n.includes('music')) return 'fa-music';
+                    if (n.includes('youth') || n.includes('young')) return 'fa-user-graduate';
+                    if (n.includes('usher')) return 'fa-door-open';
+                    if (n.includes('welfare') || n.includes('care')) return 'fa-hands-helping';
+                    if (n.includes('sanit') || n.includes('clean')) return 'fa-broom';
+                    if (n.includes('prayer') || n.includes('intercess')) return 'fa-praying-hands';
+                    if (n.includes('media') || n.includes('tech')) return 'fa-video';
+                    return 'fa-users';
+                };
                 ministriesGrid.innerHTML = ministries.map(ministry => `
                     <div class="ministry-card">
-                        ${ministry.image_url ? `<div class="ministry-image" style="height: 150px; background-image: url(${ministry.image_url}); background-size: cover; background-position: center; border-radius: 50%; width: 150px; margin: 0 auto 1.5rem;"></div>` : `
-                        <div class="ministry-icon">
-                            <i class="fas fa-users"></i>
-                        </div>`}
+                        ${ministry.image_url ? `
+                            <div class="ministry-image-wrapper">
+                                <img src="${ministry.image_url}" alt="${ministry.name}" class="ministry-img" onerror="this.parentElement.style.display='none'; const icon = this.parentElement.nextElementSibling; if(icon) icon.style.display='block';">
+                            </div>
+                            <div class="ministry-icon" style="display: none;">
+                                <i class="fas ${getMinistryIcon(ministry.name)}"></i>
+                            </div>
+                        ` : `
+                            <div class="ministry-icon">
+                                <i class="fas ${getMinistryIcon(ministry.name)}"></i>
+                            </div>
+                        `}
                         <h3>${ministry.name}</h3>
                         <p>${ministry.description || ''}</p>
                     </div>

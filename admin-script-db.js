@@ -455,6 +455,7 @@ class AdminPanel {    constructor() {
             'members': 'Connect Cards',
             'comments': 'Comments',
             'social-media': 'Social Media',
+            'hero': 'Hero Section Banner',
             'settings': 'Settings'
         };
         document.getElementById('pageTitle').textContent = titles[tab] || 'Admin';
@@ -480,6 +481,8 @@ class AdminPanel {    constructor() {
             await this.loadComments();
         } else if (tab === 'ministries') {
             await this.loadMinistries();
+        } else if (tab === 'hero') {
+            await this.loadHeroTab();
         } else if (tab === 'settings') {
             await this.loadSettings();
         }
@@ -1418,16 +1421,29 @@ class AdminPanel {    constructor() {
             if (!tbody) return;
             
             if (!Array.isArray(ministries) || ministries.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No ministries found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">No ministries found. Click "Add Ministry" to create one.</td></tr>';
                 return;
             }
             tbody.innerHTML = ministries.map(m => `
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">${m.image_url ? `<img src="${m.image_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">` : 'No Image'}</td>
-                    <td style="padding: 10px;">${this.escapeHtml(m.name)}</td>
-                    <td style="padding: 10px;">${this.escapeHtml(m.description || '')}</td>
-                    <td style="padding: 10px;">
-                        <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteMinistry(${m.id})"><i class="fas fa-trash"></i></button>
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px 10px;">
+                        ${m.image_url ? `
+                            <img src="${m.image_url}" alt="${this.escapeHtml(m.name)}" style="width: 52px; height: 52px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: block;" onerror="this.src='https://via.placeholder.com/52?text=No+Img';">
+                        ` : `
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; background: #f0f2f5; color: #888; border-radius: 6px; font-size: 0.75rem; border: 1px dashed #ccc;">
+                                <i class="fas fa-image" style="font-size: 1.2rem;"></i>
+                            </span>
+                        `}
+                    </td>
+                    <td style="padding: 12px 10px; font-weight: 600; color: #333;">${this.escapeHtml(m.name)}</td>
+                    <td style="padding: 12px 10px; color: #666; font-size: 0.9rem; max-width: 300px;">${this.escapeHtml(m.description || 'No description')}</td>
+                    <td style="padding: 12px 10px; white-space: nowrap;">
+                        <button class="btn btn-sm btn-secondary" onclick='openEditMinistry(${JSON.stringify(m).replace(/'/g, "&#39;")})' style="margin-right: 5px; padding: 5px 10px;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteMinistry(${m.id})" style="padding: 5px 10px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -1449,6 +1465,33 @@ class AdminPanel {    constructor() {
         }
     }
 
+    // --- HERO BANNER MANAGEMENT ---
+    async loadHeroTab() {
+        try {
+            const settings = await API.get('/settings');
+            const heroUrl = settings?.hero_image || '';
+            const urlInput = document.getElementById('heroTabUrlInput');
+            const previewImg = document.getElementById('heroTabPreviewImg');
+            const emptyPreview = document.getElementById('heroTabEmptyPreview');
+            
+            if (urlInput) urlInput.value = heroUrl;
+            if (previewImg && emptyPreview) {
+                if (heroUrl) {
+                    previewImg.src = heroUrl;
+                    previewImg.style.display = 'block';
+                    emptyPreview.style.display = 'none';
+                } else {
+                    previewImg.src = '';
+                    previewImg.style.display = 'none';
+                    emptyPreview.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            logger.error('Error loading hero banner settings:', error);
+            this.showNotification('Failed to load hero banner configuration', 'error');
+        }
+    }
+
     // --- SETTINGS MANAGEMENT ---
     async loadSettings() {
         try {
@@ -1456,7 +1499,14 @@ class AdminPanel {    constructor() {
             if (settings) {
                 if(settings.site_name && document.getElementById('siteName')) document.getElementById('siteName').value = settings.site_name;
                 if(settings.site_description && document.getElementById('siteDescription')) document.getElementById('siteDescription').value = settings.site_description;
-                if(settings.hero_image && document.getElementById('heroImage')) document.getElementById('heroImage').value = settings.hero_image;
+                if(settings.hero_image && document.getElementById('heroImage')) {
+                    document.getElementById('heroImage').value = settings.hero_image;
+                    const preview = document.getElementById('heroImagePreview');
+                    if (preview) {
+                        preview.src = settings.hero_image;
+                        preview.style.display = 'block';
+                    }
+                }
                 if(settings.facebook_page && document.getElementById('facebookPage')) document.getElementById('facebookPage').value = settings.facebook_page;
                 if(settings.instagram_handle && document.getElementById('instagramHandle')) document.getElementById('instagramHandle').value = settings.instagram_handle;
             }
@@ -1589,55 +1639,235 @@ window.submitFellowship = async function(e) {
     }
 };
 
+// Universal file upload helper using /api/upload (Cloudinary integration)
+async function uploadFileToServer(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = Auth.getToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: headers,
+        body: formData
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) {
+        throw new Error(data.error || data.message || 'Image upload failed');
+    }
+    return data.url;
+}
+
+window.uploadHeroImageFile = async function() {
+    const fileInput = document.getElementById('heroImageFile');
+    if (!fileInput || !fileInput.files[0]) {
+        adminPanel.showNotification('Please select an image file first', 'error');
+        return;
+    }
+
+    adminPanel.showUploadProgressOverlay();
+    adminPanel.updateUploadProgress(1, 1, 'Uploading Hero section image...');
+    
+    try {
+        const url = await uploadFileToServer(fileInput.files[0]);
+        const heroInput = document.getElementById('heroImage');
+        if (heroInput) heroInput.value = url;
+        const preview = document.getElementById('heroImagePreview');
+        if (preview) {
+            preview.src = url;
+            preview.style.display = 'block';
+        }
+        adminPanel.showNotification('Hero image uploaded! Click "Save Settings" below to save.', 'success');
+    } catch (err) {
+        logger.error('Error uploading hero image:', err);
+        adminPanel.showNotification(err.message || 'Failed to upload hero image', 'error');
+    } finally {
+        adminPanel.hideUploadProgressOverlay();
+    }
+};
+
+// Hero Section Tab Handlers
+window.uploadHeroFromTab = async function() {
+    const fileInput = document.getElementById('heroTabFileInput');
+    if (!fileInput || !fileInput.files[0]) {
+        adminPanel.showNotification('Please select an image file first', 'error');
+        return;
+    }
+
+    adminPanel.showUploadProgressOverlay();
+    adminPanel.updateUploadProgress(1, 2, 'Uploading hero banner image...');
+    try {
+        const url = await uploadFileToServer(fileInput.files[0]);
+        adminPanel.updateUploadProgress(2, 2, 'Saving hero banner...');
+        await API.put('/settings', { hero_image: url });
+        
+        const urlInput = document.getElementById('heroTabUrlInput');
+        const previewImg = document.getElementById('heroTabPreviewImg');
+        const emptyPreview = document.getElementById('heroTabEmptyPreview');
+        if (urlInput) urlInput.value = url;
+        if (previewImg) {
+            previewImg.src = url;
+            previewImg.style.display = 'block';
+        }
+        if (emptyPreview) emptyPreview.style.display = 'none';
+        
+        fileInput.value = '';
+        adminPanel.showNotification('Hero banner updated and applied successfully!', 'success');
+    } catch (err) {
+        logger.error('Error uploading hero banner:', err);
+        adminPanel.showNotification(err.message || 'Failed to upload hero banner', 'error');
+    } finally {
+        adminPanel.hideUploadProgressOverlay();
+    }
+};
+
+window.saveHeroUrlFromTab = async function() {
+    const urlInput = document.getElementById('heroTabUrlInput');
+    const url = urlInput ? urlInput.value.trim() : '';
+    if (!url) {
+        adminPanel.showNotification('Please enter an image URL', 'error');
+        return;
+    }
+
+    adminPanel.showUploadProgressOverlay();
+    adminPanel.updateUploadProgress(1, 1, 'Saving hero banner URL...');
+    try {
+        await API.put('/settings', { hero_image: url });
+        const previewImg = document.getElementById('heroTabPreviewImg');
+        const emptyPreview = document.getElementById('heroTabEmptyPreview');
+        if (previewImg) {
+            previewImg.src = url;
+            previewImg.style.display = 'block';
+        }
+        if (emptyPreview) emptyPreview.style.display = 'none';
+        adminPanel.showNotification('Hero banner URL saved successfully!', 'success');
+    } catch (err) {
+        logger.error('Error saving hero banner URL:', err);
+        adminPanel.showNotification(err.message || 'Failed to save hero banner URL', 'error');
+    } finally {
+        adminPanel.hideUploadProgressOverlay();
+    }
+};
+
 window.submitGalleryUpload = async function(e) {
     e.preventDefault();
     const title = document.getElementById('galleryTitle').value;
     const category = document.getElementById('galleryCategory').value;
     const fileInput = document.getElementById('galleryFile');
     
-    if (!fileInput.files[0]) {
+    if (!fileInput || !fileInput.files[0]) {
         adminPanel.showNotification('Please select a file', 'error');
         return;
     }
     
-    if (window.adminImageUpload && window.adminImageUpload.uploadToCloudinary) {
-        adminPanel.showUploadProgressOverlay();
-        adminPanel.updateUploadProgress(1, 1, 'Uploading image...');
-        try {
-            const url = await window.adminImageUpload.uploadToCloudinary(fileInput.files[0]);
-            await API.post('/gallery', { title, category, image_url: url });
-            adminPanel.showNotification('Image uploaded successfully', 'success');
-            document.getElementById('galleryUploadModal').style.display = 'none';
-            document.getElementById('galleryForm').reset();
-            adminPanel.loadGalleryAdmin();
-        } catch (error) {
-            logger.error('Error uploading gallery image:', error);
-            adminPanel.showNotification('Failed to upload image', 'error');
-        } finally {
-            adminPanel.hideUploadProgressOverlay();
-        }
-    } else {
-        adminPanel.showNotification('Image upload functionality is not loaded', 'error');
+    adminPanel.showUploadProgressOverlay();
+    adminPanel.updateUploadProgress(1, 2, 'Uploading gallery image...');
+    try {
+        const url = await uploadFileToServer(fileInput.files[0]);
+        adminPanel.updateUploadProgress(2, 2, 'Saving gallery record...');
+        await API.post('/gallery', { title, category, image_url: url });
+        adminPanel.showNotification('Image uploaded successfully', 'success');
+        document.getElementById('galleryUploadModal').style.display = 'none';
+        document.getElementById('galleryForm').reset();
+        await adminPanel.loadGalleryAdmin();
+    } catch (error) {
+        logger.error('Error uploading gallery image:', error);
+        adminPanel.showNotification(error.message || 'Failed to upload image', 'error');
+    } finally {
+        adminPanel.hideUploadProgressOverlay();
     }
+};
+
+// Ministry Management Handlers
+window.previewMinistryFile = function(input) {
+    if (input && input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('ministryImagePreview');
+            const container = document.getElementById('ministryImagePreviewContainer');
+            if (preview && container) {
+                preview.src = e.target.result;
+                container.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+};
+
+window.previewMinistryUrl = function(url) {
+    const preview = document.getElementById('ministryImagePreview');
+    const container = document.getElementById('ministryImagePreviewContainer');
+    if (preview && container) {
+        if (url && url.trim()) {
+            preview.src = url.trim();
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+};
+
+window.openAddMinistry = function() {
+    const form = document.getElementById('ministryForm');
+    if (form) form.reset();
+    document.getElementById('ministryId').value = '';
+    document.getElementById('ministryModalTitle').textContent = 'Add Ministry';
+    document.getElementById('ministrySubmitBtn').textContent = 'Create Ministry';
+    const previewContainer = document.getElementById('ministryImagePreviewContainer');
+    if (previewContainer) previewContainer.style.display = 'none';
+    document.getElementById('ministryEditorModal').style.display = 'flex';
+};
+
+window.openEditMinistry = function(ministry) {
+    document.getElementById('ministryId').value = ministry.id;
+    document.getElementById('ministryName').value = ministry.name || '';
+    document.getElementById('ministryDescription').value = ministry.description || '';
+    document.getElementById('ministryImageUrl').value = ministry.image_url || '';
+    document.getElementById('ministryImageFile').value = '';
+    document.getElementById('ministryModalTitle').textContent = 'Edit Ministry';
+    document.getElementById('ministrySubmitBtn').textContent = 'Update Ministry';
+    
+    const preview = document.getElementById('ministryImagePreview');
+    const container = document.getElementById('ministryImagePreviewContainer');
+    if (preview && container) {
+        if (ministry.image_url) {
+            preview.src = ministry.image_url;
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+    document.getElementById('ministryEditorModal').style.display = 'flex';
 };
 
 window.submitMinistry = async function(e) {
     e.preventDefault();
-    const name = document.getElementById('ministryName').value;
-    const description = document.getElementById('ministryDescription').value;
+    const id = document.getElementById('ministryId').value;
+    const name = document.getElementById('ministryName').value.trim();
+    const description = document.getElementById('ministryDescription').value.trim();
     const fileInput = document.getElementById('ministryImageFile');
+    const urlInput = document.getElementById('ministryImageUrl');
     
     adminPanel.showUploadProgressOverlay();
-    adminPanel.updateUploadProgress(1, 1, 'Saving ministry...');
+    adminPanel.updateUploadProgress(1, 2, id ? 'Updating ministry...' : 'Creating ministry...');
     
     try {
-        let imageUrl = null;
-        if (fileInput && fileInput.files[0] && window.adminImageUpload && window.adminImageUpload.uploadToCloudinary) {
-            imageUrl = await window.adminImageUpload.uploadToCloudinary(fileInput.files[0]);
+        let imageUrl = urlInput ? urlInput.value.trim() : null;
+        if (fileInput && fileInput.files[0]) {
+            adminPanel.updateUploadProgress(1, 2, 'Uploading ministry image...');
+            imageUrl = await uploadFileToServer(fileInput.files[0]);
         }
         
-        await API.post('/ministries', { name, description, image_url: imageUrl });
-        adminPanel.showNotification('Ministry saved successfully', 'success');
+        adminPanel.updateUploadProgress(2, 2, 'Saving ministry details...');
+        if (id) {
+            await API.put(`/ministries/${id}`, { name, description, image_url: imageUrl });
+            adminPanel.showNotification('Ministry updated successfully!', 'success');
+        } else {
+            await API.post('/ministries', { name, description, image_url: imageUrl });
+            adminPanel.showNotification('Ministry created successfully!', 'success');
+        }
+        
         document.getElementById('ministryEditorModal').style.display = 'none';
         document.getElementById('ministryForm').reset();
         await adminPanel.loadMinistries();

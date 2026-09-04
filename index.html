@@ -42,8 +42,8 @@
         <link rel="apple-touch-icon" href="logo.png">
 
         <!-- Stylesheets -->
-        <link rel="stylesheet" href="styles.css">
-        <link rel="stylesheet" href="styles/instagram-feed.css">
+        <link rel="stylesheet" href="styles.css?v=3.0">
+        <link rel="stylesheet" href="styles/floating-gallery.css?v=2.0">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link
@@ -284,41 +284,19 @@
                 </div> </div>
         </section>
 
-        <!-- Instagram Feed Section -->
-        <section class="instagram-section" id="instagram">
+        <!-- Media Gallery & Social Section -->
+        <section class="gallery-preview-section" id="community" style="padding: 4.5rem 0; background: #fdfdfd; text-align: center; border-top: 1px solid #eee; border-bottom: 1px solid #eee;">
             <div class="container">
-                <div class="section-header">
-                    <h2><i class="fab fa-instagram"></i> Follow Our Journey</h2>
-                    <p>Stay connected with us on Instagram</p>
+                <div class="section-header" style="margin-bottom: 1.5rem;">
+                    <h2><i class="fas fa-camera-retro" style="color: var(--primary-color);"></i> Moments at Graceland</h2>
+                    <p>Capturing blessed moments of worship, fellowship, and community service</p>
                 </div>
-
-                <!-- Instagram Feed Grid (API Loaded) -->
-                <div class="instagram-feed-grid">
-                    <!-- Posts will be loaded via API -->
-                    <div class="instagram-loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Loading Instagram posts...</p>
-                    </div>
-                </div>
-
-                <!-- Instagram Embed Widget (Fallback) -->
-                <div class="instagram-feed-container instagram-feed-container-hidden">
-                    <blockquote class="instagram-media"
-                        data-instgrm-permalink="https://www.instagram.com/rccggracelandparishbadagry/"
-                        data-instgrm-version="14"
-                        class="instagram-media-card">
-                    </blockquote>
-                </div>
-
-                <!-- Follow Button -->
-                <div class="instagram-follow-wrapper">
-                    <a
-                        href="https://www.instagram.com/rccggracelandparishbadagry/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="instagram-follow-btn">
-                        <i class="fab fa-instagram"></i>
-                        Follow @rccggracelandparishbadagry
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
+                    <a href="gallery.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-images"></i> View Photo Gallery
+                    </a>
+                    <a href="https://www.instagram.com/rccggracelandparishbadagry/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fab fa-instagram"></i> Follow on Instagram
                     </a>
                 </div>
             </div>
@@ -736,15 +714,12 @@
             </div>
         </div>
 
-        <!-- Instagram Embed Script -->
-        <script async src="https://www.instagram.com/embed.js"></script>
-
         <!-- Environment Configuration -->
         <script src="scripts/logger.js"></script>
         <script src="scripts/config.js"></script>
-        <script src="config/environment.js"></script>
-        <script src="scripts/instagram-feed.js"></script>
+        <script src="config/environment.js?v=3.0"></script>
+        <script src="scripts/floating-gallery.js?v=2.0"></script>
         <script src="scripts/facebook-live.js"></script>
-        <script src="script.js"></script>
+        <script src="script.js?v=3.0"></script>
     </body>
 </html>

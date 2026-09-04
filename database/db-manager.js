@@ -27,19 +27,20 @@ if (isProduction && !process.env.MYSQLHOST) {
 }
 
 // MySQL connection configuration
-// IMPORTANT: Use Railway's PRIVATE network variables to avoid egress fees!
-// Private variables: MYSQL_PRIVATE_URL or individual MYSQLHOST (without _PUBLIC suffix)
+const isRemoteHost = !['localhost', '127.0.0.1', 'db'].includes(process.env.MYSQLHOST || process.env.DB_HOST || 'localhost');
+const useSsl = isRemoteHost && (process.env.NODE_ENV === 'production' || process.env.VERCEL || process.env.DB_SSL === 'true');
+
 const dbConfig = {
-    // Railway private network: Use MYSQLHOST (not MYSQL_PUBLIC_URL)
-    // This connects through Railway's internal network (free!)
     host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT || 3306),
     user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
     password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
     database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'graceland_church',
     waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,    charset: 'utf8mb4'
+    connectionLimit: process.env.VERCEL ? 3 : 10,
+    queueLimit: 0,
+    charset: 'utf8mb4',
+    ssl: useSsl ? { rejectUnauthorized: false } : undefined
 };
 
 logger.success('MySQL Configuration:', {

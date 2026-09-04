@@ -1,0 +1,154 @@
+/**
+ * Floating Gallery Styles - RCCG Graceland Website
+ * Background ambient images: subtle, transparent, behind content, wandering smoothly across the screen.
+ */
+
+.floating-gallery-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1; /* Sits directly on top of section backgrounds, behind text & cards which are z-index: 2+ */
+    overflow: hidden;
+}
+
+.floating-gallery-item {
+    position: absolute;
+    width: 180px;
+    height: 130px;
+    border-radius: 20px;
+    overflow: hidden;
+    opacity: 0.18; /* Transparent and ambient so it never steals focus */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    filter: brightness(0.95) contrast(1.05);
+    pointer-events: none;
+    will-change: transform;
+    transition: opacity 0.5s ease;
+}
+
+.floating-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ==========================================================================
+   Wandering trajectories across the entire screen
+   Each item starts at a different coordinate and wanders in expansive loops
+   ========================================================================== */
+
+.floating-slot-1 {
+    top: 10%;
+    left: 5%;
+    animation: roam1 52s infinite ease-in-out;
+}
+
+.floating-slot-2 {
+    top: 18%;
+    right: 8%;
+    animation: roam2 58s infinite ease-in-out 4s;
+}
+
+.floating-slot-3 {
+    top: 48%;
+    left: 12%;
+    animation: roam3 64s infinite ease-in-out 8s;
+}
+
+.floating-slot-4 {
+    top: 60%;
+    right: 10%;
+    animation: roam4 50s infinite ease-in-out 12s;
+}
+
+.floating-slot-5 {
+    top: 32%;
+    left: 42%;
+    animation: roam5 60s infinite ease-in-out 6s;
+}
+
+.floating-slot-6 {
+    top: 75%;
+    left: 30%;
+    animation: roam6 68s infinite ease-in-out 10s;
+}
+
+/* Roam Animations covering large screen dimensions */
+@keyframes roam1 {
+    0%   { transform: translate3d(0vw, 0vh, 0) rotate(-4deg) scale(1); }
+    25%  { transform: translate3d(35vw, 22vh, 0) rotate(8deg) scale(1.06); }
+    50%  { transform: translate3d(65vw, -5vh, 0) rotate(-6deg) scale(0.96); }
+    75%  { transform: translate3d(25vw, 42vh, 0) rotate(10deg) scale(1.04); }
+    100% { transform: translate3d(0vw, 0vh, 0) rotate(-4deg) scale(1); }
+}
+
+@keyframes roam2 {
+    0%   { transform: translate3d(0vw, 0vh, 0) rotate(5deg) scale(1); }
+    25%  { transform: translate3d(-35vw, 32vh, 0) rotate(-8deg) scale(0.94); }
+    50%  { transform: translate3d(-60vw, 12vh, 0) rotate(9deg) scale(1.08); }
+    75%  { transform: translate3d(-20vw, -15vh, 0) rotate(-5deg) scale(1.02); }
+    100% { transform: translate3d(0vw, 0vh, 0) rotate(5deg) scale(1); }
+}
+
+@keyframes roam3 {
+    0%   { transform: translate3d(0vw, 0vh, 0) rotate(-7deg) scale(0.96); }
+    25%  { transform: translate3d(38vw, -25vh, 0) rotate(7deg) scale(1.05); }
+    50%  { transform: translate3d(20vw, -45vh, 0) rotate(-10deg) scale(1.1); }
+    75%  { transform: translate3d(-10vw, 20vh, 0) rotate(6deg) scale(0.92); }
+    100% { transform: translate3d(0vw, 0vh, 0) rotate(-7deg) scale(0.96); }
+}
+
+@keyframes roam4 {
+    0%   { transform: translate3d(0vw, 0vh, 0) rotate(6deg) scale(1.04); }
+    25%  { transform: translate3d(-38vw, -30vh, 0) rotate(-9deg) scale(0.92); }
+    50%  { transform: translate3d(-15vw, -52vh, 0) rotate(11deg) scale(1.06); }
+    75%  { transform: translate3d(28vw, -18vh, 0) rotate(-4deg) scale(1); }
+    100% { transform: translate3d(0vw, 0vh, 0) rotate(6deg) scale(1.04); }
+}
+
+@keyframes roam5 {
+    0%   { transform: translate3d(0vw, 0vh, 0) rotate(8deg) scale(0.92); }
+    33%  { transform: translate3d(42vw, -18vh, 0) rotate(-12deg) scale(1.08); }
+    66%  { transform: translate3d(-32vw, 28vh, 0) rotate(10deg) scale(0.96); }
+    100% { transform: translate3d(0vw, 0vh, 0) rotate(8deg) scale(0.92); }
+}
+
+@keyframes roam6 {
+    0%   { transform: translate3d(0vw, 0vh, 0) rotate(-9deg) scale(1.05); }
+    33%  { transform: translate3d(-38vw, -22vh, 0) rotate(14deg) scale(0.95); }
+    66%  { transform: translate3d(32vw, 15vh, 0) rotate(-7deg) scale(1.08); }
+    100% { transform: translate3d(0vw, 0vh, 0) rotate(-9deg) scale(1.05); }
+}
+
+/* ==========================================================================
+   Responsive adjustments
+   ========================================================================== */
+
+@media (max-width: 992px) {
+    .floating-gallery-item {
+        width: 140px;
+        height: 105px;
+        opacity: 0.15;
+    }
+}
+
+@media (max-width: 768px) {
+    .floating-gallery-item {
+        width: 110px;
+        height: 85px;
+        border-radius: 14px;
+        opacity: 0.14;
+    }
+
+    /* On mobile, keep 3 wandering elements to maintain clean readability */
+    .floating-slot-4,
+    .floating-slot-5,
+    .floating-slot-6 {
+        display: none;
+    }
+}

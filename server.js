@@ -110,7 +110,13 @@ const htmlRoutes = {
     '/post': 'post.html',
     '/post.html': 'post.html',
     '/admin': 'admin.html',
-    '/admin.html': 'admin.html'
+    '/admin.html': 'admin.html',
+    '/gallery': 'gallery.html',
+    '/gallery.html': 'gallery.html',
+    '/events': 'events.html',
+    '/events.html': 'events.html',
+    '/fellowships': 'fellowships.html',
+    '/fellowships.html': 'fellowships.html'
 };
 
 Object.entries(htmlRoutes).forEach(([route, file]) => {
@@ -120,7 +126,7 @@ Object.entries(htmlRoutes).forEach(([route, file]) => {
 });
 
 // ============================================
-// HEALTH CHECK
+// HEALTH CHECK & SETUP
 // ============================================
 
 app.get('/api/health', (req, res) => {
@@ -131,6 +137,29 @@ app.get('/api/health', (req, res) => {
         database: 'MySQL',
         version: '1.0.0'
     });
+});
+
+// Database initialization endpoint (for cloud/serverless setup)
+app.get('/api/init-db', async (req, res) => {
+    try {
+        const { initDatabase } = require('./database/init-mysql');
+        const result = await initDatabase();
+        res.json({
+            status: 'SUCCESS',
+            message: 'Database initialized successfully with all tables and initial admin account!',
+            adminCredentials: {
+                username: 'admin',
+                defaultPassword: 'admin123'
+            },
+            result
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Database initialization failed',
+            error: error.message
+        });
+    }
 });
 
 // ============================================
@@ -315,78 +344,82 @@ app.use((error, req, res, next) => {
 // DATABASE INITIALIZATION
 // ============================================
 
-// Initialize database asynchronously (non-blocking)
-setTimeout(async () => {
-    try {
-        const { initializeDatabase } = require('./database/init-database');
-        await initializeDatabase();
-        logger.success('Database initialized');
-    } catch (error) {
-        logger.error('Database initialization failed:', error.message);
-        logger.log('Server will continue running...');
-    }
-}, 1000);
+// Initialize database asynchronously in persistent server environments (non-blocking)
+if (!process.env.VERCEL) {
+    setTimeout(async () => {
+        try {
+            const { initializeDatabase } = require('./database/init-database');
+            await initializeDatabase();
+            logger.success('Database initialized');
+        } catch (error) {
+            logger.error('Database initialization failed:', error.message);
+            logger.log('Server will continue running...');
+        }
+    }, 1000);
+}
 
 // ============================================
 // SERVER START
 // ============================================
 
-const server = app.listen(PORT, () => {
-    logger.log('========================================');
-    logger.success(`Server running on http://localhost:${PORT}`);
-    logger.log(`📄 Main site: http://localhost:${PORT}`);
-    logger.log(`📖 Blog: http://localhost:${PORT}/blog.html`);
-    logger.log(`⚙️ Admin: http://localhost:${PORT}/admin.html`);
-    logger.log(`🔧 Health: http://localhost:${PORT}/api/health`);
-    logger.log('========================================');
-});
-
-// ============================================
-// GRACEFUL SHUTDOWN
-// ============================================
-
-function gracefulShutdown(signal) {
-    logger.info(`${signal} received, starting graceful shutdown...`);
-    
-    server.close(() => {
-        logger.info('HTTP server closed');
-        
-        // Close database connection
-        const db = require('./database/db-manager');
-        if (db.pool) {
-            db.pool.end((err) => {
-                if (err) {
-                    logger.error('Error closing database pool:', err);
-                    process.exit(1);
-                } else {
-                    logger.info('Database pool closed');
-                    process.exit(0);
-                }
-            });
-        } else {
-            process.exit(0);
-        }
+if (!process.env.VERCEL) {
+    const server = app.listen(PORT, () => {
+        logger.log('========================================');
+        logger.success(`Server running on http://localhost:${PORT}`);
+        logger.log(`📄 Main site: http://localhost:${PORT}`);
+        logger.log(`📖 Blog: http://localhost:${PORT}/blog.html`);
+        logger.log(`⚙️ Admin: http://localhost:${PORT}/admin.html`);
+        logger.log(`🔧 Health: http://localhost:${PORT}/api/health`);
+        logger.log('========================================');
     });
-    
-    // Force shutdown after 10 seconds
-    setTimeout(() => {
-        logger.error('Forced shutdown after timeout');
-        process.exit(1);
-    }, 10000);
+
+    // ============================================
+    // GRACEFUL SHUTDOWN
+    // ============================================
+
+    function gracefulShutdown(signal) {
+        logger.info(`${signal} received, starting graceful shutdown...`);
+        
+        server.close(() => {
+            logger.info('HTTP server closed');
+            
+            // Close database connection
+            const db = require('./database/db-manager');
+            if (db.pool) {
+                db.pool.end((err) => {
+                    if (err) {
+                        logger.error('Error closing database pool:', err);
+                        process.exit(1);
+                    } else {
+                        logger.info('Database pool closed');
+                        process.exit(0);
+                    }
+                });
+            } else {
+                process.exit(0);
+            }
+        });
+        
+        // Force shutdown after 10 seconds
+        setTimeout(() => {
+            logger.error('Forced shutdown after timeout');
+            process.exit(1);
+        }, 10000);
+    }
+
+    // Listen for termination signals
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+    // Handle uncaught errors
+    process.on('uncaughtException', (error) => {
+        logger.error('Uncaught Exception:', error);
+        gracefulShutdown('uncaughtException');
+    });
+
+    process.on('unhandledRejection', (reason, promise) => {
+        logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    });
 }
-
-// Listen for termination signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-// Handle uncaught errors
-process.on('uncaughtException', (error) => {
-    logger.error('Uncaught Exception:', error);
-    gracefulShutdown('uncaughtException');
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
 
 module.exports = app;
