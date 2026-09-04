@@ -145,6 +145,26 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+app.get('/api/db-check', async (req, res) => {
+    try {
+        const { db } = require('./database/db-manager');
+        const rows = await db.all('SELECT 1 as connected');
+        res.json({
+            status: 'CONNECTED',
+            result: rows,
+            dbHost: process.env.MYSQLHOST || process.env.DB_HOST || 'not-set',
+            dbName: process.env.MYSQLDATABASE || process.env.DB_NAME || 'not-set'
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: 'CONNECTION_FAILED',
+            error: err.message,
+            dbHost: process.env.MYSQLHOST || process.env.DB_HOST || 'not-set',
+            dbName: process.env.MYSQLDATABASE || process.env.DB_NAME || 'not-set'
+        });
+    }
+});
+
 // Database initialization endpoint (for cloud/serverless setup)
 app.get('/api/init-db', async (req, res) => {
     try {

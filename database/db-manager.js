@@ -27,12 +27,15 @@ if (isProduction && !process.env.MYSQLHOST) {
 }
 
 // MySQL connection configuration
-const isRemoteHost = !['localhost', '127.0.0.1', 'db'].includes(process.env.MYSQLHOST || process.env.DB_HOST || 'localhost');
-const useSsl = isRemoteHost && (process.env.NODE_ENV === 'production' || process.env.VERCEL || process.env.DB_SSL === 'true');
+const host = process.env.MYSQLHOST || process.env.DB_HOST || 'localhost';
+const isTiDB = typeof host === 'string' && host.includes('tidbcloud.com');
+const defaultPort = isTiDB ? 4000 : 3306;
+const isRemoteHost = !['localhost', '127.0.0.1', 'db'].includes(host);
+const useSsl = isRemoteHost && (isTiDB || process.env.NODE_ENV === 'production' || process.env.VERCEL || process.env.DB_SSL === 'true');
 
 const dbConfig = {
-    host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT || 3306),
+    host: host,
+    port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT || defaultPort),
     user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
     password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
     database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'graceland_church',
