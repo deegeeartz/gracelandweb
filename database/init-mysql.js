@@ -118,8 +118,7 @@ async function createTables() {
                 INDEX idx_status (status),
                 INDEX idx_published_at (published_at),
                 INDEX idx_category_id (category_id),
-                INDEX idx_image_public_id (image_public_id),
-                FULLTEXT(title, excerpt, content)
+                INDEX idx_image_public_id (image_public_id)
             ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
         `);
 
@@ -147,8 +146,7 @@ async function createTables() {
                 INDEX idx_status (status),
                 INDEX idx_sermon_date (sermon_date),
                 INDEX idx_speaker (speaker),
-                INDEX idx_series (series),
-                FULLTEXT(title, description, speaker)
+                INDEX idx_series (series)
             ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
         `);
 
