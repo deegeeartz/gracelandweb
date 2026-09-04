@@ -152,15 +152,17 @@ app.get('/api/db-check', async (req, res) => {
         res.json({
             status: 'CONNECTED',
             result: rows,
-            dbHost: process.env.MYSQLHOST || process.env.DB_HOST || 'not-set',
-            dbName: process.env.MYSQLDATABASE || process.env.DB_NAME || 'not-set'
+            dbHost: process.env.DB_HOST || process.env.MYSQLHOST || 'not-set',
+            dbUser: process.env.DB_USER || process.env.MYSQLUSER || 'not-set',
+            dbName: process.env.DB_NAME || process.env.MYSQLDATABASE || 'not-set'
         });
     } catch (err) {
         res.status(500).json({
             status: 'CONNECTION_FAILED',
             error: err.message,
-            dbHost: process.env.MYSQLHOST || process.env.DB_HOST || 'not-set',
-            dbName: process.env.MYSQLDATABASE || process.env.DB_NAME || 'not-set'
+            dbHost: process.env.DB_HOST || process.env.MYSQLHOST || 'not-set',
+            dbUser: process.env.DB_USER || process.env.MYSQLUSER || 'not-set',
+            dbName: process.env.DB_NAME || process.env.MYSQLDATABASE || 'not-set'
         });
     }
 });

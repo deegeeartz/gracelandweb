@@ -26,19 +26,24 @@ if (isProduction && !process.env.MYSQLHOST) {
     logger.warn('⚠️ NODE_ENV is production but Railway MySQL vars not set!');
 }
 
-// MySQL connection configuration
-const host = process.env.MYSQLHOST || process.env.DB_HOST || 'localhost';
-const isTiDB = typeof host === 'string' && host.includes('tidbcloud.com');
+// MySQL connection configuration - Sanitize inputs and prioritize explicit DB_ variables
+const rawHost = (process.env.DB_HOST || process.env.MYSQLHOST || 'localhost').trim().replace(/^['"]|['"]$/g, '');
+const isTiDB = typeof rawHost === 'string' && rawHost.includes('tidbcloud.com');
 const defaultPort = isTiDB ? 4000 : 3306;
-const isRemoteHost = !['localhost', '127.0.0.1', 'db'].includes(host);
+const rawPort = (process.env.DB_PORT || process.env.MYSQLPORT || defaultPort).toString().trim().replace(/^['"]|['"]$/g, '');
+const rawUser = (process.env.DB_USER || process.env.MYSQLUSER || 'root').trim().replace(/^['"]|['"]$/g, '');
+const rawPassword = (process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || '').trim().replace(/^['"]|['"]$/g, '');
+const rawDatabase = (process.env.DB_NAME || process.env.MYSQLDATABASE || 'graceland_church').trim().replace(/^['"]|['"]$/g, '');
+
+const isRemoteHost = !['localhost', '127.0.0.1', 'db'].includes(rawHost);
 const useSsl = isRemoteHost && (isTiDB || process.env.NODE_ENV === 'production' || process.env.VERCEL || process.env.DB_SSL === 'true');
 
 const dbConfig = {
-    host: host,
-    port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT || defaultPort),
-    user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
-    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
-    database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'graceland_church',
+    host: rawHost,
+    port: parseInt(rawPort) || defaultPort,
+    user: rawUser,
+    password: rawPassword,
+    database: rawDatabase,
     waitForConnections: true,
     connectionLimit: process.env.VERCEL ? 3 : 10,
     queueLimit: 0,
