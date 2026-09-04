@@ -507,201 +507,7 @@ if ('serviceWorker' in navigator) {
 }
 */
 
-// Export functions for external use
-window.RCCGGraceland = {
-    toggleMenu,
-    showNotification,
-    hideLoading
-};
-
-// Console message
-console.log(`
-    🏛️ RCCG Graceland Area HQ Website
-    📍 Jah Michael Bus Stop, Lagos-Badagry Expressway
-    ✝️ Experiencing An Overflow Of His Grace
-    
-    Made with ❤️ for the Kingdom
-`);
-
-// Fetch settings for Announcement Banner
-async function fetchAnnouncementBanner() {
-    try {
-        const response = await fetch('/api/settings');
-        if (!response.ok) return;
-        const data = await response.json();
-        
-        // Find announcement settings
-        const textSetting = data.find(s => s.key === 'announcement_text');
-        const activeSetting = data.find(s => s.key === 'announcement_active');
-        const linkSetting = data.find(s => s.key === 'announcement_link');
-
-        if (activeSetting && activeSetting.value === 'true' && textSetting && textSetting.value) {
-            const banner = document.getElementById('announcement-banner');
-            const textSpan = document.getElementById('announcement-text');
-            
-            if (banner && textSpan) {
-                if (linkSetting && linkSetting.value) {
-                    textSpan.innerHTML = `<a href="${linkSetting.value}" style="color: white; text-decoration: underline;">${textSetting.value}</a>`;
-                } else {
-                    textSpan.textContent = textSetting.value;
-                }
-                banner.style.display = 'block';
-            }
-        }
-// Performance monitoring
-function measurePagePerformance() {
-    if ('performance' in window) {
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const perfData = performance.getEntriesByType('navigation')[0];
-                console.log('Page Load Time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
-                console.log('DOM Content Loaded:', perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart, 'ms');
-            }, 0);
-        });
-    }
-}
-
-// Error handling
-window.addEventListener('error', (e) => {
-    console.error('JavaScript Error:', e.error);
-    // Could send error to logging service in production
-});
-
-// Resize handler for responsive adjustments
-const handleResize = debounce(() => {
-    // Update header height for scroll calculations
-    window.headerHeight = header.offsetHeight;
-    
-    // Close mobile menu on resize to larger screen
-    if (window.innerWidth > 768) {
-        navLinks.classList.remove('active');
-        menuToggle.classList.remove('active');
-    }
-    
-    // Adjust video player aspect ratio if needed
-    adjustVideoPlayer();
-}, 250);
-
-function adjustVideoPlayer() {
-    const videoWrapper = document.querySelector('.video-wrapper iframe');
-    if (videoWrapper && window.innerWidth < 768) {
-        const containerWidth = videoWrapper.parentElement.offsetWidth;
-        const aspectRatio = 16 / 9;
-        const newHeight = containerWidth / aspectRatio;
-        videoWrapper.style.height = newHeight + 'px';
-    }
-}
-
-window.addEventListener('resize', handleResize);
-
-// Accessibility improvements
-function enhanceAccessibility() {
-    // Add skip link
-    const skipLink = document.createElement('a');
-    skipLink.href = '#main-content';
-    skipLink.textContent = 'Skip to main content';
-    skipLink.className = 'skip-link';
-    skipLink.style.cssText = `
-        position: absolute;
-        top: -40px;
-        left: 6px;
-        background: var(--primary-color);
-        color: white;
-        padding: 8px;
-        text-decoration: none;
-        border-radius: 4px;
-        z-index: 10001;
-        transition: top 0.3s;
-    `;
-    
-    skipLink.addEventListener('focus', () => {
-        skipLink.style.top = '6px';
-    });
-    
-    skipLink.addEventListener('blur', () => {
-        skipLink.style.top = '-40px';
-    });
-    
-    document.body.insertBefore(skipLink, document.body.firstChild);
-    
-    // Add main content id
-    const heroSection = document.querySelector('.hero');
-    if (heroSection) {
-        heroSection.id = 'main-content';
-    }
-    
-    // Improve button accessibility
-    const buttons = document.querySelectorAll('button:not([aria-label])');
-    buttons.forEach(button => {
-        if (button.classList.contains('menu-toggle')) {
-            button.setAttribute('aria-label', 'Toggle navigation menu');
-            button.setAttribute('aria-expanded', 'false');
-        }
-    });
-    
-    // Update aria-expanded for mobile menu
-    menuToggle.addEventListener('click', () => {
-        const isExpanded = navLinks.classList.contains('active');
-        menuToggle.setAttribute('aria-expanded', isExpanded.toString());
-    });
-}
-
-// Toggle contact info in giving section
-function toggleContactInfo() {
-    const contactMethods = document.querySelector('.contact-methods');
-    const button = document.querySelector('.give-section .btn-primary');
-    
-    if (contactMethods.style.display === 'none' || contactMethods.style.display === '') {
-        contactMethods.style.display = 'flex';
-        contactMethods.classList.add('show');
-        button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Contact Info';
-    } else {
-        contactMethods.style.display = 'none';
-        contactMethods.classList.remove('show');
-        button.innerHTML = '<i class="fas fa-phone"></i> Contact for Giving Info';
-    }
-}
-
-// Initialize everything when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    initializePage();
-    enhanceAccessibility();
-    loadImages();    measurePagePerformance();
-});
-
-// Service Worker registration for offline support (optional)
-// DISABLED: Causes 404 errors if sw.js doesn't exist or is misconfigured
-// Uncomment below if you want to implement full PWA functionality
-/*
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        // Get base path for GitHub Pages subdirectory support
-        const getServiceWorkerPath = () => {
-            const pathname = window.location.pathname;
-            const pathParts = pathname.split('/').filter(part => part.length > 0);
-            
-            // If on GitHub Pages with subdirectory: /gracelandweb/sw.js
-            if (pathParts.length > 0 && !pathParts[0].includes('.')) {
-                return `/${pathParts[0]}/sw.js`;
-            }
-            // Otherwise: /sw.js
-            return '/sw.js';
-        };
-        
-        const swPath = getServiceWorkerPath();
-        
-        navigator.serviceWorker.register(swPath)
-            .then(registration => {
-                console.log('SW registered: ', registration);
-            })
-            .catch(registrationError => {
-                console.log('SW registration failed: ', registrationError);
-            });
-    });
-}
-*/
-
-// Export functions for external use
+// // Export functions for external use
 window.RCCGGraceland = {
     toggleMenu,
     showNotification,
@@ -840,3 +646,84 @@ async function submitMemberConnect(e) {
         messageEl.textContent = 'An error occurred. Please try again.';
     }
 }
+
+// ============================================
+// DYNAMIC CONTENT LOADING
+// ============================================
+
+async function loadDynamicContent() {
+    try {
+        // Load Settings (Hero Image)
+        const settingsRes = await fetch(`${API_URL}/settings`);
+        if (settingsRes.ok) {
+            const settings = await settingsRes.json();
+            if (settings.hero_image) {
+                const heroSection = document.querySelector('.hero');
+                if (heroSection) {
+                    heroSection.style.backgroundImage = `url(${settings.hero_image})`;
+                    heroSection.style.backgroundSize = 'cover';
+                    heroSection.style.backgroundPosition = 'center';
+                }
+            }
+        }
+
+        // Load Ministries
+        const ministriesRes = await fetch(`${API_URL}/ministries`);
+        if (ministriesRes.ok) {
+            const ministries = await ministriesRes.json();
+            const ministriesGrid = document.getElementById('ministriesGrid');
+            if (ministriesGrid && ministries.length > 0) {
+                ministriesGrid.innerHTML = ministries.map(ministry => `
+                    <div class="ministry-card">
+                        ${ministry.image_url ? `<div class="ministry-image" style="height: 150px; background-image: url(${ministry.image_url}); background-size: cover; background-position: center; border-radius: 50%; width: 150px; margin: 0 auto 1.5rem;"></div>` : `
+                        <div class="ministry-icon">
+                            <i class="fas fa-users"></i>
+                        </div>`}
+                        <h3>${ministry.name}</h3>
+                        <p>${ministry.description || ''}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Load Latest Blogs
+        const blogsRes = await fetch(`${API_URL}/blog?limit=3`);
+        if (blogsRes.ok) {
+            const data = await blogsRes.json();
+            const blogs = data.data || data; // handle pagination object if needed
+            const blogGrid = document.getElementById('blogGrid');
+            if (blogGrid && blogs.length > 0) {
+                blogGrid.innerHTML = blogs.map(blog => {
+                    const date = new Date(blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    return `
+                    <article class="blog-card">
+                        <div class="blog-image" ${blog.featured_image ? `style="background-image: url(${blog.featured_image}); background-size: cover; background-position: center;"` : ''}>
+                            <div class="blog-category">${blog.category_name || 'Blog'}</div>
+                        </div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span class="blog-date"><i class="fas fa-calendar"></i> ${date}</span>
+                                <span class="blog-author"><i class="fas fa-user"></i> ${blog.author_name}</span>
+                            </div>
+                            <h3>${blog.title}</h3>
+                            <p class="blog-excerpt">${blog.excerpt || ''}</p>
+                            <div class="blog-footer">
+                                <a href="blog.html?id=${blog.id}" class="btn-blog">
+                                    Read More <i class="fas fa-arrow-right"></i>
+                                </a>
+                                <div class="blog-stats">
+                                    <span><i class="fas fa-eye"></i> ${blog.views_count || 0} views</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                `}).join('');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading dynamic content:', error);
+    }
+}
+
+// Call loadDynamicContent on page load
+document.addEventListener('DOMContentLoaded', loadDynamicContent);

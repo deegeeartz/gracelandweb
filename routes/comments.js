@@ -53,4 +53,52 @@ router.post('/post/:postId', async (req, res) => {
     }
 });
 
+const { verifyToken } = require('./auth');
+
+// Admin: Get all comments
+router.get('/', verifyToken, async (req, res) => {
+    try {
+        const comments = await db.all(`
+            SELECT c.*, p.title as post_title 
+            FROM comments c
+            LEFT JOIN blog_posts p ON c.post_id = p.id
+            ORDER BY c.created_at DESC
+        `);
+        res.json(comments);
+    } catch (error) {
+        logger.error('Error fetching comments:', error);
+        res.status(500).json({ error: 'Failed to fetch comments' });
+    }
+});
+
+// Admin: Update comment status
+router.put('/:id/status', verifyToken, async (req, res) => {
+    try {
+        const { status } = req.body;
+        const id = req.params.id;
+        
+        if (!['pending', 'approved', 'rejected'].includes(status)) {
+            return res.status(400).json({ error: 'Invalid status' });
+        }
+
+        await db.run(`UPDATE comments SET status = ? WHERE id = ?`, [status, id]);
+        res.json({ success: true, message: 'Comment status updated' });
+    } catch (error) {
+        logger.error('Error updating comment status:', error);
+        res.status(500).json({ error: 'Failed to update comment status' });
+    }
+});
+
+// Admin: Delete comment
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        await db.run(`DELETE FROM comments WHERE id = ?`, [req.params.id]);
+        res.json({ success: true, message: 'Comment deleted' });
+    } catch (error) {
+        logger.error('Error deleting comment:', error);
+        res.status(500).json({ error: 'Failed to delete comment' });
+    }
+});
+
 module.exports = router;
+

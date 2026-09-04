@@ -292,6 +292,18 @@ async function createTables() {
             ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
         `);
 
+        // Ministries table
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS ministries (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                description TEXT,
+                image_url VARCHAR(500),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+        `);
+
         // Gallery table
         await connection.execute(`
             CREATE TABLE IF NOT EXISTS gallery (
@@ -351,6 +363,7 @@ async function insertSampleData() {
         const settings = [
             ['site_name', 'RCCG Graceland Area HQ', 'string', 'Website name'],
             ['site_description', 'Experiencing An Overflow Of His Grace', 'string', 'Website description'],
+            ['hero_image', '', 'string', 'Homepage Hero Image URL'],
             ['facebook_page', '', 'string', 'Facebook page URL'],
             ['instagram_handle', '', 'string', 'Instagram handle'],
             ['twitter_handle', '', 'string', 'Twitter handle'],
@@ -364,6 +377,26 @@ async function insertSampleData() {
                 'INSERT IGNORE INTO settings (`key`, value, type, description) VALUES (?, ?, ?, ?)',
                 [key, value, type, description]
             );
+        }
+
+        // Insert default ministries
+        const ministries = [
+            ['Children\'s Ministry', 'Building strong foundations in Christ for our young ones', null],
+            ['Choir Ministry', 'Worshiping God through music and song', null],
+            ['Youth Ministry', 'Empowering young people for kingdom service', null],
+            ['Ushering Ministry', 'Welcoming everyone with love and hospitality', null],
+            ['Welfare Ministry', 'Demonstrating God\'s love through giving and care', null]
+        ];
+
+        for (const [name, description, image_url] of ministries) {
+            // Check if it exists before inserting to avoid duplicates
+            const [existing] = await connection.execute('SELECT id FROM ministries WHERE name = ?', [name]);
+            if (existing.length === 0) {
+                await connection.execute(
+                    'INSERT INTO ministries (name, description, image_url) VALUES (?, ?, ?)',
+                    [name, description, image_url]
+                );
+            }
         }
 
         await connection.commit();

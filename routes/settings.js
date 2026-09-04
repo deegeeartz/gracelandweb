@@ -7,7 +7,7 @@ const Settings = require('../database/models/Settings');
 // GET /api/settings - Get all settings (public settings only for non-authenticated users)
 router.get('/', async (req, res) => {
     try {
-        const settings = await Settings.getAll();
+        const settings = await Settings.getAsObject();
         
         // For non-authenticated requests, only return public settings
         const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -16,6 +16,7 @@ router.get('/', async (req, res) => {
             const publicKeys = [
                 'site_name',
                 'site_description',
+                'hero_image',
                 'facebook_page',
                 'instagram_handle',  
                 'twitter_handle',
@@ -65,21 +66,10 @@ router.put('/', verifyToken, async (req, res) => {
             return res.status(400).json({ error: 'No settings provided' });
         }
         
-        // Convert settings to the format expected by the model
+        // Settings to update as key-value pairs
         const settingsToUpdate = {};
-        
         for (const [key, value] of Object.entries(settings)) {
-            // Determine type based on value
-            let type = 'string';
-            if (typeof value === 'number') {
-                type = 'number';
-            } else if (typeof value === 'boolean') {
-                type = 'boolean';
-            } else if (typeof value === 'object') {
-                type = 'json';
-            }
-            
-            settingsToUpdate[key] = { value, type };
+            settingsToUpdate[key] = value;
         }
         
         await Settings.updateMultiple(settingsToUpdate);

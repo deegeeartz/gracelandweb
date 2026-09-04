@@ -47,6 +47,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+const { verifyToken } = require('./auth');
+
 // Public: RSVP to an event
 router.post('/:id/rsvp', async (req, res) => {
     try {
@@ -70,6 +72,47 @@ router.post('/:id/rsvp', async (req, res) => {
     } catch (error) {
         logger.error('Error submitting RSVP:', error);
         res.status(500).json({ error: 'Failed to submit RSVP' });
+    }
+});
+
+// Admin: Create an event
+router.post('/', verifyToken, async (req, res) => {
+    try {
+        const { title, description, event_date, location, status = 'published' } = req.body;
+
+        if (!title || !event_date) {
+            return res.status(400).json({ error: 'Title and event date are required' });
+        }
+
+        const sanitizedTitle = Sanitizer.sanitizeText(title);
+        const sanitizedDesc = description ? Sanitizer.sanitizeText(description) : null;
+        const sanitizedLocation = location ? Sanitizer.sanitizeText(location) : null;
+        
+        // We'll use event_date for both start and end time to satisfy the schema
+        const startTime = event_date;
+        const endTime = event_date;
+
+        await db.run(
+            `INSERT INTO events (title, description, start_time, end_time, location, status) VALUES (?, ?, ?, ?, ?, ?)`,
+            [sanitizedTitle, sanitizedDesc, startTime, endTime, sanitizedLocation, status]
+        );
+
+        res.json({ success: true, message: 'Event created successfully' });
+    } catch (error) {
+        logger.error('Error creating event:', error);
+        res.status(500).json({ error: 'Failed to create event' });
+    }
+});
+
+// Admin: Delete an event
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        await db.run(`DELETE FROM events WHERE id = ?`, [eventId]);
+        res.json({ success: true, message: 'Event deleted successfully' });
+    } catch (error) {
+        logger.error('Error deleting event:', error);
+        res.status(500).json({ error: 'Failed to delete event' });
     }
 });
 

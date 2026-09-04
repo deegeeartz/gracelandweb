@@ -46,21 +46,20 @@ async function fetchInstagramPosts() {
 async function initializeInstagramFeed() {
     logger.log('Initializing Instagram feed...');
     
+    // Fetch and render floating background from gallery
+    createFloatingPostsBackground();
+    
     // Try to fetch posts from API
     const posts = await fetchInstagramPosts();
     
     if (posts.length > 0) {
         // Display posts in grid
         displayInstagramGrid(posts);
-        // Update floating background with real posts
-        createFloatingPostsBackground(posts.slice(0, 4));
         // Create carousel
         createInstagramCarousel(posts);
     } else {
         // Fallback to Instagram embed widget
         loadInstagramWidget();
-        // Use placeholder for floating posts
-        createFloatingPostsBackground();
     }
 }
 
@@ -123,22 +122,38 @@ function createPostCard(post) {
 /**
  * Create floating Instagram posts background
  */
-function createFloatingPostsBackground(posts = null) {
-    const container = document.querySelector('.floating-instagram-bg');
+async function createFloatingPostsBackground() {
+    const container = document.querySelector('.floating-gallery-bg');
     
     if (!container) return;
     
     container.innerHTML = ''; // Clear existing
     
-    // Use real posts or placeholders
-    const postsData = posts || [
-        { image: 'https://via.placeholder.com/300?text=Sunday+Service', caption: 'Sunday Service' },
-        { image: 'https://via.placeholder.com/300?text=Prayer+Meeting', caption: 'Prayer Meeting' },
-        { image: 'https://via.placeholder.com/300?text=Youth+Fellowship', caption: 'Youth Fellowship' },
-        { image: 'https://via.placeholder.com/300?text=Worship', caption: 'Worship' }
+    try {
+        const res = await fetch(`${window.API_BASE || 'http://localhost:3000'}/api/gallery/random?limit=4`);
+        if (res.ok) {
+            const galleryImages = await res.json();
+            if (galleryImages && galleryImages.length > 0) {
+                galleryImages.forEach((item, index) => {
+                    const postElement = createFloatingPost({ thumbnail: item.image_url, caption: item.title }, index);
+                    container.appendChild(postElement);
+                });
+                return;
+            }
+        }
+    } catch (e) {
+        console.error('Error fetching random gallery images for floating background:', e);
+    }
+    
+    // Fallback if gallery is empty or fails
+    const placeholders = [
+        { thumbnail: 'https://via.placeholder.com/300?text=Gallery+1', caption: 'Gallery 1' },
+        { thumbnail: 'https://via.placeholder.com/300?text=Gallery+2', caption: 'Gallery 2' },
+        { thumbnail: 'https://via.placeholder.com/300?text=Gallery+3', caption: 'Gallery 3' },
+        { thumbnail: 'https://via.placeholder.com/300?text=Gallery+4', caption: 'Gallery 4' }
     ];
     
-    postsData.forEach((post, index) => {
+    placeholders.forEach((post, index) => {
         const postElement = createFloatingPost(post, index);
         container.appendChild(postElement);
     });

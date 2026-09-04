@@ -113,6 +113,8 @@ class AdminPanel {    constructor() {
         await this.loadCategories();
         await this.loadDashboardData();
         await this.updateStats();
+        await this.loadNotifications();
+        setInterval(() => this.loadNotifications(), 30000);
     }
 
     showLoginForm() {
@@ -244,6 +246,29 @@ class AdminPanel {    constructor() {
         document.querySelector('.logout-btn').addEventListener('click', () => {
             this.logout();
         });
+
+        // Notification dropdown toggle
+        const notifBtn = document.getElementById('notificationBtn');
+        const dropdown = document.getElementById('notificationDropdown');
+        if (notifBtn && dropdown) {
+            notifBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.style.display = (dropdown.style.display === 'none' || !dropdown.style.display) ? 'block' : 'none';
+            });
+            document.addEventListener('click', () => {
+                if (dropdown) dropdown.style.display = 'none';
+            });
+            dropdown.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        // Settings save button
+        const saveSettingsBtn = document.querySelector('#settings .btn-primary');
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.saveSettings();
+            });
+        }
     }
 
     logout() {
@@ -453,6 +478,10 @@ class AdminPanel {    constructor() {
             await this.loadMembers();
         } else if (tab === 'comments') {
             await this.loadComments();
+        } else if (tab === 'ministries') {
+            await this.loadMinistries();
+        } else if (tab === 'settings') {
+            await this.loadSettings();
         }
     }
 
@@ -1105,17 +1134,18 @@ class AdminPanel {    constructor() {
     // --- PRAYER REQUESTS MANAGEMENT ---
     async loadPrayers() {
         try {
-            const prayers = await API.get('/prayers');
+            const prayers = await API.get('/prayer');
             this.renderPrayers(prayers);
         } catch (error) {
             logger.error('Error loading prayers:', error);
-            if(typeof showToast === 'function') showToast('Failed to load prayer requests', 'error');
+            this.showNotification('Failed to load prayer requests', 'error');
         }
     }
 
     renderPrayers(prayers) {
         const tbody = document.getElementById('prayersList');
-        if (prayers.length === 0) {
+        if (!tbody) return;
+        if (!Array.isArray(prayers) || prayers.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No prayer requests found.</td></tr>';
             return;
         }
@@ -1123,7 +1153,7 @@ class AdminPanel {    constructor() {
             <tr style="border-bottom: 1px solid #ddd;">
                 <td style="padding: 10px;">${new Date(p.created_at).toLocaleDateString()}</td>
                 <td style="padding: 10px;">${this.escapeHtml(p.name)}</td>
-                <td style="padding: 10px;">${this.escapeHtml(p.request)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(p.request_text || p.request || '')}</td>
                 <td style="padding: 10px;">${p.is_public ? 'Yes' : 'No'}</td>
                 <td style="padding: 10px;"><span class="status-badge status-${p.status}">${p.status}</span></td>
                 <td style="padding: 10px;">
@@ -1136,24 +1166,26 @@ class AdminPanel {    constructor() {
 
     async updatePrayerStatus(id, status) {
         try {
-            await API.put(`/prayers/${id}/status`, { status });
-            if(typeof showToast === 'function') showToast('Prayer status updated', 'success');
+            await API.put(`/prayer/${id}/status`, { status });
+            this.showNotification('Prayer status updated', 'success');
             await this.loadPrayers();
+            await this.loadNotifications();
         } catch (error) {
             logger.error('Error updating prayer status:', error);
-            if(typeof showToast === 'function') showToast('Failed to update prayer', 'error');
+            this.showNotification('Failed to update prayer', 'error');
         }
     }
 
     async deletePrayer(id) {
         if (!confirm('Are you sure you want to delete this prayer request?')) return;
         try {
-            await API.delete(`/prayers/${id}`);
-            if(typeof showToast === 'function') showToast('Prayer request deleted', 'success');
+            await API.delete(`/prayer/${id}`);
+            this.showNotification('Prayer request deleted', 'success');
             await this.loadPrayers();
+            await this.loadNotifications();
         } catch (error) {
             logger.error('Error deleting prayer:', error);
-            if(typeof showToast === 'function') showToast('Failed to delete prayer', 'error');
+            this.showNotification('Failed to delete prayer', 'error');
         }
     }
 
@@ -1164,25 +1196,41 @@ class AdminPanel {    constructor() {
             this.renderMembers(members);
         } catch (error) {
             logger.error('Error loading members:', error);
-            if(typeof showToast === 'function') showToast('Failed to load members', 'error');
+            this.showNotification('Failed to load members', 'error');
         }
     }
 
     renderMembers(members) {
         const tbody = document.getElementById('membersList');
-        if (members.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No connect cards found.</td></tr>';
+        if (!tbody) return;
+        if (!Array.isArray(members) || members.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No connect cards found.</td></tr>';
             return;
         }
         tbody.innerHTML = members.map(m => `
             <tr style="border-bottom: 1px solid #ddd;">
                 <td style="padding: 10px;">${this.escapeHtml(m.first_name)} ${this.escapeHtml(m.last_name)}</td>
-                <td style="padding: 10px;">${this.escapeHtml(m.email)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(m.email || '')}</td>
                 <td style="padding: 10px;">${this.escapeHtml(m.phone || '')}</td>
                 <td style="padding: 10px;">${this.escapeHtml(m.address || '')}</td>
-                <td style="padding: 10px;">${new Date(m.created_at).toLocaleDateString()}</td>
+                <td style="padding: 10px;">${new Date(m.created_at || m.joined_date).toLocaleDateString()}</td>
+                <td style="padding: 10px;">
+                    <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteMember(${m.id})"><i class="fas fa-trash"></i></button>
+                </td>
             </tr>
         `).join('');
+    }
+
+    async deleteMember(id) {
+        if (!confirm('Are you sure you want to delete this connect card?')) return;
+        try {
+            await API.delete(`/members/${id}`);
+            this.showNotification('Connect card deleted', 'success');
+            await this.loadMembers();
+        } catch (error) {
+            logger.error('Error deleting member:', error);
+            this.showNotification('Failed to delete member', 'error');
+        }
     }
 
     // --- COMMENTS MANAGEMENT ---
@@ -1192,21 +1240,22 @@ class AdminPanel {    constructor() {
             this.renderComments(comments);
         } catch (error) {
             logger.error('Error loading comments:', error);
-            if(typeof showToast === 'function') showToast('Failed to load comments', 'error');
+            this.showNotification('Failed to load comments', 'error');
         }
     }
 
     renderComments(comments) {
         const tbody = document.getElementById('commentsList');
-        if (!comments || comments.length === 0) {
+        if (!tbody) return;
+        if (!Array.isArray(comments) || comments.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No comments found.</td></tr>';
             return;
         }
         tbody.innerHTML = comments.map(c => `
             <tr style="border-bottom: 1px solid #ddd;">
                 <td style="padding: 10px;">${new Date(c.created_at).toLocaleDateString()}</td>
-                <td style="padding: 10px;">${this.escapeHtml(c.author_name)}</td>
-                <td style="padding: 10px;">${this.escapeHtml(c.content)}</td>
+                <td style="padding: 10px;">${this.escapeHtml(c.name || c.author_name || '')}</td>
+                <td style="padding: 10px;">${this.escapeHtml(c.comment || c.content || '')}</td>
                 <td style="padding: 10px;"><span class="status-badge status-${c.status}">${c.status}</span></td>
                 <td style="padding: 10px;">
                     ${c.status === 'pending' ? `<button class="btn btn-sm btn-primary" onclick="adminPanel.updateCommentStatus(${c.id}, 'approved')"><i class="fas fa-check"></i></button>` : ''}
@@ -1218,24 +1267,26 @@ class AdminPanel {    constructor() {
 
     async updateCommentStatus(id, status) {
         try {
-            await API.put(`/comments/${id}/status`, { status });
-            if(typeof showToast === 'function') showToast('Comment status updated', 'success');
+            await API.put(`/admin/comments/${id}/status`, { status });
+            this.showNotification('Comment status updated', 'success');
             await this.loadComments();
+            await this.loadNotifications();
         } catch (error) {
             logger.error('Error updating comment status:', error);
-            if(typeof showToast === 'function') showToast('Failed to update comment', 'error');
+            this.showNotification('Failed to update comment', 'error');
         }
     }
 
     async deleteComment(id) {
         if (!confirm('Are you sure you want to delete this comment?')) return;
         try {
-            await API.delete(`/comments/${id}`);
-            if(typeof showToast === 'function') showToast('Comment deleted', 'success');
+            await API.delete(`/admin/comments/${id}`);
+            this.showNotification('Comment deleted', 'success');
             await this.loadComments();
+            await this.loadNotifications();
         } catch (error) {
             logger.error('Error deleting comment:', error);
-            if(typeof showToast === 'function') showToast('Failed to delete comment', 'error');
+            this.showNotification('Failed to delete comment', 'error');
         }
     }
 
@@ -1358,33 +1409,133 @@ class AdminPanel {    constructor() {
         // Remove beforeunload warning
         window.onbeforeunload = null;
     }
+
+    // --- MINISTRIES MANAGEMENT ---
+    async loadMinistries() {
+        try {
+            const ministries = await API.get('/ministries');
+            const tbody = document.getElementById('ministriesList');
+            if (!tbody) return;
+            
+            if (!Array.isArray(ministries) || ministries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No ministries found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = ministries.map(m => `
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;">${m.image_url ? `<img src="${m.image_url}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">` : 'No Image'}</td>
+                    <td style="padding: 10px;">${this.escapeHtml(m.name)}</td>
+                    <td style="padding: 10px;">${this.escapeHtml(m.description || '')}</td>
+                    <td style="padding: 10px;">
+                        <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteMinistry(${m.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            logger.error('Error loading ministries:', error);
+            this.showNotification('Failed to load ministries', 'error');
+        }
+    }
+
+    async deleteMinistry(id) {
+        if (!confirm('Are you sure you want to delete this ministry?')) return;
+        try {
+            await API.delete(`/ministries/${id}`);
+            this.showNotification('Ministry deleted successfully', 'success');
+            await this.loadMinistries();
+        } catch (error) {
+            logger.error('Error deleting ministry:', error);
+            this.showNotification('Failed to delete ministry', 'error');
+        }
+    }
+
+    // --- SETTINGS MANAGEMENT ---
+    async loadSettings() {
+        try {
+            const settings = await API.get('/settings');
+            if (settings) {
+                if(settings.site_name && document.getElementById('siteName')) document.getElementById('siteName').value = settings.site_name;
+                if(settings.site_description && document.getElementById('siteDescription')) document.getElementById('siteDescription').value = settings.site_description;
+                if(settings.hero_image && document.getElementById('heroImage')) document.getElementById('heroImage').value = settings.hero_image;
+                if(settings.facebook_page && document.getElementById('facebookPage')) document.getElementById('facebookPage').value = settings.facebook_page;
+                if(settings.instagram_handle && document.getElementById('instagramHandle')) document.getElementById('instagramHandle').value = settings.instagram_handle;
+            }
+        } catch (error) {
+            logger.error('Error loading settings:', error);
+        }
+    }
+
+    async saveSettings() {
+        const settings = {
+            site_name: document.getElementById('siteName')?.value || '',
+            site_description: document.getElementById('siteDescription')?.value || '',
+            hero_image: document.getElementById('heroImage')?.value || '',
+            facebook_page: document.getElementById('facebookPage')?.value || '',
+            instagram_handle: document.getElementById('instagramHandle')?.value || ''
+        };
+        try {
+            await API.put('/settings', settings);
+            this.showNotification('Settings saved successfully', 'success');
+        } catch (error) {
+            logger.error('Error saving settings:', error);
+            this.showNotification('Failed to save settings', 'error');
+        }
+    }
+
+    // --- NOTIFICATIONS MANAGEMENT ---
+    async loadNotifications() {
+        try {
+            const [prayers, comments] = await Promise.all([
+                API.get('/prayer').catch(() => []),
+                API.get('/admin/comments').catch(() => [])
+            ]);
+            
+            const pendingPrayers = Array.isArray(prayers) ? prayers.filter(p => p.status === 'pending').length : 0;
+            const pendingComments = Array.isArray(comments) ? comments.filter(c => c.status === 'pending').length : 0;
+            const total = pendingPrayers + pendingComments;
+            
+            const badge = document.getElementById('notificationBadge');
+            const list = document.getElementById('notificationList');
+            
+            if (badge) {
+                badge.textContent = total;
+                badge.style.display = total > 0 ? 'inline-block' : 'none';
+            }
+            
+            if (list) {
+                let html = '';
+                if (pendingPrayers > 0) {
+                    html += `<li style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;" onclick="adminPanel.switchTab('prayers')">
+                        <i class="fas fa-praying-hands" style="color: #007bff; margin-right: 5px;"></i> ${pendingPrayers} pending prayer request(s)
+                    </li>`;
+                }
+                if (pendingComments > 0) {
+                    html += `<li style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;" onclick="adminPanel.switchTab('comments')">
+                        <i class="fas fa-comments" style="color: #28a745; margin-right: 5px;"></i> ${pendingComments} pending comment(s)
+                    </li>`;
+                }
+                if (total === 0) {
+                    html = '<li style="padding: 10px; color: #888;">No new notifications</li>';
+                }
+                list.innerHTML = html;
+            }
+        } catch (error) {
+            console.error('Error loading notifications', error);
+        }
+    }
 }
 
 // Add CSS for notifications
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
     }
-    
     @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
     }
-    
     .category-badge {
         background: var(--primary-color);
         color: white;
@@ -1395,27 +1546,6 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-
-// Initialize the admin panel when the page loads
-let adminPanel;
-document.addEventListener('DOMContentLoaded', () => {
-    adminPanel = new AdminPanel();
-});
-
-// Global functions for onclick handlers
-window.adminPanel = {
-    openPostEditor: (postId) => adminPanel.openPostEditor(postId),
-    deletePost: (id) => adminPanel.deletePost(id),
-    deleteSermon: (id) => adminPanel.deleteSermon(id),
-    editSermon: (id) => adminPanel.editSermon(id),
-    deleteEvent: (id) => adminPanel.deleteEvent(id),
-    deleteFellowship: (id) => adminPanel.deleteFellowship(id),
-    updatePrayerStatus: (id, status) => adminPanel.updatePrayerStatus(id, status),
-    deletePrayer: (id) => adminPanel.deletePrayer(id),
-    updateCommentStatus: (id, status) => adminPanel.updateCommentStatus(id, status),
-    deleteComment: (id) => adminPanel.deleteComment(id),
-    deleteGalleryItem: (id) => adminPanel.deleteGalleryItem(id)
-};
 
 // Global Submit Handlers for Modals
 window.submitEvent = async function(e) {
@@ -1428,13 +1558,13 @@ window.submitEvent = async function(e) {
     };
     try {
         await API.post('/events', data);
-        if(typeof showToast === 'function') showToast('Event created successfully', 'success');
+        adminPanel.showNotification('Event created successfully', 'success');
         document.getElementById('eventEditorModal').style.display = 'none';
         document.getElementById('eventForm').reset();
         adminPanel.loadEvents();
     } catch (error) {
         logger.error('Error saving event:', error);
-        if(typeof showToast === 'function') showToast('Failed to save event', 'error');
+        adminPanel.showNotification('Failed to save event', 'error');
     }
 };
 
@@ -1449,13 +1579,13 @@ window.submitFellowship = async function(e) {
     };
     try {
         await API.post('/fellowships', data);
-        if(typeof showToast === 'function') showToast('Fellowship created successfully', 'success');
+        adminPanel.showNotification('Fellowship created successfully', 'success');
         document.getElementById('fellowshipEditorModal').style.display = 'none';
         document.getElementById('fellowshipForm').reset();
         adminPanel.loadFellowships();
     } catch (error) {
         logger.error('Error saving fellowship:', error);
-        if(typeof showToast === 'function') showToast('Failed to save fellowship', 'error');
+        adminPanel.showNotification('Failed to save fellowship', 'error');
     }
 };
 
@@ -1466,29 +1596,70 @@ window.submitGalleryUpload = async function(e) {
     const fileInput = document.getElementById('galleryFile');
     
     if (!fileInput.files[0]) {
-        if(typeof showToast === 'function') showToast('Please select a file', 'error');
+        adminPanel.showNotification('Please select a file', 'error');
         return;
     }
     
-    // Check if Cloudinary upload script handles it
     if (window.adminImageUpload && window.adminImageUpload.uploadToCloudinary) {
         adminPanel.showUploadProgressOverlay();
         adminPanel.updateUploadProgress(1, 1, 'Uploading image...');
         try {
             const url = await window.adminImageUpload.uploadToCloudinary(fileInput.files[0]);
             await API.post('/gallery', { title, category, image_url: url });
-            if(typeof showToast === 'function') showToast('Image uploaded successfully', 'success');
+            adminPanel.showNotification('Image uploaded successfully', 'success');
             document.getElementById('galleryUploadModal').style.display = 'none';
             document.getElementById('galleryForm').reset();
             adminPanel.loadGalleryAdmin();
         } catch (error) {
             logger.error('Error uploading gallery image:', error);
-            if(typeof showToast === 'function') showToast('Failed to upload image', 'error');
+            adminPanel.showNotification('Failed to upload image', 'error');
         } finally {
             adminPanel.hideUploadProgressOverlay();
         }
     } else {
-        // Fallback or error
-        if(typeof showToast === 'function') showToast('Image upload functionality is not loaded', 'error');
+        adminPanel.showNotification('Image upload functionality is not loaded', 'error');
     }
 };
+
+window.submitMinistry = async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('ministryName').value;
+    const description = document.getElementById('ministryDescription').value;
+    const fileInput = document.getElementById('ministryImageFile');
+    
+    adminPanel.showUploadProgressOverlay();
+    adminPanel.updateUploadProgress(1, 1, 'Saving ministry...');
+    
+    try {
+        let imageUrl = null;
+        if (fileInput && fileInput.files[0] && window.adminImageUpload && window.adminImageUpload.uploadToCloudinary) {
+            imageUrl = await window.adminImageUpload.uploadToCloudinary(fileInput.files[0]);
+        }
+        
+        await API.post('/ministries', { name, description, image_url: imageUrl });
+        adminPanel.showNotification('Ministry saved successfully', 'success');
+        document.getElementById('ministryEditorModal').style.display = 'none';
+        document.getElementById('ministryForm').reset();
+        await adminPanel.loadMinistries();
+    } catch (error) {
+        logger.error('Error saving ministry:', error);
+        adminPanel.showNotification(error.message || 'Failed to save ministry', 'error');
+    } finally {
+        adminPanel.hideUploadProgressOverlay();
+    }
+};
+
+// Initialize the admin panel when the page loads
+let adminPanel;
+function initAdmin() {
+    if (!adminPanel) {
+        adminPanel = new AdminPanel();
+        window.adminPanel = adminPanel;
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdmin);
+} else {
+    initAdmin();
+}

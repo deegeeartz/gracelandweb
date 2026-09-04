@@ -154,7 +154,8 @@ function loadRoutes() {
         { path: '/api/fellowships', file: './routes/fellowships', name: 'Fellowships' },
         { path: '/api/comments', file: './routes/comments', name: 'Comments' },
         { path: '/api/search', file: './routes/search', name: 'Search' },
-        { path: '/api/gallery', file: './routes/gallery', name: 'Gallery' }
+        { path: '/api/gallery', file: './routes/gallery', name: 'Gallery' },
+        { path: '/api/ministries', file: './routes/ministries', name: 'Ministries' }
     ];    routes.forEach(({ path, file, name }) => {
         try {
             const router = require(file);

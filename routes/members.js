@@ -32,4 +32,28 @@ router.post('/register', async (req, res) => {
     }
 });
 
+const { verifyToken } = require('./auth');
+
+// Admin: Get all members
+router.get('/', verifyToken, async (req, res) => {
+    try {
+        const members = await db.all(`SELECT * FROM members ORDER BY joined_date DESC`);
+        res.json(members);
+    } catch (error) {
+        logger.error('Error fetching all members:', error);
+        res.status(500).json({ error: 'Failed to fetch members' });
+    }
+});
+
+// Admin: Delete member
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        await db.run(`DELETE FROM members WHERE id = ?`, [req.params.id]);
+        res.json({ success: true, message: 'Member deleted' });
+    } catch (error) {
+        logger.error('Error deleting member:', error);
+        res.status(500).json({ error: 'Failed to delete member' });
+    }
+});
+
 module.exports = router;

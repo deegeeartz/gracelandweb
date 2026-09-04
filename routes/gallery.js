@@ -22,6 +22,19 @@ const upload = multer({
 });
 
 // Admin Middleware (assuming it's passed or defined here, for simplicity we'll just check if they are logged in if this route is mounted under /api/admin/gallery, but wait, gallery view is public, upload is admin)
+
+// Public: Get random gallery images
+router.get('/random', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 6;
+        const images = await db.all(`SELECT * FROM gallery ORDER BY RAND() LIMIT ?`, [limit]);
+        res.json(images);
+    } catch (error) {
+        logger.error('Error fetching random gallery images:', error);
+        res.status(500).json({ error: 'Failed to fetch random gallery images' });
+    }
+});
+
 // Public: Get gallery images
 router.get('/', async (req, res) => {
     try {

@@ -286,7 +286,7 @@ router.post('/reset-database', verifyAdminToken, async (req, res) => {
         // Insert sample data
         const categories = [
             ['Spiritual Growth', 'spiritual-growth', 'Posts about growing in faith and spiritual maturity'],
-            ['Testimony', 'testimony', 'Personal testimonies of God\\'s goodness and faithfulness'],
+            ['Testimony', 'testimony', "Personal testimonies of God's goodness and faithfulness"],
             ['Ministry', 'ministry', 'Ministry updates and church activities'],
             ['Family', 'family', 'Biblical principles for family life'],
             ['Prayer', 'prayer', 'Teaching and resources about prayer'],
