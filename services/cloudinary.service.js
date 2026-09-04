@@ -1,7 +1,12 @@
 // Cloudinary Upload Service with Automatic Optimization
 require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
-const sharp = require('sharp');
+let sharp;
+try {
+    sharp = require('sharp');
+} catch (e) {
+    // Sharp is optional; Cloudinary handles transformation in cloud
+}
 const stream = require('stream');
 const logger = require('../utils/logger');
 

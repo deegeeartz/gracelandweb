@@ -3,10 +3,52 @@
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "*.html",
+          "*.css",
+          "*.js",
+          "*.png",
+          "*.ico",
+          "styles/**",
+          "scripts/**"
+        ]
+      }
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/blog",
+      "dest": "/blog.html"
+    },
+    {
+      "src": "/post",
+      "dest": "/post.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/gallery",
+      "dest": "/gallery.html"
+    },
+    {
+      "src": "/events",
+      "dest": "/events.html"
+    },
+    {
+      "src": "/fellowships",
+      "dest": "/fellowships.html"
+    },
     {
       "src": "/(.*)",
       "dest": "server.js"

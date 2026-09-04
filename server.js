@@ -120,8 +120,14 @@ const htmlRoutes = {
 };
 
 Object.entries(htmlRoutes).forEach(([route, file]) => {
-    app.get(route, (req, res) => {
-        res.sendFile(path.join(__dirname, file));
+    app.get(route, (req, res, next) => {
+        const filePath = path.join(__dirname, file);
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                logger.warn(`Could not send ${file} via sendFile, falling back to static handlers:`, err.message);
+                next();
+            }
+        });
     });
 });
 
@@ -166,37 +172,27 @@ app.get('/api/init-db', async (req, res) => {
 // API ROUTES
 // ============================================
 
-// Safe route loading with error handling
-function loadRoutes() {
-    const routes = [
-        { path: '/api/auth', file: './routes/auth', name: 'Auth' },
-        { path: '/api/blog', file: './routes/blog', name: 'Blog' },
-        { path: '/api/sermons', file: './routes/sermons', name: 'Sermons' },
-        { path: '/api/admin', file: './routes/admin', name: 'Admin' },
-        { path: '/api/admin', file: './routes/reset-database', name: 'Database Reset' },
-        { path: '/api/settings', file: './routes/settings', name: 'Settings' },
-        { path: '/api/instagram', file: './routes/instagram', name: 'Instagram' },
-        { path: '/api/facebook', file: './routes/facebook', name: 'Facebook' },
-        { path: '/api/events', file: './routes/events', name: 'Events' },
-        { path: '/api/prayer', file: './routes/prayer', name: 'Prayer' },
-        { path: '/api/members', file: './routes/members', name: 'Members' },
-        { path: '/api/fellowships', file: './routes/fellowships', name: 'Fellowships' },
-        { path: '/api/comments', file: './routes/comments', name: 'Comments' },
-        { path: '/api/search', file: './routes/search', name: 'Search' },
-        { path: '/api/gallery', file: './routes/gallery', name: 'Gallery' },
-        { path: '/api/ministries', file: './routes/ministries', name: 'Ministries' }
-    ];    routes.forEach(({ path, file, name }) => {
-        try {
-            const router = require(file);
-            app.use(path, router);
-            logger.success(`${name} routes loaded`);
-        } catch (error) {
-            logger.error(`Failed to load ${name} routes:`, error.message);
-        }
-    });
+// Static imports required for serverless bundling on Vercel
+try {
+    app.use('/api/auth', require('./routes/auth'));
+    app.use('/api/blog', require('./routes/blog'));
+    app.use('/api/sermons', require('./routes/sermons'));
+    app.use('/api/admin', require('./routes/admin'));
+    app.use('/api/admin', require('./routes/reset-database'));
+    app.use('/api/settings', require('./routes/settings'));
+    app.use('/api/facebook', require('./routes/facebook'));
+    app.use('/api/events', require('./routes/events'));
+    app.use('/api/prayer', require('./routes/prayer'));
+    app.use('/api/members', require('./routes/members'));
+    app.use('/api/fellowships', require('./routes/fellowships'));
+    app.use('/api/comments', require('./routes/comments'));
+    app.use('/api/search', require('./routes/search'));
+    app.use('/api/gallery', require('./routes/gallery'));
+    app.use('/api/ministries', require('./routes/ministries'));
+    logger.success('All API routes registered successfully');
+} catch (error) {
+    logger.error('Error loading API routes:', error.message);
 }
-
-loadRoutes();
 
 // ============================================
 // FILE UPLOAD - Cloudinary Integration
