@@ -12,7 +12,8 @@
           "*.png",
           "*.ico",
           "styles/**",
-          "scripts/**"
+          "scripts/**",
+          "config/**"
         ]
       }
     }
