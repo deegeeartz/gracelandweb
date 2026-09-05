@@ -661,7 +661,7 @@ async function loadDynamicContent() {
             if (settings.hero_image) {
                 const heroSection = document.querySelector('.hero');
                 if (heroSection) {
-                    heroSection.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('${settings.hero_image}')`;
+                    heroSection.style.backgroundImage = `url('${settings.hero_image}')`;
                     heroSection.style.backgroundSize = 'cover';
                     heroSection.style.backgroundPosition = 'center';
                     heroSection.style.backgroundRepeat = 'no-repeat';
