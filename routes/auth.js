@@ -5,17 +5,17 @@ const router = express.Router();
 const User = require('../database/models/User');
 const logger = require('../utils/logger');
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 function getJwtSecret(res) {
-    if (!JWT_SECRET) {
+    const rawSecret = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production-graceland-2024';
+    const secret = typeof rawSecret === 'string' ? rawSecret.trim().replace(/^['"]|['"]$/g, '') : rawSecret;
+    if (!secret) {
         logger.error('JWT_SECRET is not configured');
         if (res) {
             res.status(500).json({ error: 'Authentication is not configured on server' });
         }
         return null;
     }
-    return JWT_SECRET;
+    return secret;
 }
 
 function verifyToken(req, res, next) {
@@ -90,7 +90,7 @@ router.post('/login', async (req, res) => {
         });
     } catch (error) {
         logger.error('Login error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error', message: error.message });
     }
 });
 

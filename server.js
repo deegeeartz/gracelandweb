@@ -30,30 +30,32 @@ app.use(helmet({
     contentSecurityPolicy: false, // Allow inline scripts for now
 }));
 
-// CORS - Allow GitHub Pages and localhost
+// CORS - Allow custom domain, Vercel, GitHub Pages, and localhost
 const allowedOrigins = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:5500',
-    'https://deegeeartz.github.io', // GitHub Pages
-    'https://railway.app',
-    'https://railway.com'
+    'https://deegeeartz.github.io',
+    'https://rccggraceland.com',
+    'https://www.rccggraceland.com',
+    'https://gracelandweb.vercel.app'
 ];
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps, Postman, curl)
+        // Allow requests with no origin (mobile apps, server-to-server, curl)
         if (!origin) return callback(null, true);
-          if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('railway.app')) {
+        
+        if (
+            allowedOrigins.includes(origin) ||
+            origin.endsWith('.rccggraceland.com') ||
+            origin.endsWith('.vercel.app') ||
+            origin.includes('railway.app')
+        ) {
             callback(null, true);
         } else {
-            logger.warn('CORS blocked origin:', origin);
-            // Only allow blocked origins in development
-            if (process.env.NODE_ENV === 'production') {
-                callback(new Error('Not allowed by CORS'));
-            } else {
-                callback(null, true); // Allow all in development
-            }
+            logger.warn('CORS allowed foreign origin:', origin);
+            callback(null, true);
         }
     },
     credentials: true

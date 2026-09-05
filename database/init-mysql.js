@@ -1,65 +1,18 @@
-const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
-
-// Database configuration with Railway, TiDB, Aiven and Vercel support
-const isRemoteHost = !['localhost', '127.0.0.1', 'db'].includes(process.env.MYSQLHOST || process.env.DB_HOST || 'localhost');
-const useSsl = isRemoteHost && (process.env.NODE_ENV === 'production' || process.env.VERCEL || process.env.DB_SSL === 'true');
-
-const dbConfig = {
-    host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT || 3306),
-    user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
-    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
-    database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'graceland_church',
-    waitForConnections: true,
-    connectionLimit: process.env.VERCEL ? 3 : 10,
-    queueLimit: 0,
-    charset: 'utf8mb4',
-    ssl: useSsl ? { rejectUnauthorized: false } : undefined
-};
-
-console.log('Database config:', {
-    host: dbConfig.host,
-    port: dbConfig.port,
-    user: dbConfig.user,
-    database: dbConfig.database,
-    ssl: !!dbConfig.ssl
-});
-
-// Create connection pool
-const pool = mysql.createPool(dbConfig);
-
-// Test connection
-async function testConnection() {
-    try {
-        const connection = await pool.getConnection();
-        console.log('✅ MySQL connected successfully');
-        connection.release();
-        return true;
-    } catch (error) {
-        console.error('❌ MySQL connection failed:', error.message);
-        return false;
-    }
-}
+const { pool, testConnection } = require('./db-manager');
 
 // Create database if it doesn't exist (fails gracefully on managed cloud hosts)
 async function createDatabase() {
     try {
-        const tempConfig = { ...dbConfig };
-        delete tempConfig.database;
-        
-        const tempPool = mysql.createPool(tempConfig);
-        const connection = await tempPool.getConnection();
-        
-        await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-        console.log(`✅ Database '${dbConfig.database}' created/verified`);
-        
+        const connection = await pool.getConnection();
+        const dbName = (process.env.DB_NAME || process.env.MYSQLDATABASE || 'graceland_church').trim().replace(/^['"]|['"]$/g, '');
+        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+        console.log(`✅ Database '${dbName}' created/verified`);
         connection.release();
-        await tempPool.end();
     } catch (error) {
         console.warn('⚠️ Note on database creation:', error.message);
-        console.log(`ℹ️ Assuming database '${dbConfig.database}' already exists or user has restricted permissions.`);
+        console.log('ℹ️ Assuming database already exists or user has restricted permissions.');
     }
 }
 
