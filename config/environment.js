@@ -14,11 +14,12 @@ const environment = {
         if (environment.isDevelopment()) {
             // Local development
             return 'http://localhost:3000/api';
+        } else if (window.location.hostname.includes('github.io')) {
+            // GitHub Pages fallback if still used
+            return 'https://rccggraceland.com/api';
         } else {
-            // Production - Replace with your actual backend URL
-            // IMPORTANT: Update this to your Railway backend URL, NOT GitHub Pages!
-            return 'https://gracelandweb-production.up.railway.app/api';
-            // Or: 'https://your-app.onrender.com/api'
+            // Production on Vercel / custom domain - same origin
+            return `${window.location.origin}/api`;
         }
     },    // Get base URL (for non-API requests like post.html)
     getBaseUrl: () => {
