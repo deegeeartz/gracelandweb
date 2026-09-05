@@ -311,14 +311,8 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    /* Rich, deeper dark overlay: tames bright/white photo backgrounds while preserving detail */
-    background: linear-gradient(
-        180deg,
-        rgba(0, 0, 0, 0.58) 0%,
-        rgba(0, 0, 0, 0.48) 35%,
-        rgba(0, 0, 0, 0.58) 70%,
-        rgba(0, 0, 0, 0.75) 100%
-    );
+    /* Uniform, rich dark overlay across the entire hero section */
+    background: rgba(0, 0, 0, 0.68);
     pointer-events: none;
 }
 
@@ -326,15 +320,7 @@ body {
     position: relative;
     z-index: 2;
     max-width: 850px;
-    padding: 2.5rem 2rem;
-    border-radius: 16px;
-    /* Focused dark vignette behind the text to protect against glare and bright photo elements */
-    background: radial-gradient(
-        ellipse at center,
-        rgba(0, 0, 0, 0.55) 0%,
-        rgba(0, 0, 0, 0.35) 55%,
-        rgba(0, 0, 0, 0) 80%
-    );
+    padding: 0 2rem;
 }
 
 /* Hero Logo */
