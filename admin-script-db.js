@@ -101,12 +101,23 @@ class AdminPanel {    constructor() {
     }
 
     async init() {
-        // Check authentication first
-        const isAuthenticated = await Auth.checkAuth();
-        if (!isAuthenticated) {
+        // Fast-path: check if token exists locally before making any network calls
+        const token = Auth.getToken();
+        if (!token) {
             this.showLoginForm();
             return;
         }
+
+        // Verify token with server
+        const isAuthenticated = await Auth.checkAuth();
+        if (!isAuthenticated) {
+            Auth.removeToken();
+            this.showLoginForm();
+            return;
+        }
+
+        // Reveal dashboard only after confirmed authentication
+        document.body.classList.add('authenticated');
 
         this.setupEventListeners();
         this.initializeQuillEditor();
@@ -118,39 +129,46 @@ class AdminPanel {    constructor() {
     }
 
     showLoginForm() {
+        document.body.classList.remove('authenticated');
         document.body.innerHTML = `
-            <div class="login-container" style="display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--gray-50);">
-                <div class="login-form" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px;">
+            <div class="login-container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f8fafc;">
+                <div class="login-form" style="background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); width: 100%; max-width: 420px; box-sizing: border-box;">
                     <div style="text-align: center; margin-bottom: 2rem;">
-                        <i class="fas fa-church" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-                        <h2>RCCG Admin Login</h2>
+                        <img src="logo.png" alt="RCCG Graceland Logo" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h2 style="color: #1e293b; font-size: 1.5rem; margin: 0 0 0.5rem 0;">RCCG Admin Portal</h2>
+                        <p style="color: #64748b; font-size: 0.875rem; margin: 0;">Sign in to manage church website content</p>
                     </div>
                     <form id="loginForm">
-                        <div style="margin-bottom: 1rem;">
-                            <label for="username" style="display: block; margin-bottom: 0.5rem;">Username</label>
-                            <input type="text" id="username" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <div style="margin-bottom: 1.25rem;">
+                            <label for="username" style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.875rem; color: #334155;">Username</label>
+                            <input type="text" id="username" required autocomplete="username" placeholder="Enter username" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; outline: none;">
                         </div>
                         <div style="margin-bottom: 1.5rem;">
-                            <label for="password" style="display: block; margin-bottom: 0.5rem;">Password</label>
-                            <input type="password" id="password" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.875rem; color: #334155;">Password</label>
+                            <input type="password" id="password" required autocomplete="current-password" placeholder="Enter password" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; outline: none;">
                         </div>
-                        <button type="submit" style="width: 100%; padding: 0.75rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
-                            Login
+                        <button type="submit" id="loginSubmitBtn" style="width: 100%; padding: 0.85rem; background: var(--primary-color, #8B0000); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
+                            Sign In
                         </button>
                     </form>
-                    <div id="loginError" style="color: red; margin-top: 1rem; text-align: center; display: none;"></div>
+                    <div id="loginError" style="color: #dc2626; background: #fee2e2; border: 1px solid #fecaca; padding: 0.75rem; border-radius: 6px; margin-top: 1.25rem; font-size: 0.875rem; text-align: center; display: none;"></div>
                 </div>
             </div>
         `;
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
             await this.handleLogin();
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
         });
     }
 
     async handleLogin() {
-        const username = document.getElementById('username').value;
+        const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
         const errorDiv = document.getElementById('loginError');
 
@@ -161,7 +179,7 @@ class AdminPanel {    constructor() {
             // Reload the page to show the admin panel
             window.location.reload();
         } catch (error) {
-            errorDiv.textContent = error.message;
+            errorDiv.textContent = error.message || 'Invalid username or password';
             errorDiv.style.display = 'block';
         }
     }
