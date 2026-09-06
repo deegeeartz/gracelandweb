@@ -185,11 +185,17 @@ app.post('/api/upload', uploadLimiter, upload.single('file'), async (req, res) =
 // ============================================
 
 app.use((error, req, res, next) => {
+    logger.error('Unhandled server error:', error);
     if (error instanceof multer.MulterError) {
         if (error.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'File too large (max 5MB)' });
         return res.status(400).json({ error: 'File upload error: ' + error.message });
     }
-    next(error);
+    if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
+        return res.status(400).json({ error: 'Malformed JSON payload' });
+    }
+    res.status(error.status || 500).json({ 
+        error: error.message || 'Internal server error' 
+    });
 });
 
 // DO NOT ADD app.listen() 

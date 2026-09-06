@@ -14,10 +14,11 @@ const validate = (schema, property = 'body') => {
             req[property] = parsedData;
             next();
         } catch (error) {
-            if (error && error.errors) {
+            const issues = error?.issues || error?.errors;
+            if (issues && Array.isArray(issues)) {
                 // Format the Zod errors into a readable structure
-                const formattedErrors = error.errors.map(err => ({
-                    field: err.path ? err.path.join('.') : 'unknown',
+                const formattedErrors = issues.map(err => ({
+                    field: Array.isArray(err.path) ? err.path.join('.') : (err.path || 'unknown'),
                     message: err.message || 'Invalid input'
                 }));
 
