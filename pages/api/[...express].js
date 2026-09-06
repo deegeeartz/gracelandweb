@@ -9,10 +9,14 @@ export const config = {
 };
 
 export default function handler(req, res) {
-  // Vercel Serverless Function Patch: Explicitly set req.url for Express router matching
+  // Normalize req.url so Express router always gets /api/... with full query strings
   if (req.query && req.query.express) {
     const expressPath = Array.isArray(req.query.express) ? req.query.express.join('/') : req.query.express;
-    req.url = `/api/${expressPath}`;
+    const queryIndex = (req.url || '').indexOf('?');
+    const queryString = queryIndex !== -1 ? req.url.slice(queryIndex) : '';
+    req.url = `/api/${expressPath}${queryString}`;
+  } else if (req.url && !req.url.startsWith('/api')) {
+    req.url = `/api${req.url.startsWith('/') ? '' : '/'}${req.url}`;
   }
 
   // Pass the Next.js req/res objects directly into the Express application instance
@@ -28,7 +32,11 @@ export default function handler(req, res) {
         return reject(err);
       }
       // If express doesn't handle the route (404)
-      res.status(404).json({ error: 'API Route Not Found' });
+      res.status(404).json({
+        error: 'API Route Not Found',
+        requestedUrl: req.url,
+        method: req.method,
+      });
       resolve();
     });
   });

@@ -15,7 +15,7 @@ const app = express();
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // Trust proxy - Required for Vercel
-app.set('trust proxy', 1);
+app.set('trust proxy', true);
 
 // ============================================
 // MIDDLEWARE
@@ -63,26 +63,55 @@ app.use(timeoutMiddleware(30000));
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
+    validate: { trustProxy: false },
     message: 'Too many requests, please try again later.'
 });
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 5,
+    max: 20,
+    validate: { trustProxy: false },
     message: 'Too many login attempts, please try again later.'
 });
 
 const uploadLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
-    max: 10,
+    max: 20,
+    validate: { trustProxy: false },
     message: 'Too many uploads, please try again later.'
 });
 
 app.use('/api/', apiLimiter);
 app.use('/api/auth/login', authLimiter);
 
-// Optional: Static uploads path mapping if any local files exist, but we use Cloudinary
-// (Vercel Serverless doesn't persist local files anyway, but good for local dev)
+// Track route loading
+const routeLoadErrors = [];
+const routesToLoad = [
+    ['/api/auth', './routes/auth'],
+    ['/api/blog', './routes/blog'],
+    ['/api/sermons', './routes/sermons'],
+    ['/api/admin', './routes/admin'],
+    ['/api/admin', './routes/reset-database'],
+    ['/api/settings', './routes/settings'],
+    ['/api/facebook', './routes/facebook'],
+    ['/api/events', './routes/events'],
+    ['/api/prayer', './routes/prayer'],
+    ['/api/members', './routes/members'],
+    ['/api/fellowships', './routes/fellowships'],
+    ['/api/comments', './routes/comments'],
+    ['/api/search', './routes/search'],
+    ['/api/gallery', './routes/gallery'],
+    ['/api/ministries', './routes/ministries'],
+];
+
+for (const [routePath, modulePath] of routesToLoad) {
+    try {
+        app.use(routePath, require(modulePath));
+    } catch (error) {
+        routeLoadErrors.push({ path: routePath, module: modulePath, error: error.message });
+        logger.error(`Error loading ${routePath}:`, error.message);
+    }
+}
 
 // ============================================
 // HEALTH CHECK
@@ -94,50 +123,11 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString(),
         server: 'RCCG Graceland Website (Vercel Native)',
         database: 'TiDB',
+        routesMounted: routesToLoad.length - routeLoadErrors.length,
+        routeErrors: routeLoadErrors.length > 0 ? routeLoadErrors : undefined,
         version: '1.0.0'
     });
 });
-
-app.get('/api/db-check', async (req, res) => {
-    try {
-        const { db } = require('./database/db-manager');
-        const rows = await db.all('SELECT 1 as connected');
-        res.json({
-            status: 'CONNECTED',
-            result: rows,
-            dbHost: process.env.DB_HOST || process.env.MYSQLHOST || 'not-set',
-        });
-    } catch (err) {
-        res.status(500).json({
-            status: 'CONNECTION_FAILED',
-            error: err.message,
-        });
-    }
-});
-
-// ============================================
-// API ROUTES
-// ============================================
-
-try {
-    app.use('/api/auth', require('./routes/auth'));
-    app.use('/api/blog', require('./routes/blog'));
-    app.use('/api/sermons', require('./routes/sermons'));
-    app.use('/api/admin', require('./routes/admin'));
-    app.use('/api/admin', require('./routes/reset-database'));
-    app.use('/api/settings', require('./routes/settings'));
-    app.use('/api/facebook', require('./routes/facebook'));
-    app.use('/api/events', require('./routes/events'));
-    app.use('/api/prayer', require('./routes/prayer'));
-    app.use('/api/members', require('./routes/members'));
-    app.use('/api/fellowships', require('./routes/fellowships'));
-    app.use('/api/comments', require('./routes/comments'));
-    app.use('/api/search', require('./routes/search'));
-    app.use('/api/gallery', require('./routes/gallery'));
-    app.use('/api/ministries', require('./routes/ministries'));
-} catch (error) {
-    logger.error('Error loading API routes:', error.message);
-}
 
 // ============================================
 // FILE UPLOAD - Cloudinary Integration
