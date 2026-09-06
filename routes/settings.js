@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
                 'site_name',
                 'site_description',
                 'hero_image',
+                'about_image',
                 'facebook_page',
                 'instagram_handle',  
                 'twitter_handle',

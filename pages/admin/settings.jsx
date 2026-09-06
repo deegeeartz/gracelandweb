@@ -14,11 +14,13 @@ export default function SettingsManager() {
         instagram_handle: '',
         twitter_handle: '',
         youtube_url: '',
-        hero_image: ''
+        hero_image: '',
+        about_image: ''
     });
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [uploadingAboutImage, setUploadingAboutImage] = useState(false);
     const [statusMessage, setStatusMessage] = useState(null);
 
     useEffect(() => {
@@ -45,6 +47,24 @@ export default function SettingsManager() {
     const handleChange = (e) => {
         const { id, value } = e.target;
         setSettings(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleAboutImageUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingAboutImage(true);
+        setStatusMessage(null);
+        try {
+            const uploadedUrl = await adminApi.uploadFile(file);
+            setSettings(prev => ({ ...prev, about_image: uploadedUrl }));
+            setStatusMessage({ type: 'success', text: 'About section image uploaded! Click "Save All Settings" to confirm.' });
+        } catch (err) {
+            console.error('Error uploading about image:', err);
+            setStatusMessage({ type: 'error', text: err.message || 'Failed to upload image.' });
+        } finally {
+            setUploadingAboutImage(false);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -135,6 +155,111 @@ export default function SettingsManager() {
                                     placeholder="Sundays 8:00 AM & 10:00 AM"
                                     style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
                                 />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* About Section Image Card */}
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid #e2e8f0'
+                    }}>
+                        <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                            <i className="fas fa-image" style={{ marginRight: '8px', color: '#8B0000' }}></i> About Graceland Section Image
+                        </h3>
+
+                        <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>
+                            This image is displayed beside the "About Graceland Area HQ" writeup on the homepage. If left empty, the default cross icon badge will be shown.
+                        </p>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: settings.about_image ? '160px 1fr' : '1fr', gap: '20px', alignItems: 'center', marginBottom: '16px' }}>
+                            {settings.about_image && (
+                                <div style={{
+                                    width: '160px',
+                                    height: '160px',
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                    border: '1px solid #e2e8f0',
+                                    backgroundColor: '#f8fafc',
+                                    position: 'relative'
+                                }}>
+                                    <img 
+                                        src={settings.about_image} 
+                                        alt="About preview" 
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setSettings(prev => ({ ...prev, about_image: '' }))}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '6px',
+                                            right: '6px',
+                                            background: 'rgba(220, 38, 38, 0.9)',
+                                            color: '#fff',
+                                            border: 'none',
+                                            borderRadius: '50%',
+                                            width: '24px',
+                                            height: '24px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '11px'
+                                        }}
+                                        title="Remove Image"
+                                    >
+                                        <i className="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            )}
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                        Upload Image File (Cloudinary)
+                                    </label>
+                                    <label style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        padding: '10px 18px',
+                                        backgroundColor: '#8B0000',
+                                        color: '#ffffff',
+                                        borderRadius: '6px',
+                                        cursor: uploadingAboutImage ? 'not-allowed' : 'pointer',
+                                        fontSize: '13px',
+                                        fontWeight: '500',
+                                        opacity: uploadingAboutImage ? 0.8 : 1
+                                    }}>
+                                        <i className={uploadingAboutImage ? "fas fa-spinner fa-spin" : "fas fa-cloud-upload-alt"}></i>
+                                        {uploadingAboutImage ? 'Uploading...' : 'Choose & Upload Image'}
+                                        <input 
+                                            type="file" 
+                                            accept="image/*"
+                                            onChange={handleAboutImageUpload}
+                                            style={{ display: 'none' }}
+                                            disabled={uploadingAboutImage}
+                                        />
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="about_image" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                        Or Direct Image URL
+                                    </label>
+                                    <input 
+                                        id="about_image"
+                                        type="url"
+                                        placeholder="https://images.unsplash.com/... or Cloudinary URL"
+                                        value={settings.about_image || ''}
+                                        onChange={handleChange}
+                                        style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

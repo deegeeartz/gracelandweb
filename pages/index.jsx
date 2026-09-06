@@ -135,8 +135,16 @@ export default function Home({ recentSermons, recentPosts, settings = {} }) {
                                 <i className="fas fa-map-marker-alt"></i> Visit Us
                             </a>
                         </div>
-                        <div className="about-image">
-                            <i className="fas fa-cross"></i>
+                        <div className="about-image" style={{ overflow: 'hidden', padding: 0 }}>
+                            {settings?.about_image ? (
+                                <img 
+                                    src={settings.about_image} 
+                                    alt="About RCCG Graceland" 
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                                />
+                            ) : (
+                                <i className="fas fa-cross"></i>
+                            )}
                         </div>
                     </div> 
                 </div>
