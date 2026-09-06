@@ -4,7 +4,7 @@ import SermonCard from '../components/shared/SermonCard';
 import BlogCard from '../components/shared/BlogCard';
 import FloatingGallery from '../components/shared/FloatingGallery';
 
-export default function Home({ recentSermons, recentPosts }) {
+export default function Home({ recentSermons, recentPosts, settings = {} }) {
     const [isPrayerModalOpen, setIsPrayerModalOpen] = useState(false);
     const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
 
@@ -24,14 +24,18 @@ export default function Home({ recentSermons, recentPosts }) {
             <FloatingGallery />
 
             {/* Hero Section */}
-            <section className="hero" id="home">
+            <section 
+                className="hero" 
+                id="home"
+                style={settings.hero_image ? { backgroundImage: `url(${settings.hero_image})` } : {}}
+            >
                 <div className="hero-overlay"></div>
                 <div className="hero-content">
                     <div className="hero-logo">
                         <img src="/logo.png" alt="RCCG Graceland Area HQ Logo" className="hero-logo-image" />
                     </div>
-                    <h2>Welcome to Graceland Area HQ</h2>
-                    <p>Experiencing An Overflow Of His Grace</p>
+                    <h2>{settings.site_name || "Welcome to Graceland Area HQ"}</h2>
+                    <p>{settings.site_description || "Experiencing An Overflow Of His Grace"}</p>
                     <div className="cta-buttons">
                         <a href="#services" className="btn btn-primary">Join Us for Service</a>
                         <a href="#about" className="btn btn-secondary">Learn More</a>
@@ -106,10 +110,10 @@ export default function Home({ recentSermons, recentPosts }) {
                                 Can't make it to church? Watch our live service online and be part of our worship experience. Past services are also available on our Facebook page.
                             </p> 
                             <div className="social-live-links">
-                                <a href="https://www.facebook.com/RCCGLP4GRACELAND/" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                                <a href={settings.facebook_page || "https://www.facebook.com/RCCGLP4GRACELAND/"} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
                                     <i className="fab fa-facebook-f"></i> Facebook Page
                                 </a>
-                                <a href="https://www.instagram.com/rccggracelandparishbadagry/" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                                <a href={settings.instagram_handle || "https://www.instagram.com/rccggracelandparishbadagry/"} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
                                     <i className="fab fa-instagram"></i> Instagram
                                 </a>
                             </div>
@@ -242,21 +246,21 @@ export default function Home({ recentSermons, recentPosts }) {
                                     <div className="contact-icon"><i className="fas fa-map-marker-alt"></i></div>
                                     <div className="contact-details">
                                         <strong>Address</strong>
-                                        <p>Jah Michael Bus Stop<br />Lagos-Badagry Expressway<br />Lagos, Nigeria</p>
+                                        <p style={{ whiteSpace: 'pre-line' }}>{settings.church_address || "Jah Michael Bus Stop\nLagos-Badagry Expressway\nLagos, Nigeria"}</p>
                                     </div>
                                 </div>
                                 <div className="contact-item">
                                     <div className="contact-icon"><i className="fas fa-phone"></i></div>
                                     <div className="contact-details">
                                         <strong>Phone</strong>
-                                        <p>+234 708 713 0095<br />+234 818 418 6051</p>
+                                        <p style={{ whiteSpace: 'pre-line' }}>{settings.contact_phone || "+234 708 713 0095\n+234 818 418 6051"}</p>
                                     </div>
                                 </div>
                                 <div className="contact-item">
                                     <div className="contact-icon"><i className="fas fa-envelope"></i></div>
                                     <div className="contact-details">
                                         <strong>Email</strong>
-                                        <p>graceland@rccgapapa.org</p>
+                                        <p>{settings.contact_email || "graceland@rccgapapa.org"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -309,15 +313,18 @@ export async function getServerSideProps() {
     try {
         const SermonModel = require('../database/models/Sermon');
         const BlogPostModel = require('../database/models/BlogPost');
+        const SettingsModel = require('../database/models/Settings');
         
         // Fetch data directly from DB
         const recentSermons = await SermonModel.getRecent(3);
         const recentPosts = await BlogPostModel.getRecent(3);
+        const settings = await SettingsModel.getAsObject();
 
         return {
             props: {
                 recentSermons: JSON.parse(JSON.stringify(recentSermons)), // Serialize for Next.js
-                recentPosts: JSON.parse(JSON.stringify(recentPosts))
+                recentPosts: JSON.parse(JSON.stringify(recentPosts)),
+                settings: JSON.parse(JSON.stringify(settings || {}))
             }
         };
     } catch (error) {
@@ -325,7 +332,8 @@ export async function getServerSideProps() {
         return {
             props: {
                 recentSermons: [],
-                recentPosts: []
+                recentPosts: [],
+                settings: {}
             }
         };
     }
