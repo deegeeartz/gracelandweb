@@ -14,11 +14,11 @@ const validate = (schema, property = 'body') => {
             req[property] = parsedData;
             next();
         } catch (error) {
-            if (error instanceof ZodError) {
+            if (error && error.errors) {
                 // Format the Zod errors into a readable structure
                 const formattedErrors = error.errors.map(err => ({
-                    field: err.path.join('.'),
-                    message: err.message
+                    field: err.path ? err.path.join('.') : 'unknown',
+                    message: err.message || 'Invalid input'
                 }));
 
                 logger.warn(`Validation error on ${req.method} ${req.url}:`, formattedErrors);

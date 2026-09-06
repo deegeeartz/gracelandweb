@@ -9,6 +9,12 @@ export const config = {
 };
 
 export default function handler(req, res) {
+  // Vercel Serverless Function Patch: Explicitly set req.url for Express router matching
+  if (req.query && req.query.express) {
+    const expressPath = Array.isArray(req.query.express) ? req.query.express.join('/') : req.query.express;
+    req.url = `/api/${expressPath}`;
+  }
+
   // Pass the Next.js req/res objects directly into the Express application instance
   return new Promise((resolve, reject) => {
     // We bind to 'finish' event to resolve the promise so Next.js knows the API route is done
