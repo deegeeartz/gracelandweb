@@ -2,7 +2,6 @@
   "name": "rccg-graceland-website",
   "version": "1.0.0",
   "description": "RCCG Graceland Area HQ Website with Admin Panel",
-  "main": "server.js",
   "scripts": {
     "start": "next start",
     "dev": "next dev",
