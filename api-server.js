@@ -64,21 +64,27 @@ const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
     validate: { trustProxy: false },
-    message: 'Too many requests, please try again later.'
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later.' }
 });
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 20,
     validate: { trustProxy: false },
-    message: 'Too many login attempts, please try again later.'
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many login attempts. Please wait 15 minutes before trying again.' }
 });
 
 const uploadLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
     max: 20,
     validate: { trustProxy: false },
-    message: 'Too many uploads, please try again later.'
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many uploads, please try again later.' }
 });
 
 app.use('/api/', apiLimiter);

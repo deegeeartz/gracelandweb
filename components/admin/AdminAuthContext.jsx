@@ -62,9 +62,16 @@ export function AdminAuthProvider({ children }) {
             body: JSON.stringify({ username, password })
         });
 
-        const data = await response.json();
+        let data = null;
+        try {
+            data = await response.json();
+        } catch {
+            // Fallback if server returned plain text
+        }
+
         if (!response.ok) {
-            throw new Error(data.error || 'Invalid credentials');
+            const errorMessage = (data && (data.error || data.message)) || `Login failed (status ${response.status})`;
+            throw new Error(errorMessage);
         }
 
         AdminAuth.setToken(data.token);
