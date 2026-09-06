@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import SermonCard from '../components/shared/SermonCard';
 import BlogCard from '../components/shared/BlogCard';
+import FloatingGallery from '../components/shared/FloatingGallery';
 
 export default function Home({ recentSermons, recentPosts }) {
     const [isPrayerModalOpen, setIsPrayerModalOpen] = useState(false);
@@ -19,8 +20,8 @@ export default function Home({ recentSermons, recentPosts }) {
                 </div>
             </div>
 
-            {/* Floating Instagram Background */}
-            <div className="floating-gallery-bg"></div>
+            {/* Ambient Background Floating Gallery */}
+            <FloatingGallery />
 
             {/* Hero Section */}
             <section className="hero" id="home">
