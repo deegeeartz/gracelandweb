@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../database/models/User');
 const logger = require('../utils/logger');
+const validate = require('../middleware/validate');
+const { loginSchema, registerSchema, changePasswordSchema } = require('../schemas/auth.schema');
 
 function getJwtSecret(res) {
     const rawSecret = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production-graceland-2024';
@@ -45,16 +47,12 @@ function requireAdmin(req, res, next) {
 }
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', validate(loginSchema), async (req, res) => {
     try {
         const secret = getJwtSecret(res);
         if (!secret) return;
 
         const { username, password } = req.body;
-
-        if (!username || !password) {
-            return res.status(400).json({ error: 'Username and password are required' });
-        }
 
         // Get user from database
         const user = await User.getByCredentials(username);
@@ -85,7 +83,8 @@ router.post('/login', async (req, res) => {
         const { password_hash, ...userWithoutPassword } = user;
 
         res.json({
-            message: 'Login successful',            token,
+            message: 'Login successful',            
+            token,
             user: userWithoutPassword
         });
     } catch (error) {
@@ -95,17 +94,9 @@ router.post('/login', async (req, res) => {
 });
 
 // POST /api/auth/register (for creating new admin users)
-router.post('/register', verifyToken, requireAdmin, async (req, res) => {
+router.post('/register', verifyToken, requireAdmin, validate(registerSchema), async (req, res) => {
     try {
         const { username, email, password } = req.body;
-
-        if (!username || !email || !password) {
-            return res.status(400).json({ error: 'Username, email, and password are required' });
-        }
-
-        if (password.length < 8) {
-            return res.status(400).json({ error: 'Password must be at least 8 characters' });
-        }
 
         // Check if user already exists
         const existingUser = await User.getByCredentials(username);
@@ -126,7 +117,8 @@ router.post('/register', verifyToken, requireAdmin, async (req, res) => {
         });
 
         res.status(201).json({
-            message: 'User created successfully',            userId
+            message: 'User created successfully',            
+            userId
         });
     } catch (error) {
         logger.error('Registration error:', error);
@@ -141,7 +133,8 @@ router.get('/verify', verifyToken, async (req, res) => {
         
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
-        }        res.json({ user });
+        }        
+        res.json({ user });
     } catch (error) {
         logger.error('Token verification error:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -149,13 +142,9 @@ router.get('/verify', verifyToken, async (req, res) => {
 });
 
 // POST /api/auth/change-password
-router.post('/change-password', verifyToken, async (req, res) => {
+router.post('/change-password', verifyToken, validate(changePasswordSchema), async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
-
-        if (!currentPassword || !newPassword) {
-            return res.status(400).json({ error: 'Current password and new password are required' });
-        }
 
         // Get user with password hash
         const user = await User.getByCredentials(req.user.username);
