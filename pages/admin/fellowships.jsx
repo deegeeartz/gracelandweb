@@ -1,69 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminApi } from '../../lib/admin-api';
 
-export default function EventManager() {
-    const router = useRouter();
-    const [events, setEvents] = useState([]);
+export default function FellowshipManager() {
+    const [fellowships, setFellowships] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingEventId, setEditingEventId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        event_date: new Date().toISOString().split('T')[0],
-        location: 'RCCG Graceland Chapel Sanctuary',
-        status: 'published'
+        name: '',
+        leader_name: '',
+        address: '',
+        meeting_time: 'Sundays at 5:00 PM',
+        phone: ''
     });
 
     useEffect(() => {
-        fetchEvents();
+        fetchFellowships();
     }, []);
 
-    useEffect(() => {
-        if (!router.isReady) return;
-        if (router.query.new === '1') {
-            openCreateModal();
-        }
-    }, [router.isReady, router.query]);
-
-    const fetchEvents = async () => {
+    const fetchFellowships = async () => {
         setIsLoading(true);
         try {
-            const data = await adminApi.get('/events');
-            setEvents(Array.isArray(data) ? data : []);
+            const data = await adminApi.get('/fellowships');
+            setFellowships(Array.isArray(data) ? data : []);
         } catch (err) {
-            console.error('Failed to fetch events', err);
+            console.error('Failed to fetch fellowships', err);
         } finally {
             setIsLoading(false);
         }
     };
 
     const openCreateModal = () => {
-        setEditingEventId(null);
         setFormData({
-            title: '',
-            description: '',
-            event_date: new Date().toISOString().split('T')[0],
-            location: 'RCCG Graceland Chapel Sanctuary',
-            status: 'published'
-        });
-        setIsModalOpen(true);
-    };
-
-    const openEditModal = (event) => {
-        setEditingEventId(event.id);
-        const eventDate = event.event_date || event.start_time || '';
-        setFormData({
-            title: event.title || '',
-            description: event.description || '',
-            event_date: eventDate ? eventDate.split('T')[0] : '',
-            location: event.location || 'RCCG Graceland Chapel Sanctuary',
-            status: event.status || 'published'
+            name: '',
+            leader_name: '',
+            address: '',
+            meeting_time: 'Sundays at 5:00 PM',
+            phone: ''
         });
         setIsModalOpen(true);
     };
@@ -73,44 +49,36 @@ export default function EventManager() {
         setIsSaving(true);
 
         try {
-            if (editingEventId) {
-                await adminApi.put(`/events/${editingEventId}`, formData);
-            } else {
-                await adminApi.post('/events', formData);
-            }
-
+            await adminApi.post('/fellowships', formData);
             setIsModalOpen(false);
-            fetchEvents();
+            fetchFellowships();
         } catch (err) {
-            console.error('Error saving event:', err);
-            alert(err.message || 'Failed to save event.');
+            console.error('Error saving fellowship:', err);
+            alert(err.message || 'Failed to save fellowship.');
         } finally {
             setIsSaving(false);
         }
     };
 
-    const deleteEvent = async (id) => {
-        if (!confirm('Are you sure you want to delete this event?')) return;
-        
+    const deleteFellowship = async (id) => {
+        if (!confirm('Are you sure you want to delete this fellowship center?')) return;
         try {
-            await adminApi.del(`/events/${id}`);
-            fetchEvents();
+            await adminApi.del(`/fellowships/${id}`);
+            fetchFellowships();
         } catch (err) {
-            console.error('Error deleting event:', err);
-            alert('Failed to delete event.');
+            console.error('Error deleting fellowship:', err);
+            alert('Failed to delete fellowship.');
         }
     };
 
-    const filteredEvents = events.filter(e => {
-        const query = searchQuery.toLowerCase();
-        return (
-            (e.title && e.title.toLowerCase().includes(query)) ||
-            (e.location && e.location.toLowerCase().includes(query))
-        );
-    });
+    const filtered = fellowships.filter(f =>
+        f.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        f.leader_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        f.address?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
-        <AdminLayout title="Manage Church Events">
+        <AdminLayout title="Manage House Fellowships">
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -124,12 +92,12 @@ export default function EventManager() {
                     onClick={openCreateModal}
                     style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
-                    <i className="fas fa-plus"></i> Schedule New Event
+                    <i className="fas fa-plus"></i> Add Fellowship Center
                 </button>
 
                 <input 
                     type="text"
-                    placeholder="Search events by title or location..."
+                    placeholder="Search by center name, leader, address..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
@@ -137,7 +105,7 @@ export default function EventManager() {
                         borderRadius: '6px',
                         border: '1px solid #cbd5e1',
                         fontSize: '14px',
-                        minWidth: '240px'
+                        minWidth: '260px'
                     }}
                 />
             </div>
@@ -152,70 +120,54 @@ export default function EventManager() {
                 <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                         <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Event Title</th>
-                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Date</th>
-                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Location</th>
-                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Status</th>
+                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Center Name</th>
+                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Leader</th>
+                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Address</th>
+                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Meeting Time</th>
+                            <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px' }}>Phone</th>
                             <th style={{ padding: '14px 16px', fontWeight: '600', color: '#475569', fontSize: '13px', textAlign: 'right' }}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {isLoading ? (
                             <tr>
-                                <td colSpan="5" style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
-                                    <i className="fas fa-spinner fa-spin" style={{ marginRight: '8px' }}></i> Loading events...
+                                <td colSpan="6" style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
+                                    <i className="fas fa-spinner fa-spin" style={{ marginRight: '8px' }}></i> Loading fellowships...
                                 </td>
                             </tr>
-                        ) : filteredEvents.length === 0 ? (
+                        ) : filtered.length === 0 ? (
                             <tr>
-                                <td colSpan="5" style={{ padding: '32px', textAlign: 'center', color: '#94a3b8' }}>
-                                    No scheduled events found.
+                                <td colSpan="6" style={{ padding: '32px', textAlign: 'center', color: '#94a3b8' }}>
+                                    No house fellowship centers found.
                                 </td>
                             </tr>
                         ) : (
-                            filteredEvents.map((event) => (
-                                <tr key={event.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                    <td style={{ padding: '14px 16px', fontWeight: '500', color: '#1e293b' }}>
-                                        {event.title}
+                            filtered.map((f) => (
+                                <tr key={f.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                    <td style={{ padding: '14px 16px', fontWeight: '600', color: '#1e293b' }}>
+                                        {f.name}
                                     </td>
                                     <td style={{ padding: '14px 16px', color: '#64748b', fontSize: '13px' }}>
-                                        {event.event_date || event.start_time ? new Date(event.event_date || event.start_time).toLocaleDateString() : '—'}
+                                        {f.leader_name}
                                     </td>
                                     <td style={{ padding: '14px 16px', color: '#64748b', fontSize: '13px' }}>
-                                        {event.location || 'Graceland Chapel'}
+                                        {f.address || '—'}
                                     </td>
-                                    <td style={{ padding: '14px 16px' }}>
-                                        <span style={{
-                                            display: 'inline-block',
-                                            padding: '3px 8px',
-                                            borderRadius: '6px',
-                                            fontSize: '12px',
-                                            fontWeight: '600',
-                                            backgroundColor: event.status === 'published' ? '#dcfce7' : '#fef3c7',
-                                            color: event.status === 'published' ? '#15803d' : '#b45309'
-                                        }}>
-                                            {event.status || 'published'}
-                                        </span>
+                                    <td style={{ padding: '14px 16px', color: '#64748b', fontSize: '13px' }}>
+                                        {f.meeting_time || 'Sundays 5:00 PM'}
+                                    </td>
+                                    <td style={{ padding: '14px 16px', color: '#64748b', fontSize: '13px' }}>
+                                        {f.phone || f.contact_phone || '—'}
                                     </td>
                                     <td style={{ padding: '14px 16px', textAlign: 'right' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                                            <button 
-                                                onClick={() => openEditModal(event)}
-                                                className="btn btn-sm btn-outline"
-                                                style={{ padding: '4px 8px', fontSize: '12px' }}
-                                                title="Edit event"
-                                            >
-                                                <i className="fas fa-edit"></i>
-                                            </button>
-                                            <button 
-                                                onClick={() => deleteEvent(event.id)}
-                                                className="btn btn-sm btn-danger"
-                                                style={{ padding: '4px 8px', fontSize: '12px', backgroundColor: '#fee2e2', color: '#dc2626', border: 'none' }}
-                                                title="Delete event"
-                                            >
-                                                <i className="fas fa-trash"></i>
-                                            </button>
-                                        </div>
+                                        <button 
+                                            onClick={() => deleteFellowship(f.id)}
+                                            className="btn btn-sm btn-danger"
+                                            style={{ padding: '4px 8px', fontSize: '12px', backgroundColor: '#fee2e2', color: '#dc2626', border: 'none' }}
+                                            title="Delete fellowship"
+                                        >
+                                            <i className="fas fa-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             ))
@@ -224,7 +176,7 @@ export default function EventManager() {
                 </table>
             </div>
 
-            {/* Create / Edit Event Modal */}
+            {/* Create Fellowship Modal */}
             {isModalOpen && (
                 <div style={{
                     position: 'fixed',
@@ -258,7 +210,7 @@ export default function EventManager() {
                             alignItems: 'center'
                         }}>
                             <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#0f172a' }}>
-                                {editingEventId ? 'Edit Event' : 'Schedule New Event'}
+                                Add Fellowship Center
                             </h3>
                             <button 
                                 onClick={() => setIsModalOpen(false)}
@@ -272,14 +224,14 @@ export default function EventManager() {
                             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
-                                        Event Title *
+                                        Center Name *
                                     </label>
                                     <input 
                                         type="text"
                                         required
-                                        value={formData.title}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                                        placeholder="e.g., Annual Holy Ghost Night"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                                        placeholder="e.g., Graceland Center A"
                                         style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
                                     />
                                 </div>
@@ -287,54 +239,54 @@ export default function EventManager() {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                                     <div>
                                         <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
-                                            Date *
+                                            Leader Name *
                                         </label>
                                         <input 
-                                            type="date"
+                                            type="text"
                                             required
-                                            value={formData.event_date}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, event_date: e.target.value }))}
+                                            value={formData.leader_name}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, leader_name: e.target.value }))}
+                                            placeholder="Brother / Sister Name"
                                             style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
                                         />
                                     </div>
 
                                     <div>
                                         <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
-                                            Status
+                                            Phone Number
                                         </label>
-                                        <select 
-                                            value={formData.status}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                                        <input 
+                                            type="tel"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                                            placeholder="+234..."
                                             style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
-                                        >
-                                            <option value="published">Published</option>
-                                            <option value="draft">Draft</option>
-                                        </select>
+                                        />
                                     </div>
                                 </div>
 
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
-                                        Location
+                                        Meeting Address
                                     </label>
                                     <input 
                                         type="text"
-                                        value={formData.location}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                                        placeholder="e.g., Main Sanctuary or Online"
+                                        value={formData.address}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                                        placeholder="Street Address, Area"
                                         style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
                                     />
                                 </div>
 
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
-                                        Description & Details
+                                        Meeting Day & Time
                                     </label>
-                                    <textarea 
-                                        rows={4}
-                                        value={formData.description}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                                        placeholder="Event theme, schedule, guest ministers, etc."
+                                    <input 
+                                        type="text"
+                                        value={formData.meeting_time}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, meeting_time: e.target.value }))}
+                                        placeholder="e.g., Sundays at 5:00 PM"
                                         style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
                                     />
                                 </div>
@@ -362,7 +314,7 @@ export default function EventManager() {
                                     className="btn btn-primary"
                                     style={{ padding: '8px 20px', minWidth: '120px' }}
                                 >
-                                    {isSaving ? 'Saving...' : (editingEventId ? 'Update Event' : 'Save Event')}
+                                    {isSaving ? 'Saving...' : 'Add Center'}
                                 </button>
                             </div>
                         </form>

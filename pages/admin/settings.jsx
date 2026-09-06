@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import { adminApi } from '../../lib/admin-api';
 
 export default function SettingsManager() {
     const [settings, setSettings] = useState({
-        site_name: '',
-        site_description: '',
-        hero_image: '',
+        site_name: 'RCCG Graceland Chapel',
+        site_description: 'A Place of Grace, Transformation, and Divine Elevation.',
+        church_address: '123 Grace Avenue, Graceland',
+        contact_email: 'info@rccggraceland.org',
+        contact_phone: '+234 800 000 0000',
+        service_times: 'Sundays 8:00 AM & 10:00 AM | Wednesdays 6:00 PM',
         facebook_page: '',
         instagram_handle: '',
         twitter_handle: '',
-        contact_email: '',
-        church_address: ''
+        youtube_url: '',
+        hero_image: ''
     });
+
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [statusMessage, setStatusMessage] = useState(null);
 
     useEffect(() => {
         fetchSettings();
@@ -22,25 +28,21 @@ export default function SettingsManager() {
     const fetchSettings = async () => {
         setIsLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/settings', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await res.json();
+            const data = await adminApi.get('/settings');
             if (data && !data.error) {
-                // Merge fetched settings with default structure to prevent uncontrolled inputs
-                setSettings(prev => ({ ...prev, ...data }));
+                setSettings(prev => ({
+                    ...prev,
+                    ...data
+                }));
             }
         } catch (err) {
-            console.error("Failed to fetch settings", err);
+            console.error('Failed to fetch settings', err);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleFormChange = (e) => {
+    const handleChange = (e) => {
         const { id, value } = e.target;
         setSettings(prev => ({ ...prev, [id]: value }));
     };
@@ -48,122 +50,236 @@ export default function SettingsManager() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true);
+        setStatusMessage(null);
+
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/settings', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(settings)
-            });
-            
-            if (res.ok) {
-                alert('Settings saved successfully!');
-            } else {
-                const data = await res.json();
-                alert(`Failed to save settings: ${data.error || 'Unknown error'}`);
-            }
+            await adminApi.put('/settings', settings);
+            setStatusMessage({ type: 'success', text: 'Church settings saved and applied successfully!' });
         } catch (err) {
-            console.error(err);
-            alert('An error occurred while saving.');
+            console.error('Failed to save settings', err);
+            setStatusMessage({ type: 'error', text: err.message || 'Failed to update church settings.' });
         } finally {
             setIsSaving(false);
         }
     };
 
-    if (isLoading) {
-        return (
-            <AdminLayout title="Settings">
-                <div style={{ padding: '20px', textAlign: 'center' }}>Loading settings...</div>
-            </AdminLayout>
-        );
-    }
-
     return (
-        <AdminLayout title="Settings">
-            <div className="settings-container" style={{ maxWidth: '800px', background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                <form onSubmit={handleSubmit}>
-                    <div className="setting-section" style={{ marginBottom: '30px' }}>
-                        <h2 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>General Settings</h2>
-                        
-                        <div className="form-group" style={{ marginBottom: '15px' }}>
-                            <label htmlFor="site_name" style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Site Name</label>
-                            <input 
-                                type="text" 
-                                id="site_name" 
-                                value={settings.site_name || ''} 
-                                onChange={handleFormChange} 
-                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            />
-                        </div>
-                        
-                        <div className="form-group" style={{ marginBottom: '15px' }}>
-                            <label htmlFor="site_description" style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Site Description</label>
-                            <textarea 
-                                id="site_description" 
-                                rows="3"
-                                value={settings.site_description || ''} 
-                                onChange={handleFormChange}
-                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            ></textarea>
-                        </div>
+        <AdminLayout title="Global Church Settings">
+            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                {statusMessage && (
+                    <div style={{
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        marginBottom: '20px',
+                        backgroundColor: statusMessage.type === 'success' ? '#dcfce7' : '#fee2e2',
+                        color: statusMessage.type === 'success' ? '#15803d' : '#dc2626',
+                        border: `1px solid ${statusMessage.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                    }}>
+                        <i className={statusMessage.type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'}></i>
+                        <span>{statusMessage.text}</span>
+                    </div>
+                )}
 
-                        <div className="form-group" style={{ marginBottom: '15px' }}>
-                            <label htmlFor="hero_image" style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Hero Section Background Image (URL)</label>
-                            <input 
-                                type="url" 
-                                id="hero_image" 
-                                value={settings.hero_image || ''} 
-                                onChange={handleFormChange}
-                                placeholder="https://example.com/image.jpg"
-                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            />
-                            {settings.hero_image && (
-                                <div style={{ marginTop: '10px' }}>
-                                    <img src={settings.hero_image} alt="Hero Preview" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '4px' }} />
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    {/* General Information Card */}
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid #e2e8f0'
+                    }}>
+                        <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                            <i className="fas fa-church" style={{ marginRight: '8px', color: '#8B0000' }}></i> General Information
+                        </h3>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div>
+                                <label htmlFor="site_name" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                    Church / Site Name
+                                </label>
+                                <input 
+                                    id="site_name"
+                                    type="text"
+                                    value={settings.site_name || ''}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="site_description" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                    Tagline / Description
+                                </label>
+                                <textarea 
+                                    id="site_description"
+                                    rows={2}
+                                    value={settings.site_description || ''}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="service_times" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                    Service Times
+                                </label>
+                                <input 
+                                    id="service_times"
+                                    type="text"
+                                    value={settings.service_times || ''}
+                                    onChange={handleChange}
+                                    placeholder="Sundays 8:00 AM & 10:00 AM"
+                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Contact Information Card */}
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid #e2e8f0'
+                    }}>
+                        <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                            <i className="fas fa-map-marker-alt" style={{ marginRight: '8px', color: '#8B0000' }}></i> Contact Details & Location
+                        </h3>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                <div>
+                                    <label htmlFor="contact_email" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                        Contact Email
+                                    </label>
+                                    <input 
+                                        id="contact_email"
+                                        type="email"
+                                        value={settings.contact_email || ''}
+                                        onChange={handleChange}
+                                        style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                    />
                                 </div>
+
+                                <div>
+                                    <label htmlFor="contact_phone" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                        Contact Phone
+                                    </label>
+                                    <input 
+                                        id="contact_phone"
+                                        type="tel"
+                                        value={settings.contact_phone || ''}
+                                        onChange={handleChange}
+                                        style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="church_address" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                    Church Address
+                                </label>
+                                <input 
+                                    id="church_address"
+                                    type="text"
+                                    value={settings.church_address || ''}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Social Media Links Card */}
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid #e2e8f0'
+                    }}>
+                        <h3 style={{ margin: '0 0 16px', fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                            <i className="fas fa-share-alt" style={{ marginRight: '8px', color: '#8B0000' }}></i> Social Media Channels
+                        </h3>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div>
+                                <label htmlFor="facebook_page" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                    <i className="fab fa-facebook" style={{ color: '#1877f2', marginRight: '6px' }}></i> Facebook URL
+                                </label>
+                                <input 
+                                    id="facebook_page"
+                                    type="url"
+                                    placeholder="https://facebook.com/..."
+                                    value={settings.facebook_page || ''}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="instagram_handle" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                    <i className="fab fa-instagram" style={{ color: '#e4405f', marginRight: '6px' }}></i> Instagram Handle / URL
+                                </label>
+                                <input 
+                                    id="instagram_handle"
+                                    type="text"
+                                    placeholder="@rccggraceland or URL"
+                                    value={settings.instagram_handle || ''}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="youtube_url" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                    <i className="fab fa-youtube" style={{ color: '#ff0000', marginRight: '6px' }}></i> YouTube Channel URL
+                                </label>
+                                <input 
+                                    id="youtube_url"
+                                    type="url"
+                                    placeholder="https://youtube.com/@..."
+                                    value={settings.youtube_url || ''}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="twitter_handle" style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#334155' }}>
+                                    <i className="fab fa-twitter" style={{ color: '#1da1f2', marginRight: '6px' }}></i> Twitter / X
+                                </label>
+                                <input 
+                                    id="twitter_handle"
+                                    type="text"
+                                    placeholder="@rccggraceland"
+                                    value={settings.twitter_handle || ''}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                        <button 
+                            type="submit" 
+                            disabled={isSaving}
+                            className="btn btn-primary"
+                            style={{ padding: '12px 32px', fontSize: '15px', fontWeight: '600' }}
+                        >
+                            {isSaving ? (
+                                <span><i className="fas fa-spinner fa-spin" style={{ marginRight: '8px' }}></i> Saving Settings...</span>
+                            ) : (
+                                'Save All Settings'
                             )}
-                        </div>
+                        </button>
                     </div>
-
-                    <div className="setting-section" style={{ marginBottom: '30px' }}>
-                        <h2 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>Social Media Links</h2>
-                        
-                        <div className="form-group" style={{ marginBottom: '15px' }}>
-                            <label htmlFor="facebook_page" style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Facebook Page URL</label>
-                            <input 
-                                type="url" 
-                                id="facebook_page" 
-                                value={settings.facebook_page || ''} 
-                                onChange={handleFormChange}
-                                placeholder="https://facebook.com/your-page"
-                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            />
-                        </div>
-                        
-                        <div className="form-group" style={{ marginBottom: '15px' }}>
-                            <label htmlFor="instagram_handle" style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Instagram Handle</label>
-                            <input 
-                                type="text" 
-                                id="instagram_handle" 
-                                value={settings.instagram_handle || ''} 
-                                onChange={handleFormChange}
-                                placeholder="@your_handle"
-                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            />
-                        </div>
-                    </div>
-
-                    <button 
-                        type="submit" 
-                        className="btn btn-primary" 
-                        disabled={isSaving}
-                        style={{ padding: '12px 24px', fontSize: '1.1em', width: '100%' }}
-                    >
-                        {isSaving ? 'Saving...' : 'Save Settings'}
-                    </button>
                 </form>
             </div>
         </AdminLayout>

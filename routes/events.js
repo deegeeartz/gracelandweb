@@ -104,6 +104,34 @@ router.post('/', verifyToken, async (req, res) => {
     }
 });
 
+// Admin: Update an event
+router.put('/:id', verifyToken, async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const { title, description, event_date, location, status = 'published' } = req.body;
+
+        if (!title || !event_date) {
+            return res.status(400).json({ error: 'Title and event date are required' });
+        }
+
+        const sanitizedTitle = Sanitizer.sanitizeText(title);
+        const sanitizedDesc = description ? Sanitizer.sanitizeText(description) : null;
+        const sanitizedLocation = location ? Sanitizer.sanitizeText(location) : null;
+        const startTime = event_date;
+        const endTime = event_date;
+
+        await db.run(
+            `UPDATE events SET title = ?, description = ?, start_time = ?, end_time = ?, location = ?, status = ? WHERE id = ?`,
+            [sanitizedTitle, sanitizedDesc, startTime, endTime, sanitizedLocation, status, eventId]
+        );
+
+        res.json({ success: true, message: 'Event updated successfully' });
+    } catch (error) {
+        logger.error('Error updating event:', error);
+        res.status(500).json({ error: 'Failed to update event' });
+    }
+});
+
 // Admin: Delete an event
 router.delete('/:id', verifyToken, async (req, res) => {
     try {
