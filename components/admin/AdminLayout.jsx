@@ -212,8 +212,20 @@ function AdminLayoutInner({ children, title = 'Admin Dashboard' }) {
                             )}
                         </div>
 
-                        {/* Logout Button */}
+                        {/* Header Actions */}
                         <div className="header-actions">
+                            <a 
+                                href="/" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="action-btn"
+                                title="Open website in new tab to preview"
+                                style={{ textDecoration: 'none' }}
+                            >
+                                <i className="fas fa-external-link-alt"></i>
+                                <span>Preview Site</span>
+                            </a>
+
                             <button 
                                 className="action-btn" 
                                 id="logoutBtn"

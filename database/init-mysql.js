@@ -317,7 +317,10 @@ async function insertSampleData() {
         const settings = [
             ['site_name', 'RCCG Graceland Area HQ', 'string', 'Website name'],
             ['site_description', 'Experiencing An Overflow Of His Grace', 'string', 'Website description'],
-            ['hero_image', '', 'string', 'Homepage Hero Image URL'],
+            ['hero_title', '', 'string', 'Hero Heading Title (defaults to site_name if blank)'],
+            ['hero_description', '', 'string', 'Hero Subtitle Description (defaults to site_description if blank)'],
+            ['hero_image', '', 'string', 'Homepage Hero Desktop Image URL'],
+            ['hero_image_mobile', '', 'string', 'Homepage Hero Mobile Image URL (defaults to desktop if blank)'],
             ['facebook_page', '', 'string', 'Facebook page URL'],
             ['instagram_handle', '', 'string', 'Instagram handle'],
             ['twitter_handle', '', 'string', 'Twitter handle'],

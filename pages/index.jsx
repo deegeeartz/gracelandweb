@@ -8,8 +8,40 @@ export default function Home({ recentSermons, recentPosts, settings = {} }) {
     const [isPrayerModalOpen, setIsPrayerModalOpen] = useState(false);
     const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
 
+    // Hero content & preview link metadata
+    const heroTitle = settings.hero_title || settings.site_name || "Welcome to Graceland Area HQ";
+    const heroDescription = settings.hero_description || settings.site_description || "Experiencing An Overflow Of His Grace";
+    const heroDesktopImage = settings.hero_image || '';
+    const heroMobileImage = settings.hero_image_mobile || '';
+    // Use desktop image for preview card, falling back to mobile image or default logo
+    const previewImage = heroDesktopImage || heroMobileImage || "/logo.png";
+    const siteUrl = settings.site_url || "https://rccggraceland.com";
+
+    // Dynamic style with CSS variables for responsive desktop/mobile backgrounds
+    const heroStyle = {
+        ...(heroDesktopImage ? { '--hero-bg-desktop': `url("${heroDesktopImage}")` } : {}),
+        ...((heroMobileImage || heroDesktopImage) ? { '--hero-bg-mobile': `url("${heroMobileImage || heroDesktopImage}")` } : {})
+    };
+
     return (
-        <MainLayout>
+        <MainLayout
+            title={heroTitle}
+            description={heroDescription}
+            image={previewImage}
+            url={siteUrl}
+        >
+            {/* Inline responsive style for hero background with automatic mobile fallback */}
+            <style jsx>{`
+                .hero {
+                    ${heroDesktopImage ? `background-image: url("${heroDesktopImage}");` : ''}
+                }
+                @media (max-width: 768px) {
+                    .hero {
+                        ${(heroMobileImage || heroDesktopImage) ? `background-image: url("${heroMobileImage || heroDesktopImage}");` : ''}
+                    }
+                }
+            `}</style>
+
             {/* Announcement Banner */}
             <div id="announcement-banner" className="announcement-banner" style={{ display: 'none' }}>
                 <div className="container banner-content">
@@ -27,15 +59,15 @@ export default function Home({ recentSermons, recentPosts, settings = {} }) {
             <section 
                 className="hero" 
                 id="home"
-                style={settings.hero_image ? { backgroundImage: `url(${settings.hero_image})` } : {}}
+                style={heroStyle}
             >
                 <div className="hero-overlay"></div>
                 <div className="hero-content">
                     <div className="hero-logo">
                         <img src="/logo.png" alt="RCCG Graceland Area HQ Logo" className="hero-logo-image" />
                     </div>
-                    <h2>{settings.site_name || "Welcome to Graceland Area HQ"}</h2>
-                    <p>{settings.site_description || "Experiencing An Overflow Of His Grace"}</p>
+                    <h2>{heroTitle}</h2>
+                    <p>{heroDescription}</p>
                     <div className="cta-buttons">
                         <a href="#services" className="btn btn-primary">Join Us for Service</a>
                         <a href="#about" className="btn btn-secondary">Learn More</a>

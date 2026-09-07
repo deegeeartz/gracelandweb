@@ -16,7 +16,10 @@ router.get('/', async (req, res) => {
             const publicKeys = [
                 'site_name',
                 'site_description',
+                'hero_title',
+                'hero_description',
                 'hero_image',
+                'hero_image_mobile',
                 'about_image',
                 'facebook_page',
                 'instagram_handle',  

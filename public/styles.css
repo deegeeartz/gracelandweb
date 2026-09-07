@@ -291,7 +291,7 @@ body {
 
 /* Hero Section */
 .hero {
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23333" width="1200" height="600"/><path fill="%23444" d="M0 300L50 280L100 320L150 290L200 310L250 285L300 305L350 295L400 315L450 288L500 308L550 292L600 312L650 287L700 307L750 293L800 313L850 289L900 309L950 294L1000 314L1050 291L1100 311L1150 296L1200 316V600H0Z"/></svg>');
+    background-image: var(--hero-bg-desktop, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23333" width="1200" height="600"/><path fill="%23444" d="M0 300L50 280L100 320L150 290L200 310L250 285L300 305L350 295L400 315L450 288L500 308L550 292L600 312L650 287L700 307L750 293L800 313L850 289L900 309L950 294L1000 314L1050 291L1100 311L1150 296L1200 316V600H0Z"/></svg>'));
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -1562,6 +1562,7 @@ body {
     .hero {
         margin-top: 60px;
         background-attachment: scroll;
+        background-image: var(--hero-bg-mobile, var(--hero-bg-desktop));
     }
 
     .hero-content {
